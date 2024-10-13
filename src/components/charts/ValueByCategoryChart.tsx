@@ -3,6 +3,7 @@ import { hexToRgb } from "../../utils";
 
 export interface CategoryValueItem {
   color?: string; // HEX-колір для кожного елемента
+  count?: number;
   value: number;
   label: string;
 }
@@ -51,7 +52,12 @@ export const ValueByCategoryChart: React.FC<ValueByCategoryChartProps> = ({
                 />
               </div>
               <div className="mx-2 flex items-center justify-between text-gray-800 text-sm font-medium">
-                <span className="">{item.label}</span>
+                <span className="">
+                  {item.label}
+                  {item.count && (
+                    <span className="text-gray-500"> ({item.count})</span>
+                  )}
+                </span>
 
                 <span className="text-gray-500">
                   {labelSuffix}

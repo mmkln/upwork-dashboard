@@ -61,8 +61,8 @@ const AverageRateByExperience: React.FC<AverageRateByExperienceProps> = ({
   const sortedData = data.sort((a, b) => b.value - a.value);
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-md w-full max-w-sm">
-      <h2 className="text-lg font-semibold mb-8">Average Rate By Experience</h2>
+    <div className="bg-white p-8 rounded-3xl shadow w-full max-w-sm">
+      <h2 className="text-lg font-semibold mb-8">Rate by Experience (avg.)</h2>
       <ValueByCategoryChart
         data={sortedData}
         maxValue={maxRate}

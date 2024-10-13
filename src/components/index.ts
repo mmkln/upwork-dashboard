@@ -1,3 +1,5 @@
+import JobCalendar from "./JobCalendar";
+
 export { default as JobsChart } from "./JobsChart";
 export { default as CountryJobsChart } from "./CountryJobsChart";
 export { default as ExperiencePieChart } from "./ExperiencePieChart";
@@ -24,3 +26,10 @@ export { default as AverageRateByCountry } from "./AverageRateByCountry";
 export { default as AverageRateByExperience } from "./AverageRateByExperience";
 export { default as JobsByExperienceLevel } from "./JobsByExperienceLevel";
 export { default as TopSkills } from "./TopSkills";
+export { default as SkillBadges } from "./SkillBadges";
+export { default as AvgMinMaxJobRatesByCountry } from "./AvgMinMaxJobRatesByCountry";
+export { default as JobRatesByCountryMinMax } from "./JobRatesByCountryMinMax";
+export { default as JobRatesByCountryAvg } from "./JobRatesByCountryAvg";
+export { default as JobRatesByCountryAvg2 } from "./JobRatesByCountryAvg2";
+export { default as JobRatesByCountryMed } from "./JobRatesByCountryMed";
+export { default as JobCalendar } from "./JobCalendar";

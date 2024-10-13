@@ -71,7 +71,7 @@ const JobStats: React.FC<JobStatsProps> = ({ jobs }) => {
   );
 
   return (
-    <div className="bg-white p-10 rounded-3xl shadow-md w-full">
+    <div className="bg-white p-10 rounded-3xl shadow w-full">
       <div className="">
         <h3 className="text-xl font-medium mb-4">Job Statuses</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">

@@ -30,7 +30,7 @@ const JobsByExperienceLevel: React.FC<JobsByExperienceLevelProps> = ({
   ];
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-md w-full max-w-sm">
+    <div className="bg-white p-8 rounded-3xl shadow w-full max-w-sm">
       <h2 className="text-lg font-semibold mb-6">Jobs by Experience Level</h2>
 
       <div className="flex items-center justify-center mb-4">

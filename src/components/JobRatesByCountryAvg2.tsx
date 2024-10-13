@@ -1,30 +1,40 @@
 import React from "react";
 import { UpworkJob } from "../models";
-import { ValueByCategoryChart, CategoryValueItem } from "./charts";
+import { CategoryValueItem, ValueByCategoryChart } from "./charts";
 
-interface AverageRateByCountryProps {
+interface MinMaxRateByCountryProps {
   jobs: UpworkJob[];
   limit?: number;
 }
 
 const roundToSignificant = (num: number): number => {
-  if (num < 10) return 10; // Значення менше 10 округлюємо до 10
+  if (num < 10) return 10;
   const power = Math.pow(10, Math.floor(Math.log10(num)));
-  return Math.ceil(num / power) * power; // Округлення до найближчого значного числа
+  return Math.ceil(num / power) * power;
 };
 
-const AverageRateByCountry: React.FC<AverageRateByCountryProps> = ({
+const JobRatesByCountryAvg2: React.FC<MinMaxRateByCountryProps> = ({
   jobs,
   limit,
 }) => {
   const countryData = jobs.reduce(
-    (acc: { [key: string]: { totalRate: number; count: number } }, job) => {
-      if (job.country && job.average_rate !== null) {
+    (
+      acc: {
+        [key: string]: { medRate: number; count: number };
+      },
+      job,
+    ) => {
+      if (job.country && job.hourly_rates?.length) {
         if (!acc[job.country]) {
-          acc[job.country] = { totalRate: Number(job.average_rate), count: 1 };
+          acc[job.country] = {
+            medRate:
+              (Number(job.hourly_rates[0]) + Number(job.hourly_rates[1])) / 2,
+            count: 1,
+          };
         } else {
-          acc[job.country].totalRate += Number(job.average_rate);
-          acc[job.country].count += 1;
+          acc[job.country].medRate +=
+            (Number(job.hourly_rates[0]) + Number(job.hourly_rates[1])) / 2;
+          acc[job.country].count++;
         }
       }
       return acc;
@@ -32,13 +42,10 @@ const AverageRateByCountry: React.FC<AverageRateByCountryProps> = ({
     {},
   );
 
-  console.log({ countryData });
-
-  // Перетворюємо об'єкт у масив для використання в BarChart
   const data: CategoryValueItem[] = Object.keys(countryData).map((country) => ({
     label: country,
     value: Number(
-      (countryData[country].totalRate / countryData[country].count).toFixed(2),
+      (countryData[country].medRate / countryData[country].count).toFixed(2),
     ),
     count: countryData[country].count,
   }));
@@ -53,7 +60,7 @@ const AverageRateByCountry: React.FC<AverageRateByCountryProps> = ({
   return (
     <div className="bg-white p-8 rounded-3xl shadow w-full">
       <h2 className="text-lg font-semibold mb-8">
-        Client Rate by Country (avg.)
+        Job Rate by Country (avg.2)
       </h2>
       <ValueByCategoryChart
         data={limitedData}
@@ -65,4 +72,4 @@ const AverageRateByCountry: React.FC<AverageRateByCountryProps> = ({
   );
 };
 
-export default AverageRateByCountry;
+export default JobRatesByCountryAvg2;

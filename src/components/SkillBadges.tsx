@@ -13,7 +13,7 @@ const roundToSignificant = (num: number): number => {
   return Math.ceil(num / power) * power; // Округлення до найближчого значного числа
 };
 
-const TopSkills: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
+const SkillBadges: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
   const skillsData = jobs.reduce((acc: { [key: string]: number }, job) => {
     if (job.skills) {
       job.skills.forEach((skill: string) => {
@@ -41,15 +41,32 @@ const TopSkills: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
   const limitedData = limit ? sortedData.slice(0, limit) : data;
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-md w-full">
-      <h2 className="text-lg font-semibold mb-8">Top {limit} Skills</h2>
-      <ValueByCategoryChart
-        data={limitedData}
-        maxValue={maxRate}
-        minValue={0}
-      />
+    <div className="bg-white p-8 rounded-3xl shadow w-full">
+      <h2 className="text-lg font-semibold mb-8">
+        Top {limitedData.length} Skills
+      </h2>
+      <div className="flex flex-wrap gap-2 ">
+        {limitedData.map(({ label, value }) => {
+          const rateDiff = value / maxRate;
+          const color = "";
+          return (
+            <div
+              className="relative px-2 py-1 rounded-xl text-xs font-medium group/skill"
+              style={{
+                backgroundColor: `rgba(59, 130, 246, ${rateDiff})`,
+                color: `${rateDiff > 0.5 ? "rgba(255,255,255, 0.95)" : "rgba(45,59,101,0.8)"}`,
+              }}
+            >
+              {label.length > 12 ? label.slice(0, 8) + ".." : label}
+              <div className="hidden group-hover/skill:flex absolute bottom-7 bg-white border border-gray-200 rounded-xl px-2 py-1 text-gray-800">
+                ({value}) {label}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
 
-export default TopSkills;
+export default SkillBadges;

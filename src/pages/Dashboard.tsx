@@ -27,8 +27,15 @@ import {
   SkillsTreeMapChart,
   JobsByExperienceLevel,
   TopSkills,
+  AvgMinMaxJobRatesByCountry,
+  JobRatesByCountryMinMax,
+  JobRatesByCountryAvg,
+  JobRatesByCountryAvg2,
+  JobRatesByCountryMed,
+  JobCalendar,
 } from "../components";
 import Tile from "../components/Tile";
+import SkillBadges from "../components/SkillBadges";
 
 const Dashboard: React.FC = () => {
   const [jobsData, setJobsData] = useState<UpworkJob[]>([]);
@@ -69,22 +76,49 @@ const Dashboard: React.FC = () => {
     return <p>Loading...</p>;
   }
 
+  const today = new Date();
+
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="mx-auto p-6">
+      <div className="mx-auto p-6 flex flex-col gap-4">
         <div className="flex gap-4">
-          {/*<div className=" max-w-3xl">*/}
-          {/*  <JobStats jobs={jobsData} />*/}
-          {/*</div>*/}
+          <div className=" max-w-3xl">
+            <JobStats jobs={jobsData} />
+          </div>
+          <div className="">
+            <JobCalendar jobs={jobsData} month={today} />
+          </div>
+        </div>
+        <div className="flex gap-4">
           <div className="max-w-md min-w-80">
             <AverageRateByCountry jobs={jobsData} limit={7} />
-          </div>
-          <div className="max-w-md min-w-80">
-            <TopSkills jobs={jobsData} limit={7} />
           </div>
           <div className="flex flex-col gap-4 max-w-xs">
             <AverageRateByExperience jobs={jobsData} />
             <JobsByExperienceLevel jobs={jobsData} />
+          </div>
+          {/*<div className="max-w-md min-w-80">*/}
+          {/*  <TopSkills jobs={jobsData} limit={7} />*/}
+          {/*</div>*/}
+          <div className="max-w-96 min-w-80">
+            <SkillBadges jobs={jobsData} limit={35} />
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <div className="max-w-md min-w-80">
+            <AvgMinMaxJobRatesByCountry jobs={jobsData} />
+          </div>
+          <div className="max-w-md min-w-80">
+            <JobRatesByCountryMinMax jobs={jobsData} />
+          </div>
+          {/*<div className="max-w-md min-w-80">*/}
+          {/*  <JobRatesByCountryAvg jobs={jobsData} />*/}
+          {/*</div>*/}
+          <div className="max-w-md min-w-80">
+            <JobRatesByCountryAvg2 jobs={jobsData} />
+          </div>
+          <div className="max-w-md min-w-80">
+            <JobRatesByCountryMed jobs={jobsData} />
           </div>
         </div>
 
@@ -99,7 +133,7 @@ const Dashboard: React.FC = () => {
         <TopSkillsChart jobs={jobsData} />
         <ExperiencePieChart jobs={jobsData} />
         <CountryJobsChart jobs={jobsData} />
-        <AverageRateByCountryChart jobs={jobsData} />
+        {/*<AverageRateByCountryChart jobs={jobsData} />*/}
         <JobsByBinnedRangeChart jobs={jobsData} rangeStep={15} />
         <JobsByRateDistributionChart jobs={jobsData} valueStep={1} />
         <JobsByAverageRateChart jobs={jobsData} />
