@@ -16,14 +16,27 @@ interface JobCalendarProps {
 }
 
 // Функція для генерації інтенсивності кольору на основі кількості задач
-const getColorIntensity = (jobCount: number): string => {
+const getColorIntensity = (
+  jobCount: number,
+  isToday: boolean = false,
+): string => {
+  if (isToday) {
+    if (jobCount === 0) return "text-orange-200 bg-orange-50 border-orange-50"; // Немає задач
+    if (jobCount <= 5) return "text-orange-300 bg-orange-100 border-orange-100"; // 1-5 задач
+    if (jobCount <= 12)
+      return "text-orange-400 bg-orange-200 border-orange-200"; // 5-12 задач
+    if (jobCount <= 20)
+      return "text-orange-500 bg-orange-300 border-orange-300"; // 12-20 задач
+    if (jobCount <= 30)
+      return "text-orange-600 bg-orange-400 border-orange-400"; // 20-30 задач
+    return "text-orange-700 bg-orange-500 border-orange-500"; // Більше 30 задач
+  }
   if (jobCount === 0) return "text-gray-200 bg-gray-50 border-gray-50"; // Немає задач
-  // if (jobCount <= 4) return "text-blue-200 bg-blue-50 border-blue-200"; // Менше 3 задач
-  if (jobCount <= 5) return "text-blue-300 bg-blue-100 border-blue-100"; // 3-5 задач
-  if (jobCount <= 12) return "text-blue-400 bg-blue-200 border-blue-200"; // 5-8 задач
-  if (jobCount <= 20) return "text-blue-500 bg-blue-300 border-blue-300"; // 8-12 задач
-  if (jobCount <= 30) return "text-blue-600 bg-blue-400 border-blue-400"; // 12-18 задач
-  return "text-blue-700 bg-blue-500 border-blue-500"; // Більше 8 задач
+  if (jobCount <= 5) return "text-blue-300 bg-blue-100 border-blue-100"; // 1-5 задач
+  if (jobCount <= 12) return "text-blue-400 bg-blue-200 border-blue-200"; // 5-12 задач
+  if (jobCount <= 20) return "text-blue-500 bg-blue-300 border-blue-300"; // 12-20 задач
+  if (jobCount <= 30) return "text-blue-600 bg-blue-400 border-blue-400"; // 20-30 задач
+  return "text-blue-700 bg-blue-500 border-blue-500"; // Більше 30 задач
 };
 
 const JobCalendar: React.FC<JobCalendarProps> = ({ jobs, month }) => {
@@ -75,17 +88,19 @@ const JobCalendar: React.FC<JobCalendarProps> = ({ jobs, month }) => {
         {daysInMonth.map((day) => {
           const formattedDay = format(day, "yyyy-MM-dd");
           const jobCount = jobCountPerDay[formattedDay] || 0;
-          const colorClass = getColorIntensity(jobCount);
-
           const isDayToday = isToday(day);
+
+          const colorClass = getColorIntensity(jobCount, isDayToday);
 
           return (
             <div className="flex justify-center">
               <div
                 key={formattedDay}
-                className={`w-7 h-7 flex items-center justify-center rounded-xl border-2 ${colorClass} ${isDayToday ? "shadow shadow-blue-600 " : ""}`}
+                className={`w-7 h-7 flex items-center justify-center rounded-lg border-2 hover:outline outline-2 outline-inherit cursor-pointer ${colorClass}`}
               >
-                <span className="text-sm font-medium">{format(day, "d")}</span>
+                <span className="text-base font-medium">
+                  {format(day, "d")}
+                </span>
               </div>
             </div>
           );

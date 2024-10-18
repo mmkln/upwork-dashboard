@@ -33,6 +33,8 @@ import {
   JobRatesByCountryAvg2,
   JobRatesByCountryMed,
   JobCalendar,
+  JobsByCountry,
+  KeywordFrequency,
 } from "../components";
 import Tile from "../components/Tile";
 import SkillBadges from "../components/SkillBadges";
@@ -91,7 +93,10 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="flex gap-4">
           <div className="max-w-md min-w-80">
-            <AverageRateByCountry jobs={jobsData} limit={7} />
+            <AverageRateByCountry jobs={jobsData} />
+          </div>
+          <div className="max-w-md min-w-80">
+            <JobsByCountry jobs={jobsData} />
           </div>
           <div className="flex flex-col gap-4 max-w-xs">
             <AverageRateByExperience jobs={jobsData} />
@@ -101,7 +106,12 @@ const Dashboard: React.FC = () => {
           {/*  <TopSkills jobs={jobsData} limit={7} />*/}
           {/*</div>*/}
           <div className="max-w-96 min-w-80">
-            <SkillBadges jobs={jobsData} limit={35} />
+            <SkillBadges jobs={jobsData} limit={33} />
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <div className="max-w-96 min-w-80">
+            <KeywordFrequency jobs={jobsData} limit={50} />
           </div>
         </div>
         <div className="flex gap-4">
@@ -130,15 +140,15 @@ const Dashboard: React.FC = () => {
         {/*  ))}*/}
         {/*</div>*/}
 
-        <TopSkillsChart jobs={jobsData} />
-        <ExperiencePieChart jobs={jobsData} />
-        <CountryJobsChart jobs={jobsData} />
+        {/*<TopSkillsChart jobs={jobsData} />*/}
+        {/*<ExperiencePieChart jobs={jobsData} />*/}
+        {/*<CountryJobsChart jobs={jobsData} />*/}
         {/*<AverageRateByCountryChart jobs={jobsData} />*/}
         <JobsByBinnedRangeChart jobs={jobsData} rangeStep={15} />
         <JobsByRateDistributionChart jobs={jobsData} valueStep={1} />
         <JobsByAverageRateChart jobs={jobsData} />
         <JobsByFixedPriceChart jobs={jobsData} />
-        <HourlyRateChart jobs={jobsData} />
+        {/*<HourlyRateChart jobs={jobsData} />*/}
         <ClientRatingVsAverageRateChart jobs={jobsData} />
         <ClientSpendingByIndustryChart jobs={jobsData} />
         <JobsOverTimeChart jobs={jobsData} />

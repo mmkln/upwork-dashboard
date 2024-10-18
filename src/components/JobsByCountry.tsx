@@ -2,7 +2,7 @@ import React from "react";
 import { UpworkJob } from "../models";
 import { ValueByCategoryChart, CategoryValueItem } from "./charts";
 
-interface AverageRateByCountryProps {
+interface JobsByCountryProps {
   jobs: UpworkJob[];
   limit?: number;
 }
@@ -13,17 +13,13 @@ const roundToSignificant = (num: number): number => {
   return Math.ceil(num / power) * power; // Округлення до найближчого значного числа
 };
 
-const AverageRateByCountry: React.FC<AverageRateByCountryProps> = ({
-  jobs,
-  limit,
-}) => {
+const JobsByCountry: React.FC<JobsByCountryProps> = ({ jobs, limit }) => {
   const countryData = jobs.reduce(
-    (acc: { [key: string]: { totalRate: number; count: number } }, job) => {
-      if (job.country && job.average_rate !== null) {
+    (acc: { [key: string]: { count: number } }, job) => {
+      if (job.country) {
         if (!acc[job.country]) {
-          acc[job.country] = { totalRate: Number(job.average_rate), count: 1 };
+          acc[job.country] = { count: 1 };
         } else {
-          acc[job.country].totalRate += Number(job.average_rate);
           acc[job.country].count += 1;
         }
       }
@@ -37,10 +33,7 @@ const AverageRateByCountry: React.FC<AverageRateByCountryProps> = ({
   // Перетворюємо об'єкт у масив для використання в BarChart
   const data: CategoryValueItem[] = Object.keys(countryData).map((country) => ({
     label: country,
-    value: Number(
-      (countryData[country].totalRate / countryData[country].count).toFixed(2),
-    ),
-    count: countryData[country].count,
+    value: countryData[country].count,
   }));
 
   const maxRate = roundToSignificant(
@@ -52,19 +45,17 @@ const AverageRateByCountry: React.FC<AverageRateByCountryProps> = ({
 
   return (
     <div className="bg-white p-8 rounded-3xl shadow w-full">
-      <h2 className="text-lg font-semibold mb-8">
-        Client Rate by Country (avg.)
-      </h2>
+      <h2 className="text-lg font-semibold mb-8">Jobs by Country</h2>
+
       <div className="overflow-scroll h-[21.5rem]">
         <ValueByCategoryChart
           data={limitedData}
           maxValue={maxRate}
           minValue={0}
-          labelSuffix="$"
         />
       </div>
     </div>
   );
 };
 
-export default AverageRateByCountry;
+export default JobsByCountry;

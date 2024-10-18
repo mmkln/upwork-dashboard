@@ -1,4 +1,5 @@
 import JobCalendar from "./JobCalendar";
+import JobsByCountry from "./JobsByCountry";
 
 export { default as JobsChart } from "./JobsChart";
 export { default as CountryJobsChart } from "./CountryJobsChart";
@@ -33,3 +34,5 @@ export { default as JobRatesByCountryAvg } from "./JobRatesByCountryAvg";
 export { default as JobRatesByCountryAvg2 } from "./JobRatesByCountryAvg2";
 export { default as JobRatesByCountryMed } from "./JobRatesByCountryMed";
 export { default as JobCalendar } from "./JobCalendar";
+export { default as JobsByCountry } from "./JobsByCountry";
+export { default as KeywordFrequency } from "./KeywordFrequency";

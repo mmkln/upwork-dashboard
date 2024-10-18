@@ -45,6 +45,7 @@ const SkillBadges: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
       <h2 className="text-lg font-semibold mb-8">
         Top {limitedData.length} Skills
       </h2>
+      {/*<div className="overflow-auto over h-[21.5rem]">*/}
       <div className="flex flex-wrap gap-2 ">
         {limitedData.map(({ label, value }) => {
           const rateDiff = value / maxRate;
@@ -57,7 +58,7 @@ const SkillBadges: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
                 color: `${rateDiff > 0.5 ? "rgba(255,255,255, 0.95)" : "rgba(45,59,101,0.8)"}`,
               }}
             >
-              {label.length > 12 ? label.slice(0, 8) + ".." : label}
+              {label.length > 12 ? label.slice(0, 8).trim() + ".." : label}
               <div className="hidden group-hover/skill:flex absolute bottom-7 bg-white border border-gray-200 rounded-xl px-2 py-1 text-gray-800">
                 ({value}) {label}
               </div>
@@ -65,6 +66,7 @@ const SkillBadges: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
           );
         })}
       </div>
+      {/*</div>*/}
     </div>
   );
 };

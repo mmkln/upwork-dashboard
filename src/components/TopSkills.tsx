@@ -43,11 +43,13 @@ const TopSkills: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
   return (
     <div className="bg-white p-8 rounded-3xl shadow-md w-full">
       <h2 className="text-lg font-semibold mb-8">Top {limit} Skills</h2>
-      <ValueByCategoryChart
-        data={limitedData}
-        maxValue={maxRate}
-        minValue={0}
-      />
+      <div className="overflow-scroll h-[21.5rem]">
+        <ValueByCategoryChart
+          data={limitedData}
+          maxValue={maxRate}
+          minValue={0}
+        />
+      </div>
     </div>
   );
 };
