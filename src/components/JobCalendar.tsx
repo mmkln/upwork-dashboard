@@ -96,11 +96,14 @@ const JobCalendar: React.FC<JobCalendarProps> = ({ jobs, month }) => {
             <div className="flex justify-center">
               <div
                 key={formattedDay}
-                className={`w-7 h-7 flex items-center justify-center rounded-lg border-2 hover:outline outline-2 outline-inherit cursor-pointer ${colorClass}`}
+                className={`relative group/day w-7 h-7 flex items-center justify-center rounded-lg border-2 hover:outline outline-2 outline-inherit cursor-pointer ${colorClass}`}
               >
                 <span className="text-base font-medium">
                   {format(day, "d")}
                 </span>
+                <div className="hidden group-hover/day:flex w-max absolute bottom-8 bg-white border border-gray-200 rounded-xl px-2 py-1 text-gray-800">
+                  {jobCount} {jobCount > 1 ? "Jobs" : "Job"}
+                </div>
               </div>
             </div>
           );
