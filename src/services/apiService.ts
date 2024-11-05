@@ -1,9 +1,10 @@
 import axios from "axios";
 import { UpworkJob } from "../models";
+import { environment } from "../environments";
 
 // Створюємо інстанс axios із базовим URL
 const apiClient = axios.create({
-  baseURL: "http://localhost:8080/api", // Заміни на свій базовий URL
+  baseURL: environment.apiUrl, // Заміни на свій базовий URL
   headers: {
     "Content-Type": "application/json",
   },
