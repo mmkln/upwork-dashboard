@@ -51,6 +51,7 @@ const AverageRateByExperience: React.FC<AverageRateByExperienceProps> = ({
           experienceData[experience].count
         ).toFixed(2),
       ),
+      count: experienceData[experience].count,
     }),
   );
 
