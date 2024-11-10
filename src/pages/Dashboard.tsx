@@ -35,9 +35,9 @@ import {
   JobCalendar,
   JobsByCountry,
   KeywordFrequency,
+  SkillBadges,
+  Tile,
 } from "../components";
-import Tile from "../components/Tile";
-import SkillBadges from "../components/SkillBadges";
 
 const Dashboard: React.FC = () => {
   const [jobsData, setJobsData] = useState<UpworkJob[]>([]);
