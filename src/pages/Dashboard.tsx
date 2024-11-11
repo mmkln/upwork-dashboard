@@ -37,6 +37,7 @@ import {
   KeywordFrequency,
   SkillBadges,
   Tile,
+  PaymentTypeChart,
 } from "../components";
 
 const Dashboard: React.FC = () => {
@@ -112,6 +113,9 @@ const Dashboard: React.FC = () => {
         <div className="flex gap-4">
           <div className="max-w-96 min-w-80">
             <KeywordFrequency jobs={jobsData} limit={50} />
+          </div>
+          <div>
+            <PaymentTypeChart jobs={jobsData} />
           </div>
         </div>
         <div className="flex gap-4">
