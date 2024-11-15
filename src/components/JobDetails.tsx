@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import Modal from "react-modal";
-
 import { UpworkJob } from "../models";
 
 interface JobDetailsProps {
@@ -17,9 +16,38 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose }) => {
       contentLabel="Job Details"
       className="modal-content"
       overlayClassName="modal-overlay"
+      style={{
+        content: {
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          right: "auto",
+          bottom: "auto",
+          transform: "translate(-50%, -50%)",
+          zIndex: 1000,
+          backgroundColor: "#ffffff",
+          padding: "20px",
+          borderRadius: "8px",
+          maxWidth: "90%",
+          maxHeight: "90%",
+          overflowY: "auto",
+        },
+        overlay: {
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          zIndex: 999,
+        },
+      }}
     >
-      <div className="p-6">
-        <button onClick={onClose} className="float-right text-gray-500">
+      <div>
+        <button
+          onClick={onClose}
+          className="float-right text-gray-500 text-2xl"
+        >
           &times;
         </button>
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">

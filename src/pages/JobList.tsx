@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
+import Modal from "react-modal";
 import { UpworkJob, JobExperience, JobStatus } from "../models";
 import { fetchUpworkJobs } from "../services";
+import { JobDetails } from "../components";
+
+Modal.setAppElement("#root"); // Налаштування react-modal для роботи з accessibility
 
 const JobList: React.FC = () => {
   const [jobs, setJobs] = useState<UpworkJob[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedJob, setSelectedJob] = useState<UpworkJob | null>(null);
 
   useEffect(() => {
     const loadJobs = async () => {
@@ -21,6 +26,14 @@ const JobList: React.FC = () => {
     loadJobs();
   }, []);
 
+  const openJobDetails = (job: UpworkJob) => {
+    setSelectedJob(job);
+  };
+
+  const closeJobDetails = () => {
+    setSelectedJob(null);
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -30,7 +43,8 @@ const JobList: React.FC = () => {
       {jobs.map((job) => (
         <div
           key={job.id}
-          className="bg-white shadow-md rounded-md p-4 w-full sm:w-[48%] md:w-[31%] lg:w-[23%] hover:shadow-lg transition-shadow duration-200"
+          className="bg-white shadow-md rounded-md p-4 w-full sm:w-[48%] md:w-[31%] lg:w-[23%] hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+          onClick={() => openJobDetails(job)}
         >
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-semibold text-blue-600">
@@ -63,21 +77,35 @@ const JobList: React.FC = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-800">
-                ${job.hourly_rates ? job.hourly_rates[0] : job.fixed_price}
+                $
+                {job.hourly_rates && job.hourly_rates.length > 0
+                  ? job.hourly_rates[0]
+                  : job.fixed_price}
               </span>
               <span className="text-xs text-gray-500">
-                {job.hourly_rates ? "/ hr" : " (fixed)"}
+                {job.hourly_rates && job.hourly_rates.length > 0
+                  ? "/ hr"
+                  : " (fixed)"}
               </span>
             </div>
             <span className="text-xs text-gray-400">
               {job.status === JobStatus.InProgress && "In Progress"}
               {job.status === JobStatus.Completed && "Completed"}
               {job.status === JobStatus.Closed && "Closed"}
-              {/* Add more conditions for other statuses */}
+              {job.status === JobStatus.Submitted && "Submitted"}
+              {job.status === JobStatus.Interview && "Interview"}
+              {job.status === JobStatus.OfferReceived && "Offer Received"}
+              {job.status === JobStatus.OfferAccepted && "Offer Accepted"}
+              {job.status === JobStatus.Draft && "Draft"}
+              {job.status === JobStatus.Withdrawn && "Withdrawn"}
+              {job.status === JobStatus.Declined && "Declined"}
             </span>
           </div>
         </div>
       ))}
+      {selectedJob && (
+        <JobDetails job={selectedJob} isOpen={true} onClose={closeJobDetails} />
+      )}
     </div>
   );
 };
