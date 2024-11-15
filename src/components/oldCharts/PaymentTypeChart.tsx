@@ -102,7 +102,7 @@ class PaymentTypeChart extends PureComponent<PaymentTypeChartProps> {
 
     return (
       <div className="bg-white p-8 rounded-3xl shadow w-full">
-        <h2 className="text-lg font-semibold">Співвідношення типів оплати</h2>
+        <h2 className="text-lg font-semibold">Payment Types</h2>
         <ResponsiveContainer width="100%" height={400}>
           <PieChart>
             <Pie
