@@ -101,6 +101,16 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose }) => {
             <p className="text-sm text-gray-600">${job.total_spent}</p>
           </div>
         )}
+        <div className="mt-6">
+          <a
+            href={`https://www.upwork.com/jobs/${job.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 underline"
+          >
+            View Job on Upwork
+          </a>
+        </div>
       </div>
     </Modal>
   );

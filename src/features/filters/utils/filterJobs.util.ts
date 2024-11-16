@@ -8,11 +8,13 @@ export const filterJobs = (
   hourlyRateRange: [number, number] | null,
 ): UpworkJob[] => {
   return jobs.filter((job) => {
+    const fixedPrice = Number(job.fixed_price) || null;
+
     if (jobType === "Fixed Price" && fixedPriceRange) {
       return (
-        job.fixed_price !== null &&
-        job.fixed_price >= fixedPriceRange[0] &&
-        job.fixed_price <= fixedPriceRange[1]
+        fixedPrice !== null &&
+        fixedPrice >= fixedPriceRange[0] &&
+        fixedPrice <= fixedPriceRange[1]
       );
     }
     if (jobType === "Hourly Rate" && hourlyRateRange) {
@@ -24,7 +26,7 @@ export const filterJobs = (
       );
     }
     if (jobType === "Unspecified") {
-      return !(job.hourly_rates || job.fixed_price);
+      return !(job.hourly_rates?.length || fixedPrice);
     }
     return jobType === "None";
   });

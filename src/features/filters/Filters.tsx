@@ -10,16 +10,19 @@ interface FilterComponentProps {
   ) => void;
 }
 
+const INITIAL_HOURLY_RATE_MAX = 500;
+const INITIAL_FIXED_PRICE_MAX = 5000;
+
 export const FilterComponent: React.FC<FilterComponentProps> = ({
   onFilterChange,
 }) => {
   const [jobType, setJobType] = useState<JobType>("None");
   const [fixedPriceRange, setFixedPriceRange] = useState<
     [number, number] | null
-  >(null);
+  >([0, INITIAL_FIXED_PRICE_MAX]);
   const [hourlyRateRange, setHourlyRateRange] = useState<
     [number, number] | null
-  >(null);
+  >([0, INITIAL_HOURLY_RATE_MAX]);
 
   const handleJobTypeChange = (value: JobType) => {
     setJobType(value);
@@ -70,10 +73,12 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
               onChange={(e) =>
                 handleFixedPriceChange(
                   Number(e.target.value),
-                  fixedPriceRange ? fixedPriceRange[1] : 5000,
+                  fixedPriceRange
+                    ? fixedPriceRange[1]
+                    : INITIAL_FIXED_PRICE_MAX,
                 )
               }
-              className="w-48"
+              className="w-72"
             />
             <span className="text-gray-700 text-sm">
               ${fixedPriceRange ? fixedPriceRange[0] : 0}
@@ -82,17 +87,19 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
               type="range"
               min="0"
               max="5000"
-              value={fixedPriceRange ? fixedPriceRange[1] : 5000}
+              value={
+                fixedPriceRange ? fixedPriceRange[1] : INITIAL_FIXED_PRICE_MAX
+              }
               onChange={(e) =>
                 handleFixedPriceChange(
                   fixedPriceRange ? fixedPriceRange[0] : 0,
                   Number(e.target.value),
                 )
               }
-              className="w-48"
+              className="w-72"
             />
             <span className="text-gray-700 text-sm">
-              ${fixedPriceRange ? fixedPriceRange[1] : 5000}
+              ${fixedPriceRange ? fixedPriceRange[1] : INITIAL_FIXED_PRICE_MAX}
             </span>
           </div>
         </div>
@@ -112,7 +119,9 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
               onChange={(e) =>
                 handleHourlyRateChange(
                   Number(e.target.value),
-                  hourlyRateRange ? hourlyRateRange[1] : 500,
+                  hourlyRateRange
+                    ? hourlyRateRange[1]
+                    : INITIAL_HOURLY_RATE_MAX,
                 )
               }
               className="w-24"
@@ -124,7 +133,9 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
               type="range"
               min="0"
               max="500"
-              value={hourlyRateRange ? hourlyRateRange[1] : 500}
+              value={
+                hourlyRateRange ? hourlyRateRange[1] : INITIAL_HOURLY_RATE_MAX
+              }
               onChange={(e) =>
                 handleHourlyRateChange(
                   hourlyRateRange ? hourlyRateRange[0] : 0,
@@ -134,7 +145,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
               className="w-24"
             />
             <span className="text-gray-700 text-sm">
-              ${hourlyRateRange ? hourlyRateRange[1] : 500}
+              ${hourlyRateRange ? hourlyRateRange[1] : INITIAL_HOURLY_RATE_MAX}
             </span>
           </div>
         </div>
