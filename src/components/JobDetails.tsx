@@ -1,46 +1,7 @@
 import React from "react";
 import Modal from "react-modal";
-import { UpworkJob, JobStatus } from "../models";
-
-const getStatusColor = (status: JobStatus): string => {
-  switch (status) {
-    case JobStatus.Draft:
-      return "bg-gray-200 text-gray-800";
-    case JobStatus.Submitted:
-      return "bg-blue-200 text-blue-800";
-    case JobStatus.Interview:
-      return "bg-yellow-200 text-yellow-800";
-    case JobStatus.OfferReceived:
-      return "bg-green-200 text-green-800";
-    case JobStatus.OfferAccepted:
-      return "bg-indigo-200 text-indigo-800";
-    case JobStatus.InProgress:
-      return "bg-purple-200 text-purple-800";
-    case JobStatus.Completed:
-      return "bg-teal-200 text-teal-800";
-    case JobStatus.Closed:
-      return "bg-red-200 text-red-800";
-    case JobStatus.Declined:
-      return "bg-pink-200 text-pink-800";
-    case JobStatus.Withdrawn:
-      return "bg-orange-200 text-orange-800";
-    default:
-      return "bg-gray-200 text-gray-800";
-  }
-};
-
-const statusLabels: { [key in JobStatus]: string } = {
-  [JobStatus.Draft]: "Opportunity",
-  [JobStatus.Submitted]: "Submitted",
-  [JobStatus.Interview]: "Interview",
-  [JobStatus.OfferReceived]: "Offer Received",
-  [JobStatus.OfferAccepted]: "Offer Accepted",
-  [JobStatus.InProgress]: "In Progress",
-  [JobStatus.Completed]: "Completed",
-  [JobStatus.Closed]: "Closed",
-  [JobStatus.Declined]: "Declined",
-  [JobStatus.Withdrawn]: "Withdrawn",
-};
+import { UpworkJob } from "../models";
+import { JobStatusSelect } from ".";
 
 interface JobDetailsProps {
   job: UpworkJob;
@@ -94,13 +55,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose }) => {
           {job.title}
         </h2>
         <div className="flex gap-4 mb-4 items-center">
-          <span
-            className={`text-xs font-medium px-2 py-1 rounded ${getStatusColor(
-              job.status,
-            )}`}
-          >
-            {statusLabels[job.status]}
-          </span>
+          <JobStatusSelect status={job.status} onStatusChange={() => {}} />
           <p className="text-sm text-gray-600">{job.experience}</p>
           <p className="text-sm text-gray-600">
             {new Date(job.created_at).toLocaleDateString()}

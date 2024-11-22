@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { UpworkJob, JobExperience, JobStatus } from "../models";
 import { fetchUpworkJobs } from "../services";
-import { JobDetails } from "../components";
+import { JobDetails, JobStatusSelect } from "../components";
 import { filterJobs, Filters, JobType } from "../features";
 
 Modal.setAppElement("#root"); // Налаштування react-modal для роботи з accessibility
@@ -156,13 +156,15 @@ const JobList: React.FC = () => {
                     : " (fixed)"}
                 </span>
               </div>
-              <span
-                className={`text-xs font-medium px-2 py-1 rounded ${getStatusColor(
-                  job.status,
-                )}`}
-              >
-                {statusLabels[job.status]}
-              </span>
+
+              <JobStatusSelect status={job.status} onStatusChange={() => {}} />
+              {/*<span*/}
+              {/*  className={`text-xs font-medium px-2 py-1 rounded ${getStatusColor(*/}
+              {/*    job.status,*/}
+              {/*  )}`}*/}
+              {/*>*/}
+              {/*  {statusLabels[job.status]}*/}
+              {/*</span>*/}
             </div>
           </div>
         ))}
