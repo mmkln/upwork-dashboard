@@ -7,6 +7,46 @@ import { filterJobs, Filters, JobType } from "../features";
 
 Modal.setAppElement("#root"); // Налаштування react-modal для роботи з accessibility
 
+const getStatusColor = (status: JobStatus): string => {
+  switch (status) {
+    case JobStatus.Draft:
+      return "bg-gray-200 text-gray-700";
+    case JobStatus.Submitted:
+      return "bg-blue-200 text-blue-800";
+    case JobStatus.Interview:
+      return "bg-yellow-200 text-yellow-800";
+    case JobStatus.OfferReceived:
+      return "bg-green-200 text-green-800";
+    case JobStatus.OfferAccepted:
+      return "bg-indigo-200 text-indigo-800";
+    case JobStatus.InProgress:
+      return "bg-purple-200 text-purple-800";
+    case JobStatus.Completed:
+      return "bg-teal-200 text-teal-800";
+    case JobStatus.Closed:
+      return "bg-red-200 text-red-800";
+    case JobStatus.Declined:
+      return "bg-pink-200 text-pink-800";
+    case JobStatus.Withdrawn:
+      return "bg-orange-200 text-orange-800";
+    default:
+      return "bg-gray-200 text-gray-800";
+  }
+};
+
+const statusLabels: { [key in JobStatus]: string } = {
+  [JobStatus.Draft]: "Opportunity",
+  [JobStatus.Submitted]: "Submitted",
+  [JobStatus.Interview]: "Interview",
+  [JobStatus.OfferReceived]: "Offer Received",
+  [JobStatus.OfferAccepted]: "Offer Accepted",
+  [JobStatus.InProgress]: "In Progress",
+  [JobStatus.Completed]: "Completed",
+  [JobStatus.Closed]: "Closed",
+  [JobStatus.Declined]: "Declined",
+  [JobStatus.Withdrawn]: "Withdrawn",
+};
+
 const JobList: React.FC = () => {
   const [jobsData, setJobsData] = useState<UpworkJob[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -116,17 +156,12 @@ const JobList: React.FC = () => {
                     : " (fixed)"}
                 </span>
               </div>
-              <span className="text-xs text-gray-400">
-                {job.status === JobStatus.InProgress && "In Progress"}
-                {job.status === JobStatus.Completed && "Completed"}
-                {job.status === JobStatus.Closed && "Closed"}
-                {job.status === JobStatus.Submitted && "Submitted"}
-                {job.status === JobStatus.Interview && "Interview"}
-                {job.status === JobStatus.OfferReceived && "Offer Received"}
-                {job.status === JobStatus.OfferAccepted && "Offer Accepted"}
-                {job.status === JobStatus.Draft && "Draft"}
-                {job.status === JobStatus.Withdrawn && "Withdrawn"}
-                {job.status === JobStatus.Declined && "Declined"}
+              <span
+                className={`text-xs font-medium px-2 py-1 rounded ${getStatusColor(
+                  job.status,
+                )}`}
+              >
+                {statusLabels[job.status]}
               </span>
             </div>
           </div>
