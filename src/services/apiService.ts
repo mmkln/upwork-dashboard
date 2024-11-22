@@ -22,3 +22,13 @@ export const createUpworkJob = async (
   const response = await apiClient.post<UpworkJob>("/jobs/", jobData);
   return response.data;
 };
+
+export const updateUpworkJob = async (
+  jobData: Partial<UpworkJob>,
+): Promise<UpworkJob> => {
+  const response = await apiClient.patch<UpworkJob>(
+    `/jobs/${jobData.id}/`,
+    jobData,
+  );
+  return response.data;
+};

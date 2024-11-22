@@ -1,1 +1,1 @@
-export { fetchUpworkJobs } from "./apiService";
+export { fetchUpworkJobs, updateUpworkJob } from "./apiService";

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import Modal from "react-modal";
-import { UpworkJob } from "../models";
+import { JobStatus, UpworkJob } from "../models";
 import { JobStatusSelect } from ".";
+import { updateUpworkJob } from "../services";
 
 interface JobDetailsProps {
   job: UpworkJob;
@@ -10,6 +11,17 @@ interface JobDetailsProps {
 }
 
 const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose }) => {
+  const [jobData, setJobData] = useState<UpworkJob>(job);
+  const handleStatusChange = (status: JobStatus) => {
+    updateUpworkJob({ ...job, status })
+      .then((updatedJob) => {
+        setJobData(updatedJob);
+      })
+      .catch((error) => {
+        console.error("Error updating job status:", error);
+      });
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -55,7 +67,10 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose }) => {
           {job.title}
         </h2>
         <div className="flex gap-4 mb-4 items-center">
-          <JobStatusSelect status={job.status} onStatusChange={() => {}} />
+          <JobStatusSelect
+            status={jobData.status}
+            onStatusChange={handleStatusChange}
+          />
           <p className="text-sm text-gray-600">{job.experience}</p>
           <p className="text-sm text-gray-600">
             {new Date(job.created_at).toLocaleDateString()}
