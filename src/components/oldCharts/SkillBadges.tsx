@@ -55,12 +55,12 @@ const SkillBadges: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
               className="relative px-2 py-1 rounded-xl text-xs font-medium group/skill"
               style={{
                 backgroundColor: `rgba(59, 130, 246, ${rateDiff})`,
-                color: `${rateDiff > 0.5 ? "rgba(255,255,255, 0.95)" : "rgba(45,59,101,0.8)"}`,
+                color: `${rateDiff > 0.7 ? "rgba(255,255,255, 0.95)" : "rgba(45,59,101,0.8)"}`,
               }}
             >
               {label.length > 12 ? label.slice(0, 8).trim() + ".." : label}
               <div className="hidden group-hover/skill:flex absolute bottom-7 bg-white border border-gray-200 rounded-xl px-2 py-1 text-gray-800">
-                ({value}) {label}
+                {label} <br /> ({value})
               </div>
             </div>
           );

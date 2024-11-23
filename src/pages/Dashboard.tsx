@@ -38,6 +38,7 @@ import {
   SkillBadges,
   Tile,
   PaymentTypeChart,
+  InstrumentBadges,
 } from "../components";
 import { filterJobs, Filters, JobType } from "../features";
 
@@ -114,6 +115,17 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         <div className="flex gap-4">
+          <div className="max-w-96 min-w-80">
+            <KeywordFrequency jobs={filteredJobsData} limit={50} />
+          </div>
+          <div className="max-w-96 min-w-80">
+            <InstrumentBadges jobs={filteredJobsData} />
+          </div>
+          <div className="max-w-96 min-w-80">
+            <SkillBadges jobs={filteredJobsData} limit={33} />
+          </div>
+        </div>
+        <div className="flex gap-4">
           <div className="max-w-md min-w-80">
             <AverageRateByCountry jobs={filteredJobsData} />
           </div>
@@ -127,14 +139,8 @@ const Dashboard: React.FC = () => {
           {/*<div className="max-w-md min-w-80">*/}
           {/*  <TopSkills jobs={jobsData} limit={7} />*/}
           {/*</div>*/}
-          <div className="max-w-96 min-w-80">
-            <SkillBadges jobs={filteredJobsData} limit={33} />
-          </div>
         </div>
         <div className="flex gap-4">
-          <div className="max-w-96 min-w-80">
-            <KeywordFrequency jobs={filteredJobsData} limit={50} />
-          </div>
           <div className="max-w-96 min-w-80">
             <PaymentTypeChart jobs={filteredJobsData} />
           </div>

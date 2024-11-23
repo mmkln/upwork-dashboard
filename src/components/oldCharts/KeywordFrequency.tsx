@@ -131,7 +131,7 @@ const KeywordFrequencyChart: React.FC<KeywordFrequencyChartProps> = ({
               className="relative px-2 py-1 rounded-xl text-xs font-medium group/keyword"
               style={{
                 backgroundColor: `rgba(59, 130, 246, ${frequencyRatio})`,
-                color: `${frequencyRatio > 0.5 ? "rgba(255,255,255, 0.95)" : "rgba(45,59,101,0.8)"}`,
+                color: `${frequencyRatio > 0.7 ? "rgba(255,255,255, 0.95)" : "rgba(45,59,101,0.8)"}`,
               }}
             >
               {label.length > 12 ? label.slice(0, 8).trim() + ".." : label}
