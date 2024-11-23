@@ -126,7 +126,7 @@ const ToolFrequencyChart: React.FC<ToolFrequencyChartProps> = ({
         {limitedData.map(({ tool, count }) => {
           const frequencyRatio = count / maxFrequency;
           const backgroundColor = `rgba(59, 130, 246, ${frequencyRatio})`;
-          const textColor =
+          const color =
             frequencyRatio > 0.7
               ? "rgba(255,255,255, 0.95)"
               : "rgba(45,59,101,0.8)";
@@ -134,9 +134,10 @@ const ToolFrequencyChart: React.FC<ToolFrequencyChartProps> = ({
           return (
             <div
               key={tool}
-              className={`relative px-2 py-1 rounded-xl text-xs font-medium ${textColor} group`}
+              className={`relative px-2 py-1 rounded-xl text-xs font-medium group`}
               style={{
                 backgroundColor,
+                color,
               }}
             >
               {tool.length > 15 ? `${tool.slice(0, 12).trim()}..` : tool}
