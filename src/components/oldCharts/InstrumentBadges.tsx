@@ -52,6 +52,7 @@ const toolsList: string[] = [
   "Rentman",
   "Retell",
   "Salesforce",
+  "Shopify",
   "Slack",
   "Softr",
   "Squarespace",
