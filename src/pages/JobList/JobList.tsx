@@ -5,7 +5,7 @@ import Modal from "react-modal";
 import { UpworkJob, JobStatus } from "../../models";
 import { fetchUpworkJobs } from "../../services";
 import { JobDetails } from "../../components";
-import { filterJobs, JobType } from "../../features";
+import { filterJobs, Filters, JobType } from "../../features";
 import { JobListItem } from "./components"; // Імпортуємо новий компонент
 
 Modal.setAppElement("#root"); // Налаштування react-modal для роботи з accessibility
@@ -20,8 +20,9 @@ const JobList: React.FC = () => {
     const loadJobs = async () => {
       try {
         const fetchedJobs = await fetchUpworkJobs();
-        setJobsData(fetchedJobs);
-        setFilteredJobsData(fetchedJobs);
+        const sortedJobs = sortJobs(fetchedJobs);
+        setJobsData(sortedJobs);
+        setFilteredJobsData(sortedJobs);
       } catch (error) {
         console.error("Error fetching jobs:", error);
       } finally {
@@ -31,6 +32,10 @@ const JobList: React.FC = () => {
 
     loadJobs();
   }, []);
+
+  const sortJobs = (jobs: UpworkJob[]): UpworkJob[] => {
+    return jobs.reverse();
+  };
 
   const openJobDetails = (job: UpworkJob) => {
     setSelectedJob(job);
@@ -61,6 +66,9 @@ const JobList: React.FC = () => {
 
   return (
     <>
+      <div className="p-6">
+        <Filters onFilterChange={onFilterChanged} />
+      </div>
       <div className="px-6">
         <p className="text-lg font-medium text-gray-800">
           {filteredJobsData.length} job
