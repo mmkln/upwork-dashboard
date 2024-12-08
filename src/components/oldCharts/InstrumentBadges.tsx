@@ -59,6 +59,7 @@ const toolsList: string[] = [
   "Slack",
   "Softr",
   "Squarespace",
+  "Supabase",
   "Twilio",
   "Vapi",
   "Whimsical",

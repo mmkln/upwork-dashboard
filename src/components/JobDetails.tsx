@@ -75,6 +75,12 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose }) => {
           <p className="text-sm text-gray-600">
             {new Date(job.created_at).toLocaleDateString()}
           </p>
+
+          {job.connects && (
+            <p className="text-sm text-gray-600">
+              Connects: {job.connects.toFixed(0)}
+            </p>
+          )}
         </div>
         {/*<div className="mb-4">*/}
         {/*  <h3 className="text-lg font-semibold text-gray-800 mb-2">Status</h3>*/}

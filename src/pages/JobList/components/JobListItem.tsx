@@ -42,6 +42,11 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onClick }) => {
       </div>
       <h3 className="text-lg font-semibold text-gray-800 mb-2">{job.title}</h3>
       <p className="text-sm text-gray-600 mb-4 truncate">{job.description}</p>
+      {job.connects && (
+        <p className="text-sm text-gray-600 mb-4 truncate">
+          Connects: {job.connects.toFixed(0)}
+        </p>
+      )}
       <div className="flex flex-wrap gap-2 mb-4">
         {job.skills.map((skill, index) => (
           <span
