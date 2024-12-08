@@ -41,10 +41,10 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onClick }) => {
         </span>
       </div>
       <h3 className="text-lg font-semibold text-gray-800 mb-2">{job.title}</h3>
-      <p className="text-sm text-gray-600 mb-4 truncate">{job.description}</p>
+      <p className="text-sm text-gray-600 mb-2 truncate">{job.description}</p>
       {job.connects && (
         <p className="text-sm text-gray-600 mb-4 truncate">
-          Connects: {job.connects.toFixed(0)}
+          Connects: {parseInt(job.connects)}
         </p>
       )}
       <div className="flex flex-wrap gap-2 mb-4">

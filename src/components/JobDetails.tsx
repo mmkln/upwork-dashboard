@@ -75,10 +75,9 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose }) => {
           <p className="text-sm text-gray-600">
             {new Date(job.created_at).toLocaleDateString()}
           </p>
-
           {job.connects && (
             <p className="text-sm text-gray-600">
-              Connects: {job.connects.toFixed(0)}
+              Connects: {parseInt(job.connects)}
             </p>
           )}
         </div>

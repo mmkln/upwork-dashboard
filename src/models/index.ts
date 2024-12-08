@@ -13,7 +13,7 @@ export interface UpworkJob {
   fixed_price: number | null;
   created_at: string;
   status: JobStatus;
-  connects: number | null;
+  connects: string | null;
 }
 
 export enum JobExperience {
