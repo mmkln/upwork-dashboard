@@ -79,6 +79,10 @@ const Dashboard: React.FC = () => {
     );
   };
 
+  const availableSkills = Array.from(
+    new Set(jobsData.flatMap((job) => job.skills)),
+  );
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -89,13 +93,15 @@ const Dashboard: React.FC = () => {
     jobType: JobType,
     fixedPriceRange: [number, number] | null,
     hourlyRateRange: [number, number] | null,
+    selectedSkills: string[],
   ) => {
-    console.log({ jobType, fixedPriceRange, hourlyRateRange });
+    console.log({ jobType, fixedPriceRange, hourlyRateRange, selectedSkills });
     const jobs = filterJobs(
       jobsData,
       jobType,
       fixedPriceRange,
       hourlyRateRange,
+      selectedSkills,
     );
     setFilteredJobsData(jobs);
   };
@@ -103,7 +109,10 @@ const Dashboard: React.FC = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="p-6">
-        <Filters onFilterChange={onFilterChanged} />
+        <Filters
+          onFilterChange={onFilterChanged}
+          availableSkills={availableSkills}
+        />
       </div>
       <div className="mx-auto p-6 flex flex-col gap-4">
         <div className="flex gap-4">

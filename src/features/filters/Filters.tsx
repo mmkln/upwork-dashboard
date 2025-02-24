@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Select from "react-select"; // Імпортуємо react-select
 
 export type JobType = "Fixed Price" | "Hourly Rate" | "Unspecified" | "None";
 
@@ -7,7 +8,9 @@ interface FilterComponentProps {
     jobType: JobType,
     fixedPriceRange: [number, number] | null,
     hourlyRateRange: [number, number] | null,
+    selectedSkills: string[], // Додаємо скіли як параметр
   ) => void;
+  availableSkills: string[]; // Додаємо список доступних скілів
 }
 
 const INITIAL_HOURLY_RATE_MAX = 500;
@@ -15,6 +18,7 @@ const INITIAL_FIXED_PRICE_MAX = 5000;
 
 export const FilterComponent: React.FC<FilterComponentProps> = ({
   onFilterChange,
+  availableSkills,
 }) => {
   const [jobType, setJobType] = useState<JobType>("None");
   const [fixedPriceRange, setFixedPriceRange] = useState<
@@ -23,22 +27,36 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   const [hourlyRateRange, setHourlyRateRange] = useState<
     [number, number] | null
   >([0, INITIAL_HOURLY_RATE_MAX]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]); // Стан для обраних скілів
+
+  const skillOptions = availableSkills.map((skill) => ({
+    value: skill,
+    label: skill,
+  })); // Формат для react-select
 
   const handleJobTypeChange = (value: JobType) => {
     setJobType(value);
-    onFilterChange(value, fixedPriceRange, hourlyRateRange);
+    onFilterChange(value, fixedPriceRange, hourlyRateRange, selectedSkills);
   };
 
   const handleFixedPriceChange = (min: number, max: number) => {
     const range: [number, number] = [min, max];
     setFixedPriceRange(range);
-    onFilterChange(jobType, range, hourlyRateRange);
+    onFilterChange(jobType, range, hourlyRateRange, selectedSkills);
   };
 
   const handleHourlyRateChange = (min: number, max: number) => {
     const range: [number, number] = [min, max];
     setHourlyRateRange(range);
-    onFilterChange(jobType, fixedPriceRange, range);
+    onFilterChange(jobType, fixedPriceRange, range, selectedSkills);
+  };
+
+  const handleSkillsChange = (selectedOptions: any) => {
+    const skills = selectedOptions
+      ? selectedOptions.map((option: any) => option.value)
+      : [];
+    setSelectedSkills(skills);
+    onFilterChange(jobType, fixedPriceRange, hourlyRateRange, skills);
   };
 
   return (
@@ -150,6 +168,22 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
           </div>
         </div>
       )}
+
+      <div className="w-64">
+        <label className="block text-sm font-semibold text-gray-700">
+          Skills
+        </label>
+        <Select
+          isMulti
+          options={skillOptions}
+          value={skillOptions.filter((option) =>
+            selectedSkills.includes(option.value),
+          )}
+          onChange={handleSkillsChange}
+          placeholder="Select skills..."
+          className="mt-1"
+        />
+      </div>
     </div>
   );
 };

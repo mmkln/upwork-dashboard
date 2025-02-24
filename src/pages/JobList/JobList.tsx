@@ -6,9 +6,9 @@ import { UpworkJob, JobStatus } from "../../models";
 import { fetchUpworkJobs } from "../../services";
 import { JobDetails } from "../../components";
 import { filterJobs, Filters, JobType } from "../../features";
-import { JobListItem } from "./components"; // Імпортуємо новий компонент
+import { JobListItem } from "./components";
 
-Modal.setAppElement("#root"); // Налаштування react-modal для роботи з accessibility
+Modal.setAppElement("#root");
 
 const JobList: React.FC = () => {
   const [jobsData, setJobsData] = useState<UpworkJob[]>([]);
@@ -45,6 +45,11 @@ const JobList: React.FC = () => {
     setSelectedJob(null);
   };
 
+  // Отримуємо унікальний список скілів із jobsData
+  const availableSkills = Array.from(
+    new Set(jobsData.flatMap((job) => job.skills)),
+  );
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -53,13 +58,15 @@ const JobList: React.FC = () => {
     jobType: JobType,
     fixedPriceRange: [number, number] | null,
     hourlyRateRange: [number, number] | null,
+    selectedSkills: string[],
   ) => {
-    console.log({ jobType, fixedPriceRange, hourlyRateRange });
+    console.log({ jobType, fixedPriceRange, hourlyRateRange, selectedSkills });
     const jobs = filterJobs(
       jobsData,
       jobType,
       fixedPriceRange,
       hourlyRateRange,
+      selectedSkills,
     );
     setFilteredJobsData(jobs);
   };
@@ -67,7 +74,10 @@ const JobList: React.FC = () => {
   return (
     <>
       <div className="p-6">
-        <Filters onFilterChange={onFilterChanged} />
+        <Filters
+          onFilterChange={onFilterChanged}
+          availableSkills={availableSkills}
+        />
       </div>
       <div className="px-6">
         <p className="text-lg font-medium text-gray-800">
