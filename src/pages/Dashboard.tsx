@@ -131,7 +131,7 @@ const Dashboard: React.FC = () => {
             <InstrumentBadges jobs={filteredJobsData} />
           </div>
           <div className="max-w-96 min-w-80">
-            <SkillBadges jobs={filteredJobsData} limit={33} />
+            <SkillBadges jobs={filteredJobsData} limit={50} />
           </div>
         </div>
         <div className="flex gap-4">

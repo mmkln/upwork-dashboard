@@ -7,7 +7,7 @@ interface ToolFrequencyChartProps {
 }
 
 // Список інструментів
-const toolsList: string[] = [
+const toolsList: Array<string | string[]> = [
   "Active Campaign",
   "Airtable",
   "Apollo",
@@ -29,14 +29,13 @@ const toolsList: string[] = [
   "Fireflies",
   "Funnelytics",
   "getimg",
-  "GoHighLevel",
-  "GHL",
+  ["GoHighLevel", "GHL", "gohighlevel"],
   "Harvest",
   "HubSpot",
   "Klaviyo",
   "Leadpages",
   "Luma",
-  "Make.com",
+  ["Make.com", "make.com", "makecom"],
   "Manatal",
   "Manychat",
   "Mautic",
@@ -74,21 +73,29 @@ const getToolFrequency = (jobs: UpworkJob[]): { [key: string]: number } => {
   const frequency: { [key: string]: number } = {};
 
   // Підготовка регулярних виразів для кожного інструменту
-  const toolRegexes = toolsList.map((tool) => ({
-    tool,
-    regex: new RegExp(`\\b${escapeRegExp(tool)}\\b`, "i"),
-  }));
+  const toolRegexes = toolsList.map((toolEntry) => {
+    const mainTool = Array.isArray(toolEntry) ? toolEntry[0] : toolEntry;
+    const synonyms = Array.isArray(toolEntry) ? toolEntry : [toolEntry];
+    return {
+      mainTool,
+      regexes: synonyms.map(
+        (synonym) => new RegExp(`\\b${escapeRegExp(synonym)}\\b`, "i"),
+      ),
+    };
+  });
 
   jobs.forEach((job) => {
-    toolRegexes.forEach(({ tool, regex }) => {
-      const inTitle = regex.test(job.title);
-      const inDescription = regex.test(job.description);
-      const inSkills = job.skills.some(
-        (skill) => skill.toLowerCase() === tool.toLowerCase(),
+    toolRegexes.forEach(({ mainTool, regexes }) => {
+      const inTitle = regexes.some((regex) => regex.test(job.title));
+      const inDescription = regexes.some((regex) =>
+        regex.test(job.description),
+      );
+      const inSkills = job.skills.some((skill) =>
+        regexes.some((regex) => regex.test(skill)),
       );
 
       if (inTitle || inDescription || inSkills) {
-        frequency[tool] = (frequency[tool] || 0) + 1;
+        frequency[mainTool] = (frequency[mainTool] || 0) + 1;
       }
     });
   });
