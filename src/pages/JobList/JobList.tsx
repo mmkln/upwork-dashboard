@@ -98,12 +98,13 @@ const JobList: React.FC = () => {
           {filteredJobsData.length !== 1 ? "s" : ""} found
         </p>
         <button
-          className="p-2 rounded hover:bg-gray-100"
-          title="Скопіювати до буфера обміну"
+          className="p-2 rounded text-gray-500 hover:bg-gray-100  disabled:text-gray-200 disabled:bg-white"
+          title="Copy jobs to clipboard"
           onClick={handleExport}
+          disabled={filteredJobsData.length === 0}
         >
           <svg
-            className="w-6 h-6 text-gray-500"
+            className="w-6 h-6 "
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
