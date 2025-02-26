@@ -9,6 +9,7 @@ import {
 } from "date-fns";
 import { UpworkJob } from "../../models";
 import { isToday } from "../../utils";
+import Card from "../ui/Card";
 
 interface JobCalendarProps {
   jobs: UpworkJob[];
@@ -69,50 +70,52 @@ const JobCalendar: React.FC<JobCalendarProps> = ({ jobs, month }) => {
   );
 
   return (
-    <div className="bg-white p-6 rounded-3xl shadow w-72">
-      <h2 className="text-lg font-semibold mb-4">
-        {format(month, "MMMM, yyyy")}
-      </h2>
-      <div className="grid grid-cols-7 gap-1.5">
-        {/* Відображаємо назви днів тижня */}
-        {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
-          <div key={day} className="text-center font-bold text-gray-300">
-            {day}
-          </div>
-        ))}
+    <Card>
+      <div className="p-6 w-72">
+        <h2 className="text-lg font-medium mb-4">
+          {format(month, "MMMM, yyyy")}
+        </h2>
+        <div className="grid grid-cols-7 gap-1.5">
+          {/* Відображаємо назви днів тижня */}
+          {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
+            <div key={day} className="text-center font-semibold text-gray-300">
+              {day}
+            </div>
+          ))}
 
-        {/* Відображаємо дні з початку місяця */}
-        {leadingDays}
+          {/* Відображаємо дні з початку місяця */}
+          {leadingDays}
 
-        {/* Відображаємо активні дні місяця */}
-        {daysInMonth.map((day) => {
-          const formattedDay = format(day, "yyyy-MM-dd");
-          const jobCount = jobCountPerDay[formattedDay] || 0;
-          const isDayToday = isToday(day);
+          {/* Відображаємо активні дні місяця */}
+          {daysInMonth.map((day) => {
+            const formattedDay = format(day, "yyyy-MM-dd");
+            const jobCount = jobCountPerDay[formattedDay] || 0;
+            const isDayToday = isToday(day);
 
-          const colorClass = getColorIntensity(jobCount, isDayToday);
+            const colorClass = getColorIntensity(jobCount, isDayToday);
 
-          return (
-            <div className="flex justify-center">
-              <div
-                key={formattedDay}
-                className={`relative group/day w-7 h-7 flex items-center justify-center rounded-lg border-2 hover:outline outline-2 outline-inherit cursor-pointer ${colorClass}`}
-              >
-                <span className="text-base font-medium">
-                  {format(day, "d")}
-                </span>
-                <div className="hidden group-hover/day:flex w-max absolute bottom-8 bg-white border border-gray-200 rounded-xl px-2 py-1 text-gray-800">
-                  {jobCount} {jobCount > 1 ? "Jobs" : "Job"}
+            return (
+              <div className="flex justify-center">
+                <div
+                  key={formattedDay}
+                  className={`relative group/day w-7 h-7 flex items-center justify-center rounded-lg border-2 hover:outline outline-2 outline-inherit cursor-pointer ${colorClass}`}
+                >
+                  <span className="text-base font-medium">
+                    {format(day, "d")}
+                  </span>
+                  <div className="hidden group-hover/day:flex w-max absolute bottom-8 bg-white border border-gray-200 rounded-xl px-2 py-1 text-gray-800">
+                    {jobCount} {jobCount > 1 ? "Jobs" : "Job"}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
 
-        {/* Додаємо порожні дні після місяця */}
-        {trailingDays}
+          {/* Додаємо порожні дні після місяця */}
+          {trailingDays}
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
