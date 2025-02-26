@@ -25,7 +25,7 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onClick }) => {
 
   return (
     <div
-      className="bg-white shadow-md rounded-md p-4 w-full sm:w-[48%] md:w-[31%] lg:w-[23%] hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+      className="bg-white shadow-md rounded-md p-4 hover:shadow-lg transition-shadow duration-200 cursor-pointer"
       onClick={() => onClick(job)}
     >
       <div className="flex justify-between items-center mb-2">
