@@ -8,16 +8,14 @@ import { Sidebar } from "./features";
 function App() {
   return (
     <Router>
-      <div className="app-container">
+      <div className="relative flex h-screen">
         <Sidebar />
-        <div className="w-full h-[100vh] overflow-y-scroll">
-          <div className="container">
-            <Routes>
-              <Route path="/upwork-dashboard" element={<Dashboard />} />
-              <Route path="/upwork-dashboard/jobs" element={<JobList />} />
-              {/* Add more routes as needed */}
-            </Routes>
-          </div>
+        <div className="flex-1 ml-20 overflow-y-auto p-6">
+          <Routes>
+            <Route path="/upwork-dashboard" element={<Dashboard />} />
+            <Route path="/upwork-dashboard/jobs" element={<JobList />} />
+            {/* Add more routes as needed */}
+          </Routes>
         </div>
       </div>
     </Router>
