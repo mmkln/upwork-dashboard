@@ -59,6 +59,7 @@ const toolsList: Array<string | string[]> = [
   "Softr",
   "Squarespace",
   "Supabase",
+  ["TikTok", "tiktok"],
   "Twilio",
   "Vapi",
   "Whimsical",
