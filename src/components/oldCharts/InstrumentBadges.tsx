@@ -29,7 +29,7 @@ const toolsList: Array<string | string[]> = [
   "Fireflies",
   "Funnelytics",
   "getimg",
-  ["GoHighLevel", "GHL", "gohighlevel"],
+  ["GoHighLevel", "GHL", "Go High Level", "gohighlevel"],
   "Harvest",
   "HubSpot",
   "Klaviyo",
