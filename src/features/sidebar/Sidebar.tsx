@@ -10,7 +10,7 @@ const Sidebar: React.FC = () => {
   const location = useLocation();
 
   return (
-    <div className="fixed top-0 left-0 flex flex-col w-20 h-screen bg-gray-900 text-gray-400 transition-all duration-300 hover:w-44 group p-4">
+    <div className="fixed z-50 top-0 left-0 flex flex-col w-20 h-screen bg-gray-900 text-gray-400 transition-all duration-300 hover:w-44 group p-4">
       <Logo />
       <SidebarSection>
         <SidebarItem

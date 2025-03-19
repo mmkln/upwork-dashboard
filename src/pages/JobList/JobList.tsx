@@ -7,6 +7,7 @@ import { fetchUpworkJobs } from "../../services";
 import { JobDetails } from "../../components";
 import { filterJobs, Filters, JobType } from "../../features";
 import { JobListItem } from "./components";
+import { instruments } from "../../utils";
 
 Modal.setAppElement("#root");
 
@@ -15,6 +16,10 @@ const JobList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedJob, setSelectedJob] = useState<UpworkJob | null>(null);
   const [filteredJobsData, setFilteredJobsData] = useState<UpworkJob[]>([]);
+  const availableStatuses = Object.values(JobStatus);
+  const availableInstruments: string[] = instruments.map((toolEntry) =>
+    Array.isArray(toolEntry) ? toolEntry[0] : toolEntry,
+  );
 
   useEffect(() => {
     const loadJobs = async () => {
@@ -59,6 +64,8 @@ const JobList: React.FC = () => {
     fixedPriceRange: [number, number] | null,
     hourlyRateRange: [number, number] | null,
     selectedSkills: string[],
+    selectedInstruments: string[],
+    selectedStatuses: JobStatus[],
   ) => {
     console.log({ jobType, fixedPriceRange, hourlyRateRange, selectedSkills });
     const jobs = filterJobs(
@@ -67,6 +74,8 @@ const JobList: React.FC = () => {
       fixedPriceRange,
       hourlyRateRange,
       selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
     );
     setFilteredJobsData(jobs);
   };
@@ -101,6 +110,8 @@ const JobList: React.FC = () => {
         <Filters
           onFilterChange={onFilterChanged}
           availableSkills={availableSkills}
+          availableInstruments={availableInstruments}
+          availableStatuses={availableStatuses}
         />
       </div>
       <div className="flex items-center justify-between px-6">

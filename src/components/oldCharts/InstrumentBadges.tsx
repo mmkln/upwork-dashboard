@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { UpworkJob } from "../../models";
+import { instruments } from "../../utils";
 
 interface ToolFrequencyChartProps {
   jobs: UpworkJob[];
@@ -7,74 +8,13 @@ interface ToolFrequencyChartProps {
 }
 
 // Список інструментів
-const toolsList: Array<string | string[]> = [
-  "Active Campaign",
-  "Airtable",
-  "Apollo",
-  "Amwork",
-  "Automation Anywhere",
-  "Beehiiv",
-  "bolt.new",
-  "Brevo",
-  "bubble.io",
-  "Caspio",
-  "chatbotbuilder.ai",
-  "clearout",
-  "Click Funnels",
-  "ClickUp",
-  "Close CRM",
-  "Coda",
-  "Drawio",
-  "Dumpling",
-  "Fireflies",
-  "Funnelytics",
-  "getimg",
-  ["GoHighLevel", "GHL", "Go High Level", "gohighlevel"],
-  "Harvest",
-  "HubSpot",
-  "Klaviyo",
-  "Leadpages",
-  "Luma",
-  ["Make.com", "make.com", "makecom"],
-  "Manatal",
-  "Manychat",
-  "Mautic",
-  "MindManager",
-  "Monday",
-  "n8n",
-  "Pabbly",
-  "PandaDoc",
-  "PhantomBuster",
-  "Pipedrive",
-  "Play.ai",
-  "Podio",
-  "QuickBooks",
-  "Rentman",
-  "Retell",
-  "RingCentral",
-  "Salesforce",
-  "SendGrid",
-  "Shopify",
-  "Slack",
-  "Softr",
-  "Squarespace",
-  "Supabase",
-  ["TikTok", "tiktok"],
-  "Twilio",
-  "Vapi",
-  "Whimsical",
-  "Wix",
-  "Xero",
-  "Zapier",
-  "Zoho",
-];
 
 // Функція для підрахунку частоти інструментів
 const getToolFrequency = (jobs: UpworkJob[]): { [key: string]: number } => {
   const frequency: { [key: string]: number } = {};
 
   // Підготовка регулярних виразів для кожного інструменту
-  const toolRegexes = toolsList.map((toolEntry) => {
+  const toolRegexes = instruments.map((toolEntry) => {
     const mainTool = Array.isArray(toolEntry) ? toolEntry[0] : toolEntry;
     const synonyms = Array.isArray(toolEntry) ? toolEntry : [toolEntry];
     return {

@@ -3,7 +3,7 @@ import update from "immutability-helper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend"; // Бекенд для drag-and-drop
 import { fetchUpworkJobs } from "../services";
-import { UpworkJob } from "../models";
+import { JobStatus, UpworkJob } from "../models";
 import {
   AverageRateByCountry,
   AverageRateByExperience,
@@ -41,11 +41,16 @@ import {
   InstrumentBadges,
 } from "../components";
 import { filterJobs, Filters, JobType } from "../features";
+import { instruments } from "../utils";
 
 const Dashboard: React.FC = () => {
   const [jobsData, setJobsData] = useState<UpworkJob[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filteredJobsData, setFilteredJobsData] = useState<UpworkJob[]>([]);
+  const availableStatuses = Object.values(JobStatus);
+  const availableInstruments: string[] = instruments.map((toolEntry) =>
+    Array.isArray(toolEntry) ? toolEntry[0] : toolEntry,
+  );
 
   useEffect(() => {
     const loadJobs = async () => {
@@ -94,14 +99,17 @@ const Dashboard: React.FC = () => {
     fixedPriceRange: [number, number] | null,
     hourlyRateRange: [number, number] | null,
     selectedSkills: string[],
+    selectedInstruments: string[],
+    selectedStatuses: JobStatus[],
   ) => {
-    console.log({ jobType, fixedPriceRange, hourlyRateRange, selectedSkills });
     const jobs = filterJobs(
       jobsData,
       jobType,
       fixedPriceRange,
       hourlyRateRange,
       selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
     );
     setFilteredJobsData(jobs);
   };
@@ -112,6 +120,8 @@ const Dashboard: React.FC = () => {
         <Filters
           onFilterChange={onFilterChanged}
           availableSkills={availableSkills}
+          availableInstruments={availableInstruments}
+          availableStatuses={availableStatuses}
         />
       </div>
       <div className="mx-auto p-6 flex flex-col gap-4">

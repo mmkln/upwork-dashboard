@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import Select from "react-select";
+import { JobStatus } from "../../models";
+import { camelToCapitalizedWords } from "../../utils";
 
 export type JobType = "Fixed Price" | "Hourly Rate" | "Unspecified" | "None";
 
@@ -9,8 +11,12 @@ interface FilterComponentProps {
     fixedPriceRange: [number, number] | null,
     hourlyRateRange: [number, number] | null,
     selectedSkills: string[],
+    selectedInstruments: string[],
+    selectedStatuses: JobStatus[],
   ) => void;
   availableSkills: string[];
+  availableInstruments: string[];
+  availableStatuses: JobStatus[];
 }
 
 const INITIAL_HOURLY_RATE_MAX = 500;
@@ -19,6 +25,8 @@ const INITIAL_FIXED_PRICE_MAX = 5000;
 export const FilterComponent: React.FC<FilterComponentProps> = ({
   onFilterChange,
   availableSkills,
+  availableInstruments,
+  availableStatuses,
 }) => {
   const [jobType, setJobType] = useState<JobType>("None");
   const [fixedPriceRange, setFixedPriceRange] = useState<
@@ -28,27 +36,60 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     [number, number] | null
   >([0, INITIAL_HOURLY_RATE_MAX]);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [selectedInstruments, setSelectedInstruments] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<JobStatus[]>([]);
 
   const skillOptions = availableSkills.map((skill) => ({
     value: skill,
     label: skill,
   }));
 
+  const instrumentOptions = availableInstruments.map((instrument) => ({
+    value: instrument,
+    label: instrument,
+  }));
+
+  const statusOptions = availableStatuses.map((status) => ({
+    value: status,
+    label: camelToCapitalizedWords(status),
+  }));
+
   const handleJobTypeChange = (value: JobType) => {
     setJobType(value);
-    onFilterChange(value, fixedPriceRange, hourlyRateRange, selectedSkills);
+    onFilterChange(
+      value,
+      fixedPriceRange,
+      hourlyRateRange,
+      selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
+    );
   };
 
   const handleFixedPriceChange = (min: number, max: number) => {
     const range: [number, number] = [min, max];
     setFixedPriceRange(range);
-    onFilterChange(jobType, range, hourlyRateRange, selectedSkills);
+    onFilterChange(
+      jobType,
+      range,
+      hourlyRateRange,
+      selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
+    );
   };
 
   const handleHourlyRateChange = (min: number, max: number) => {
     const range: [number, number] = [min, max];
     setHourlyRateRange(range);
-    onFilterChange(jobType, fixedPriceRange, range, selectedSkills);
+    onFilterChange(
+      jobType,
+      fixedPriceRange,
+      range,
+      selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
+    );
   };
 
   const handleSkillsChange = (selectedOptions: any) => {
@@ -56,14 +97,51 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       ? selectedOptions.map((option: any) => option.value)
       : [];
     setSelectedSkills(skills);
-    onFilterChange(jobType, fixedPriceRange, hourlyRateRange, skills);
+    onFilterChange(
+      jobType,
+      fixedPriceRange,
+      hourlyRateRange,
+      skills,
+      selectedInstruments,
+      selectedStatuses,
+    );
+  };
+
+  const handleInstrumentsChange = (selectedOptions: any) => {
+    const instruments = selectedOptions
+      ? selectedOptions.map((option: any) => option.value)
+      : [];
+    setSelectedInstruments(instruments);
+    onFilterChange(
+      jobType,
+      fixedPriceRange,
+      hourlyRateRange,
+      selectedSkills,
+      instruments,
+      selectedStatuses,
+    );
+  };
+
+  const handleStatusesChange = (selectedOptions: any) => {
+    const statuses = selectedOptions
+      ? selectedOptions.map((option: any) => option.value)
+      : [];
+    setSelectedStatuses(statuses);
+    onFilterChange(
+      jobType,
+      fixedPriceRange,
+      hourlyRateRange,
+      selectedSkills,
+      selectedInstruments,
+      statuses,
+    );
   };
 
   return (
     <div className="bg-white rounded-md">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="flex flex-wrap gap-6">
         {/* Job Type */}
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full md:w-1/4">
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Job Type
           </label>
@@ -81,7 +159,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
 
         {/* Fixed Price Range */}
         {jobType === "Fixed Price" && (
-          <div className="md:col-span-2 flex flex-col">
+          <div className="flex flex-col w-full md:w-1/2">
             <label className="mb-1 text-sm font-semibold text-gray-700">
               Fixed Price Range
             </label>
@@ -137,7 +215,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
 
         {/* Hourly Rate Range */}
         {jobType === "Hourly Rate" && (
-          <div className="md:col-span-2 flex flex-col">
+          <div className="flex flex-col w-full md:w-1/2">
             <label className="mb-1 text-sm font-semibold text-gray-700">
               Hourly Rate Range
             </label>
@@ -192,7 +270,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
         )}
 
         {/* Skills */}
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full md:w-1/4">
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Skills
           </label>
@@ -204,6 +282,42 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
             )}
             onChange={handleSkillsChange}
             placeholder="Select skills..."
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
+        </div>
+
+        {/* Instruments */}
+        <div className="flex flex-col w-full md:w-1/4">
+          <label className="mb-1 text-sm font-semibold text-gray-700">
+            Instruments
+          </label>
+          <Select
+            isMulti
+            options={instrumentOptions}
+            value={instrumentOptions.filter((option) =>
+              selectedInstruments.includes(option.value),
+            )}
+            onChange={handleInstrumentsChange}
+            placeholder="Select instruments..."
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
+        </div>
+
+        {/* Statuses */}
+        <div className="flex flex-col w-full md:w-1/4">
+          <label className="mb-1 text-sm font-semibold text-gray-700">
+            Job Statuses
+          </label>
+          <Select
+            isMulti
+            options={statusOptions}
+            value={statusOptions.filter((option) =>
+              selectedStatuses.includes(option.value),
+            )}
+            onChange={handleStatusesChange}
+            placeholder="Select statuses..."
             className="react-select-container"
             classNamePrefix="react-select"
           />
