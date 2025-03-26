@@ -19,7 +19,7 @@ interface ValueByCategoryChartProps {
 // Функція для створення градієнта на основі HEX-кольору
 const generateGradient = (hexColor: string): string => {
   const { r, g, b } = hexToRgb(hexColor);
-  return `linear-gradient(to right, rgba(${r},${g},${b},0.2), rgba(${r},${g},${b},1))`;
+  return `linear-gradient(to right, rgba(${r},${g},${b},0.7), rgba(${r},${g},${b},1))`;
 };
 
 export const ValueByCategoryChart: React.FC<ValueByCategoryChartProps> = ({
@@ -37,14 +37,14 @@ export const ValueByCategoryChart: React.FC<ValueByCategoryChartProps> = ({
             ? { background: generateGradient(item.color) }
             : {
                 background:
-                  "linear-gradient(to right, rgba(29, 78, 216, 0.2), rgba(29, 78, 216, 1))",
+                  "linear-gradient(to right, rgba(29, 78, 216, 0.7), rgba(29, 78, 216, 1))",
               }; // Синій градієнт за замовчуванням
 
           return (
             <li key={item.label} className="flex flex-col gap-1.5">
-              <div className="bg-gray-500/10 rounded-full w-full h-3 relative mr-4">
+              <div className="bg-gradient-to-r from-gray-500/5 to-gray-500/10 rounded w-full h-3 relative mr-4">
                 <div
-                  className="absolute top-0 left-0 h-full rounded-full"
+                  className="absolute top-0 left-0 h-full rounded"
                   style={{
                     ...gradientStyle,
                     width: `${((item.value - minValue) / (maxValue - minValue)) * 100}%`,

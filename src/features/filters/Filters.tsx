@@ -138,7 +138,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-md">
+    <div className="rounded-md">
       <div className="flex flex-wrap gap-6">
         {/* Job Type */}
         <div className="flex flex-col w-full md:w-1/4">

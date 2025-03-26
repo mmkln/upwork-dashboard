@@ -1,6 +1,7 @@
 import React from "react";
 import { ProgressBar } from "../charts";
-import { JobExperience, UpworkJob } from "../../models"; // Інтерфейс UpworkJob
+import { JobExperience, UpworkJob } from "../../models";
+import { Card } from "../ui"; // Інтерфейс UpworkJob
 
 interface JobsByExperienceLevelProps {
   jobs: UpworkJob[];
@@ -30,13 +31,15 @@ const JobsByExperienceLevel: React.FC<JobsByExperienceLevelProps> = ({
   ];
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow w-full max-w-sm">
-      <h2 className="text-lg font-semibold mb-6">Jobs by Experience Level</h2>
+    <Card>
+      <div className="p-6 w-full max-w-sm">
+        <h2 className="text-lg font-semibold mb-8">Jobs by Experience Level</h2>
 
-      <div className="flex items-center justify-center mb-4">
-        <ProgressBar segments={segments} total={total} />
+        <div className="flex items-center justify-center mb-4">
+          <ProgressBar segments={segments} total={total} />
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

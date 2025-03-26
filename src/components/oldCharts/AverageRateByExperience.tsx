@@ -2,6 +2,7 @@ import React from "react";
 import { JobExperience, UpworkJob } from "../../models";
 import { ValueByCategoryChart, CategoryValueItem } from "../charts";
 import { findAvg } from "../../utils";
+import { Card } from "../ui";
 
 interface AverageRateByExperienceProps {
   jobs: UpworkJob[];
@@ -63,15 +64,19 @@ const AverageRateByExperience: React.FC<AverageRateByExperienceProps> = ({
   // const sortedData = data.sort((a, b) => b.value - a.value);
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow w-full max-w-sm">
-      <h2 className="text-lg font-semibold mb-8">Rate by Experience (avg.)</h2>
-      <ValueByCategoryChart
-        data={data}
-        maxValue={maxRate}
-        minValue={0}
-        labelSuffix="$"
-      />
-    </div>
+    <Card>
+      <div className="p-6 w-full max-w-sm">
+        <h2 className="text-lg font-semibold mb-8">
+          Rate by Experience (avg.)
+        </h2>
+        <ValueByCategoryChart
+          data={data}
+          maxValue={maxRate}
+          minValue={0}
+          labelSuffix="$"
+        />
+      </div>
+    </Card>
   );
 };
 

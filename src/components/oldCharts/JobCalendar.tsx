@@ -104,7 +104,7 @@ const JobCalendar: React.FC<JobCalendarProps> = ({ jobs, month }) => {
                     {format(day, "d")}
                   </span>
                   <div className="hidden group-hover/day:flex w-max absolute bottom-8 bg-white border border-gray-200 rounded-xl px-2 py-1 text-gray-800">
-                    {jobCount} {jobCount > 1 ? "Jobs" : "Job"}
+                    {jobCount} {jobCount != 1 ? "Jobs" : "Job"}
                   </div>
                 </div>
               </div>

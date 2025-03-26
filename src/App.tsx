@@ -8,7 +8,7 @@ import { Sidebar } from "./features";
 function App() {
   return (
     <Router>
-      <div className="relative flex h-screen">
+      <div className="relative flex h-screen bg-[#fafafc]">
         <Sidebar />
         <div className="flex-1 ml-20 overflow-y-auto p-6">
           <Routes>

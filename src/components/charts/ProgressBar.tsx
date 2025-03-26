@@ -44,7 +44,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = React.memo(
     return (
       <div className="flex flex-col w-full gap-4">
         <div
-          className={`relative w-full rounded-full bg-gray-300 flex overflow-hidden ${styles.barHeight}`}
+          className={`relative w-full rounded bg-gray-300 flex overflow-hidden ${styles.barHeight}`}
         >
           {segments.map((segment, index) => (
             <div
@@ -59,13 +59,11 @@ export const ProgressBar: React.FC<ProgressBarProps> = React.memo(
             </div>
           ))}
         </div>
-        <div
-          className={`flex justify-between mx-2 font-medium ${styles.textSize}`}
-        >
+        <div className={`flex justify-between font-medium ${styles.textSize}`}>
           {segments.map((segment, index) => (
             <div key={index} className="flex items-center gap-1">
               <div
-                className={`${styles.dotSize} rounded`}
+                className={`${styles.dotSize} rounded-full`}
                 style={{
                   backgroundColor: segment.color,
                 }}

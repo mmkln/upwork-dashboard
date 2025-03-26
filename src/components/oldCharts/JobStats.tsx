@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa"; // Іконки
 
 import { JobStatus, UpworkJob } from "../../models";
+import Card from "../ui/Card";
 
 interface JobStatsProps {
   jobs: UpworkJob[];
@@ -76,8 +77,8 @@ const JobStats: React.FC<JobStatsProps> = ({ jobs }) => {
   );
 
   return (
-    <div className="bg-white p-10 rounded-3xl shadow w-full">
-      <div className="">
+    <Card>
+      <div className="p-6">
         <h3 className="text-xl font-medium mb-4">Job Statuses</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {Object.keys(statusCounts).map((status) => (
@@ -94,29 +95,29 @@ const JobStats: React.FC<JobStatsProps> = ({ jobs }) => {
             </div>
           ))}
         </div>
-      </div>
-      <div className="mt-6">
-        <h2 className="text-xl font-medium mb-4">Overall Job Statistics</h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <h3 className="text-lg font-medium">Total Jobs</h3>
-            <p className="text-2xl">{totalJobs}</p>
-          </div>
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <h3 className="text-lg font-medium">Average Rate</h3>
-            <p className="text-2xl">${averageRate}</p>
-          </div>
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <h3 className="text-lg font-medium">Unique Countries</h3>
-            <p className="text-2xl">{uniqueCountries.length}</p>
-          </div>
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <h3 className="text-lg font-medium">Unique Skills</h3>
-            <p className="text-2xl">{uniqueSkills}</p>
+        <div className="mt-6">
+          <h2 className="text-xl font-medium mb-4">Overall Job Statistics</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-100 p-4 rounded-lg">
+              <h3 className="text-lg font-medium">Total Jobs</h3>
+              <p className="text-2xl">{totalJobs}</p>
+            </div>
+            <div className="bg-gray-100 p-4 rounded-lg">
+              <h3 className="text-lg font-medium">Average Rate</h3>
+              <p className="text-2xl">${averageRate}</p>
+            </div>
+            <div className="bg-gray-100 p-4 rounded-lg">
+              <h3 className="text-lg font-medium">Unique Countries</h3>
+              <p className="text-2xl">{uniqueCountries.length}</p>
+            </div>
+            <div className="bg-gray-100 p-4 rounded-lg">
+              <h3 className="text-lg font-medium">Unique Skills</h3>
+              <p className="text-2xl">{uniqueSkills}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

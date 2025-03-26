@@ -1,6 +1,7 @@
 import React from "react";
 import { UpworkJob } from "../../models";
 import { ValueByCategoryChart, CategoryValueItem } from "../charts";
+import Card from "../ui/Card";
 
 interface AverageRateByCountryProps {
   jobs: UpworkJob[];
@@ -51,19 +52,21 @@ const AverageRateByCountry: React.FC<AverageRateByCountryProps> = ({
   const limitedData = limit ? sortedData.slice(0, limit) : data;
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow w-full">
-      <h2 className="text-lg font-semibold mb-8">
-        Client Rate by Country (avg.)
-      </h2>
-      <div className="overflow-scroll h-[21.5rem]">
-        <ValueByCategoryChart
-          data={limitedData}
-          maxValue={maxRate}
-          minValue={0}
-          labelSuffix="$"
-        />
+    <Card>
+      <div className="p-6">
+        <h2 className="text-lg font-semibold mb-8">
+          Client Rate by Country (avg.)
+        </h2>
+        <div className="overflow-scroll h-[21.5rem]">
+          <ValueByCategoryChart
+            data={limitedData}
+            maxValue={maxRate}
+            minValue={0}
+            labelSuffix="$"
+          />
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

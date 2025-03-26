@@ -1,6 +1,9 @@
 import React, { useMemo } from "react";
 import { UpworkJob } from "../../models";
 import { instruments } from "../../utils";
+import Card from "../ui/Card";
+import { CopyToClipboardButton } from "../elements";
+import { Badge } from "../ui";
 
 interface ToolFrequencyChartProps {
   jobs: UpworkJob[];
@@ -70,38 +73,29 @@ const ToolFrequencyChart: React.FC<ToolFrequencyChartProps> = ({
       ? Math.max(...limitedData.map((item) => item.count))
       : 1;
 
-  return (
-    <div className="bg-white p-8 rounded-3xl shadow w-full">
-      <h2 className="text-lg font-semibold mb-8">
-        Top {limit && limit} Instruments
-      </h2>
-      <div className="flex flex-wrap gap-2">
-        {limitedData.map(({ tool, count }) => {
-          const frequencyRatio = count / maxFrequency;
-          const backgroundColor = `rgba(59, 130, 246, ${frequencyRatio})`;
-          const color =
-            frequencyRatio > 0.7
-              ? "rgba(255,255,255, 0.95)"
-              : "rgba(45,59,101,0.8)";
+  const instrumentsText = limitedData.map(({ tool }) => tool).join(", ");
 
-          return (
-            <div
+  return (
+    <Card>
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-semibold">
+            Top {limit && limit} Instruments
+          </h2>
+          <CopyToClipboardButton data={instrumentsText} name="Instruments" />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {limitedData.map(({ tool, count }) => (
+            <Badge
               key={tool}
-              className={`relative px-2 py-1 rounded-xl text-xs font-medium group`}
-              style={{
-                backgroundColor,
-                color,
-              }}
-            >
-              {tool.length > 15 ? `${tool.slice(0, 12).trim()}..` : tool}
-              <div className="hidden group-hover:flex absolute bottom-8 left-0 bg-white border border-gray-200 rounded-xl px-3 py-1 text-gray-800 z-10">
-                {tool}: {count} {count === 1 ? "раз" : "рази"}
-              </div>
-            </div>
-          );
-        })}
+              label={tool}
+              value={count}
+              maxRate={maxFrequency}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
