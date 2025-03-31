@@ -1,8 +1,7 @@
 // src/components/JobList.tsx
-
 import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
-import { UpworkJob, JobStatus } from "../../models";
+import { UpworkJob, JobStatus, JobExperience } from "../../models";
 import { fetchUpworkJobs } from "../../services";
 import { JobDetails } from "../../components";
 import { filterJobs, Filters, JobType } from "../../features";
@@ -66,6 +65,7 @@ const JobList: React.FC = () => {
     selectedSkills: string[],
     selectedInstruments: string[],
     selectedStatuses: JobStatus[],
+    selectedExperience: JobExperience[],
   ) => {
     console.log({ jobType, fixedPriceRange, hourlyRateRange, selectedSkills });
     const jobs = filterJobs(
@@ -76,6 +76,7 @@ const JobList: React.FC = () => {
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedExperience,
     );
     setFilteredJobsData(jobs);
   };

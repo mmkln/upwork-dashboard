@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Select from "react-select";
-import { JobStatus } from "../../models";
+import { JobStatus, JobExperience } from "../../models";
 import { camelToCapitalizedWords } from "../../utils";
 
 export type JobType = "Fixed Price" | "Hourly Rate" | "Unspecified" | "None";
@@ -13,6 +13,7 @@ interface FilterComponentProps {
     selectedSkills: string[],
     selectedInstruments: string[],
     selectedStatuses: JobStatus[],
+    selectedExperience: JobExperience[],
   ) => void;
   availableSkills: string[];
   availableInstruments: string[];
@@ -38,6 +39,9 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [selectedInstruments, setSelectedInstruments] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<JobStatus[]>([]);
+  const [selectedJobExperience, setSelectedJobExperience] = useState<
+    JobExperience[]
+  >([]);
 
   const skillOptions = availableSkills.map((skill) => ({
     value: skill,
@@ -54,6 +58,11 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     label: camelToCapitalizedWords(status),
   }));
 
+  const experienceOptions = Object.values(JobExperience).map((exp) => ({
+    value: exp,
+    label: exp,
+  }));
+
   const handleJobTypeChange = (value: JobType) => {
     setJobType(value);
     onFilterChange(
@@ -63,6 +72,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedJobExperience,
     );
   };
 
@@ -76,6 +86,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedJobExperience,
     );
   };
 
@@ -89,6 +100,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedJobExperience,
     );
   };
 
@@ -104,6 +116,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       skills,
       selectedInstruments,
       selectedStatuses,
+      selectedJobExperience,
     );
   };
 
@@ -119,6 +132,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       instruments,
       selectedStatuses,
+      selectedJobExperience,
     );
   };
 
@@ -134,6 +148,23 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       statuses,
+      selectedJobExperience,
+    );
+  };
+
+  const handleExperienceChange = (selectedOptions: any) => {
+    const experiences = selectedOptions
+      ? selectedOptions.map((option: any) => option.value)
+      : [];
+    setSelectedJobExperience(experiences);
+    onFilterChange(
+      jobType,
+      fixedPriceRange,
+      hourlyRateRange,
+      selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
+      experiences,
     );
   };
 
@@ -305,7 +336,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
           />
         </div>
 
-        {/* Statuses */}
+        {/* Job Statuses */}
         <div className="flex flex-col w-full md:w-1/4">
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Job Statuses
@@ -318,6 +349,24 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
             )}
             onChange={handleStatusesChange}
             placeholder="Select statuses..."
+            className="react-select-container"
+            classNamePrefix="react-select"
+          />
+        </div>
+
+        {/* Job Experience */}
+        <div className="flex flex-col w-full md:w-1/4">
+          <label className="mb-1 text-sm font-semibold text-gray-700">
+            Job Experience
+          </label>
+          <Select
+            isMulti
+            options={experienceOptions}
+            value={experienceOptions.filter((option) =>
+              selectedJobExperience.includes(option.value),
+            )}
+            onChange={handleExperienceChange}
+            placeholder="Select experience..."
             className="react-select-container"
             classNamePrefix="react-select"
           />

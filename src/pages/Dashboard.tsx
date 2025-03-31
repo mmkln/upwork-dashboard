@@ -3,7 +3,7 @@ import update from "immutability-helper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend"; // Бекенд для drag-and-drop
 import { fetchUpworkJobs } from "../services";
-import { JobStatus, UpworkJob } from "../models";
+import { JobExperience, JobStatus, UpworkJob } from "../models";
 import {
   AverageRateByCountry,
   AverageRateByExperience,
@@ -101,6 +101,7 @@ const Dashboard: React.FC = () => {
     selectedSkills: string[],
     selectedInstruments: string[],
     selectedStatuses: JobStatus[],
+    selectedExperience: JobExperience[],
   ) => {
     const jobs = filterJobs(
       jobsData,
@@ -110,6 +111,7 @@ const Dashboard: React.FC = () => {
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedExperience,
     );
     setFilteredJobsData(jobs);
   };

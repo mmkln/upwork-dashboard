@@ -1,3 +1,4 @@
+// src/models/index.ts
 export interface UpworkJob {
   id: string;
   average_rate: number | null;

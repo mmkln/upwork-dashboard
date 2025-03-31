@@ -1,4 +1,5 @@
-import { JobStatus, UpworkJob } from "../../../models";
+// src/feature/filters/utils/filterJobs.util.ts
+import { JobStatus, UpworkJob, JobExperience } from "../../../models";
 import { JobType } from "../Filters";
 import { toolRegexMap } from "../../../utils";
 
@@ -10,6 +11,7 @@ export const filterJobs = (
   selectedSkills: string[],
   selectedInstruments: string[],
   selectedStatuses: JobStatus[],
+  selectedExperience: JobExperience[],
 ): UpworkJob[] => {
   return jobs.filter((job) => {
     const fixedPrice = Number(job.fixed_price) || null;
@@ -55,8 +57,17 @@ export const filterJobs = (
     const matchesStatuses =
       selectedStatuses.length === 0 || selectedStatuses.includes(job.status);
 
+    // Experience Filter
+    const matchesExperience =
+      selectedExperience.length === 0 ||
+      selectedExperience.includes(job.experience as JobExperience);
+
     return (
-      matchesJobType && matchesSkills && matchesInstruments && matchesStatuses
+      matchesJobType &&
+      matchesSkills &&
+      matchesInstruments &&
+      matchesStatuses &&
+      matchesExperience
     );
   });
 };
