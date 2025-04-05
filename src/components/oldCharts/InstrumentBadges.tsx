@@ -23,19 +23,22 @@ const getToolFrequency = (jobs: UpworkJob[]): { [key: string]: number } => {
     return {
       mainTool,
       regexes: synonyms.map(
-        (synonym) => new RegExp(`\\b${escapeRegExp(synonym)}\\b`, "i"),
+        (synonym) =>
+          new RegExp(`\\b${escapeRegExp(synonym.toLowerCase())}\\b`, "i"),
       ),
     };
   });
 
   jobs.forEach((job) => {
     toolRegexes.forEach(({ mainTool, regexes }) => {
-      const inTitle = regexes.some((regex) => regex.test(job.title));
+      const inTitle = regexes.some((regex) =>
+        regex.test(job.title.toLowerCase()),
+      );
       const inDescription = regexes.some((regex) =>
-        regex.test(job.description),
+        regex.test(job.description.toLowerCase()),
       );
       const inSkills = job.skills.some((skill) =>
-        regexes.some((regex) => regex.test(skill)),
+        regexes.some((regex) => regex.test(skill.toLowerCase())),
       );
 
       if (inTitle || inDescription || inSkills) {

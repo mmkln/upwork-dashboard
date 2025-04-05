@@ -16,7 +16,7 @@ const roundToSignificant = (num: number): number => {
 };
 
 const getKeywordFrequency = (jobs: UpworkJob[]): { [key: string]: number } => {
-  const commonWords = [
+  const skipWords = [
     "and",
     "to",
     "the",
@@ -89,7 +89,7 @@ const getKeywordFrequency = (jobs: UpworkJob[]): { [key: string]: number } => {
       .match(/\b\w+\b/g);
     if (keywords) {
       keywords.forEach((word) => {
-        if (!commonWords.includes(word)) {
+        if (!skipWords.includes(word)) {
           acc[word] = (acc[word] || 0) + 1;
         }
       });
