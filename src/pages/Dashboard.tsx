@@ -33,14 +33,16 @@ import {
   JobRatesByCountryAvg2,
   JobRatesByCountryMed,
   JobCalendar,
-  JobsByCountry,
   KeywordFrequency,
   SkillBadges,
   Tile,
   PaymentTypeChart,
   InstrumentBadges,
 } from "../components";
-import { filterJobs, Filters, JobType } from "../features";
+import { filterJobs, JobType } from "../features";
+import StatsPanel from "../features/analytics/components/StatsPanel";
+import DashboardFiltersPanel from "../features/analytics/components/DashboardFiltersPanel";
+import JobsByCountryChart from "../features/analytics/charts/JobsByCountryChart";
 import { instruments } from "../utils";
 
 const Dashboard: React.FC = () => {
@@ -119,7 +121,7 @@ const Dashboard: React.FC = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="p-6">
-        <Filters
+        <DashboardFiltersPanel
           onFilterChange={onFilterChanged}
           availableSkills={availableSkills}
           availableInstruments={availableInstruments}
@@ -127,14 +129,7 @@ const Dashboard: React.FC = () => {
         />
       </div>
       <div className="mx-auto p-6 flex flex-col gap-4">
-        <div className="flex gap-4">
-          <div className=" max-w-3xl">
-            <JobStats jobs={filteredJobsData} />
-          </div>
-          <div className="">
-            <JobCalendar jobs={filteredJobsData} month={today} />
-          </div>
-        </div>
+        <StatsPanel jobs={filteredJobsData} />
         <div className="flex gap-4">
           <div className="max-w-96 min-w-80">
             <KeywordFrequency jobs={filteredJobsData} limit={50} />
@@ -151,7 +146,7 @@ const Dashboard: React.FC = () => {
             <AverageRateByCountry jobs={filteredJobsData} />
           </div>
           <div className="max-w-md min-w-80">
-            <JobsByCountry jobs={filteredJobsData} />
+            <JobsByCountryChart jobs={filteredJobsData} />
           </div>
           <div className="flex flex-col gap-4 max-w-xs">
             <AverageRateByExperience jobs={filteredJobsData} />

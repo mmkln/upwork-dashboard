@@ -4,9 +4,11 @@ import Modal from "react-modal";
 import { UpworkJob, JobStatus, JobExperience } from "../../models";
 import { fetchUpworkJobs } from "../../services";
 import { JobDetails } from "../../components";
-import { filterJobs, Filters, JobType } from "../../features";
+import { filterJobs, JobType } from "../../features";
 import { JobListItem } from "./components";
 import { instruments } from "../../utils";
+import FiltersPanel from "../../features/jobs/components/FiltersPanel";
+import CopyExportControls from "../../features/jobs/components/CopyExportControls";
 
 Modal.setAppElement("#root");
 
@@ -108,7 +110,7 @@ const JobList: React.FC = () => {
   return (
     <>
       <div className="p-6">
-        <Filters
+        <FiltersPanel
           onFilterChange={onFilterChanged}
           availableSkills={availableSkills}
           availableInstruments={availableInstruments}
@@ -120,50 +122,11 @@ const JobList: React.FC = () => {
           {filteredJobsData.length} job
           {filteredJobsData.length !== 1 ? "s" : ""} found
         </p>
-        <div className="flex space-x-2">
-          <button
-            className="p-2 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
-            title="Copy jobs to clipboard"
-            onClick={handleCopy}
-            disabled={filteredJobsData.length === 0}
-          >
-            <svg
-              className="w-6 h-6"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-              />
-            </svg>
-          </button>
-          <button
-            className="p-2 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
-            title="Export jobs as JSON file"
-            onClick={handleDownload}
-            disabled={filteredJobsData.length === 0}
-          >
-            <svg
-              className="w-6 h-6"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-              />
-            </svg>
-          </button>
-        </div>
+        <CopyExportControls
+          count={filteredJobsData.length}
+          onCopy={handleCopy}
+          onDownload={handleDownload}
+        />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 pt-4">
         {filteredJobsData.map((job) => (
