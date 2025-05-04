@@ -28,6 +28,7 @@ export const instruments: Array<string | string[]> = [
   "Klaviyo",
   "Leadpages",
   "Luma",
+  "Mailchimp",
   ["Make.com", "make.com", "makecom", "integromat"],
   "Manatal",
   "Manychat",
