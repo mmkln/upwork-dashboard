@@ -79,6 +79,7 @@ const JobList: React.FC = () => {
       selectedInstruments,
       selectedStatuses,
       selectedExperience,
+      null, // minClientRating not used here
     );
     setFilteredJobsData(jobs);
   };

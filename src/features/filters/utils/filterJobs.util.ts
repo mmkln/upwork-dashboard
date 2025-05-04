@@ -12,6 +12,7 @@ export const filterJobs = (
   selectedInstruments: string[],
   selectedStatuses: JobStatus[],
   selectedExperience: JobExperience[],
+  minClientRating: number | null,
 ): UpworkJob[] => {
   return jobs.filter((job) => {
     const fixedPrice = Number(job.fixed_price) || null;
@@ -62,12 +63,18 @@ export const filterJobs = (
       selectedExperience.length === 0 ||
       selectedExperience.includes(job.experience as JobExperience);
 
+    // Client Rating Filter
+    const matchesClientRating =
+      minClientRating == null ||
+      (job.client_rating !== null && job.client_rating >= minClientRating);
+
     return (
       matchesJobType &&
       matchesSkills &&
       matchesInstruments &&
       matchesStatuses &&
-      matchesExperience
+      matchesExperience &&
+      matchesClientRating
     );
   });
 };

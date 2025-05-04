@@ -8,8 +8,6 @@ import {
   AverageRateByCountry,
   AverageRateByExperience,
   JobStats,
-  TopSkillsChart,
-  ExperiencePieChart,
   CountryJobsChart,
   AverageRateByCountryChart,
   JobsByBinnedRangeChart,
@@ -19,30 +17,25 @@ import {
   HourlyRateChart,
   ClientRatingVsAverageRateChart,
   ClientSpendingByIndustryChart,
-  JobsOverTimeChart,
   SkillsAverageRateChart,
   SkillsStackedBarChart,
   SkillsBubbleChart,
   SkillsPieChart,
   SkillsTreeMapChart,
   JobsByExperienceLevel,
-  TopSkills,
-  AvgMinMaxJobRatesByCountry,
-  JobRatesByCountryMinMax,
-  JobRatesByCountryAvg,
-  JobRatesByCountryAvg2,
-  JobRatesByCountryMed,
-  JobCalendar,
-  KeywordFrequency,
-  SkillBadges,
-  Tile,
-  PaymentTypeChart,
-  InstrumentBadges,
 } from "../components";
+import CategoriesDistributionChart from '../features/analytics/charts/CategoriesDistributionChart';
+import BudgetHistogramChart from '../features/analytics/charts/BudgetHistogramChart';
+import TopSkillsChart from '../features/analytics/charts/TopSkillsChart';
+import TrendingKeywordsChart from '../features/analytics/charts/TrendingKeywordsChart';
 import { filterJobs, JobType } from "../features";
 import StatsPanel from "../features/analytics/components/StatsPanel";
 import DashboardFiltersPanel from "../features/analytics/components/DashboardFiltersPanel";
 import JobsByCountryChart from "../features/analytics/charts/JobsByCountryChart";
+import AverageRateByExperienceLevelChart from '../features/analytics/charts/AverageRateByExperienceLevelChart';
+import CompetitionThresholdChart from '../features/analytics/charts/CompetitionThresholdChart';
+import PostTimeHeatmapChart from "../features/analytics/charts/PostTimeHeatmapChart";
+import ConversionSnapshotChart from "../features/analytics/charts/ConversionSnapshotChart";
 import { instruments } from "../utils";
 
 const Dashboard: React.FC = () => {
@@ -104,6 +97,7 @@ const Dashboard: React.FC = () => {
     selectedInstruments: string[],
     selectedStatuses: JobStatus[],
     selectedExperience: JobExperience[],
+    minClientRating: number | null,
   ) => {
     const jobs = filterJobs(
       jobsData,
@@ -114,6 +108,7 @@ const Dashboard: React.FC = () => {
       selectedInstruments,
       selectedStatuses,
       selectedExperience,
+      minClientRating,
     );
     setFilteredJobsData(jobs);
   };
@@ -129,16 +124,29 @@ const Dashboard: React.FC = () => {
         />
       </div>
       <div className="mx-auto p-6 flex flex-col gap-4">
+        <div className="flex gap-4">
+          <div className="max-w-md min-w-80">
+            <CategoriesDistributionChart jobs={filteredJobsData} />
+          </div>
+          <div className="max-w-md min-w-80">
+            <BudgetHistogramChart jobs={filteredJobsData} />
+          </div>
+        </div>
         <StatsPanel jobs={filteredJobsData} />
         <div className="flex gap-4">
+          <div className="max-w-md min-w-80">
+            <PostTimeHeatmapChart jobs={filteredJobsData} />
+          </div>
+          <div className="max-w-md min-w-80">
+            <ConversionSnapshotChart jobs={filteredJobsData} />
+          </div>
+        </div>
+        <div className="flex gap-4">
           <div className="max-w-96 min-w-80">
-            <KeywordFrequency jobs={filteredJobsData} limit={50} />
+            <TrendingKeywordsChart jobs={filteredJobsData} limit={5} />
           </div>
           <div className="max-w-96 min-w-80">
-            <InstrumentBadges jobs={filteredJobsData} />
-          </div>
-          <div className="max-w-96 min-w-80">
-            <SkillBadges jobs={filteredJobsData} limit={50} />
+            <TopSkillsChart jobs={filteredJobsData} limit={5} />
           </div>
         </div>
         <div className="flex gap-4">
@@ -152,59 +160,18 @@ const Dashboard: React.FC = () => {
             <AverageRateByExperience jobs={filteredJobsData} />
             <JobsByExperienceLevel jobs={filteredJobsData} />
           </div>
-          {/*<div className="max-w-md min-w-80">*/}
-          {/*  <TopSkills jobs={jobsData} limit={7} />*/}
-          {/*</div>*/}
         </div>
-        <div className="flex gap-4">
-          <div className="max-w-96 min-w-80">
-            <PaymentTypeChart jobs={filteredJobsData} />
-          </div>
-        </div>
-        <div className="flex gap-4">
-          <div className="max-w-md min-w-80">
-            <AvgMinMaxJobRatesByCountry jobs={filteredJobsData} />
-          </div>
-          <div className="max-w-md min-w-80">
-            <JobRatesByCountryMinMax jobs={filteredJobsData} />
-          </div>
-          {/*<div className="max-w-md min-w-80">*/}
-          {/*  <JobRatesByCountryAvg jobs={jobsData} />*/}
-          {/*</div>*/}
-          <div className="max-w-md min-w-80">
-            <JobRatesByCountryAvg2 jobs={filteredJobsData} />
-          </div>
-          <div className="max-w-md min-w-80">
-            <JobRatesByCountryMed jobs={filteredJobsData} />
-          </div>
-        </div>
-
-        {/*<div>*/}
-        {/*  {tiles.map((tile, index) => (*/}
-        {/*    <Tile key={tile.id} id={tile.id} index={index} moveTile={moveTile}>*/}
-        {/*      {tile.component}*/}
-        {/*    </Tile>*/}
-        {/*  ))}*/}
-        {/*</div>*/}
-
-        {/*<TopSkillsChart jobs={jobsData} />*/}
-        {/*<ExperiencePieChart jobs={jobsData} />*/}
-        {/*<CountryJobsChart jobs={jobsData} />*/}
-        {/*<AverageRateByCountryChart jobs={jobsData} />*/}
         <JobsByBinnedRangeChart jobs={filteredJobsData} rangeStep={15} />
         <JobsByRateDistributionChart jobs={filteredJobsData} valueStep={1} />
         <JobsByAverageRateChart jobs={filteredJobsData} />
         <JobsByFixedPriceChart jobs={filteredJobsData} />
-        {/*<HourlyRateChart jobs={jobsData} />*/}
         <ClientRatingVsAverageRateChart jobs={filteredJobsData} />
         <ClientSpendingByIndustryChart jobs={filteredJobsData} />
-        <JobsOverTimeChart jobs={filteredJobsData} />
+        <CompetitionThresholdChart jobs={filteredJobsData} />
+        <AverageRateByExperienceLevelChart jobs={filteredJobsData} />
         <SkillsAverageRateChart jobs={filteredJobsData} />
         <SkillsStackedBarChart jobs={filteredJobsData} />
         <SkillsBubbleChart jobs={filteredJobsData} />
-        {/*<SkillsPieChart jobs={jobsData} />*/}
-        {/*<SkillsTreeMapChart jobs={jobsData} />*/}
-        {/* Додаткові графіки можна додавати тут */}
       </div>
     </DndProvider>
   );
