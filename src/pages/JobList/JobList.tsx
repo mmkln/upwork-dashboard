@@ -99,8 +99,13 @@ const JobList: React.FC = () => {
     const blob = new Blob([jsonString], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
+    const date = new Date().toLocaleDateString();
+    const time = new Date().toLocaleTimeString();
+    const formattedDateTime = `${date}-${time}`
+      .replace(/\//g, "-")
+      .replace(/:/g, "-");
     a.href = url;
-    a.download = "filtered_jobs.json";
+    a.download = `filtered-jobs-${formattedDateTime}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

@@ -77,7 +77,10 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   };
 
   const handleFixedPriceChange = (min: number, max: number) => {
-    const range: [number, number] = [min, max];
+    // Validate inputs: ensure non-negative and min <= max
+    const validatedMin = Math.max(0, min);
+    const validatedMax = Math.max(validatedMin, max);
+    const range: [number, number] = [validatedMin, validatedMax];
     setFixedPriceRange(range);
     onFilterChange(
       jobType,
@@ -194,52 +197,40 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
             <label className="mb-1 text-sm font-semibold text-gray-700">
               Fixed Price Range
             </label>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-3">
-                <input
-                  type="range"
-                  min="0"
-                  max="5000"
-                  value={fixedPriceRange ? fixedPriceRange[0] : 0}
-                  onChange={(e) =>
-                    handleFixedPriceChange(
-                      Number(e.target.value),
-                      fixedPriceRange
-                        ? fixedPriceRange[1]
-                        : INITIAL_FIXED_PRICE_MAX,
-                    )
-                  }
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <span className="w-16 text-sm text-gray-700">
-                  ${fixedPriceRange ? fixedPriceRange[0] : 0}
-                </span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <input
-                  type="range"
-                  min="0"
-                  max="5000"
-                  value={
+            <div className="flex items-center space-x-3">
+              <input
+                type="number"
+                min="0"
+                max="5000"
+                value={fixedPriceRange ? fixedPriceRange[0] : 0}
+                onChange={(e) =>
+                  handleFixedPriceChange(
+                    Number(e.target.value),
                     fixedPriceRange
                       ? fixedPriceRange[1]
-                      : INITIAL_FIXED_PRICE_MAX
-                  }
-                  onChange={(e) =>
-                    handleFixedPriceChange(
-                      fixedPriceRange ? fixedPriceRange[0] : 0,
-                      Number(e.target.value),
-                    )
-                  }
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                />
-                <span className="w-16 text-sm text-gray-700">
-                  $
-                  {fixedPriceRange
-                    ? fixedPriceRange[1]
-                    : INITIAL_FIXED_PRICE_MAX}
-                </span>
-              </div>
+                      : INITIAL_FIXED_PRICE_MAX,
+                  )
+                }
+                className="w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Min Price"
+              />
+              <span className="text-sm text-gray-700">to</span>
+              <input
+                type="number"
+                min="0"
+                max="5000"
+                value={
+                  fixedPriceRange ? fixedPriceRange[1] : INITIAL_FIXED_PRICE_MAX
+                }
+                onChange={(e) =>
+                  handleFixedPriceChange(
+                    fixedPriceRange ? fixedPriceRange[0] : 0,
+                    Number(e.target.value),
+                  )
+                }
+                className="w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Max Price"
+              />
             </div>
           </div>
         )}
