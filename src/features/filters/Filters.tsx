@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import Select from "react-select";
 import { JobStatus, JobExperience } from "../../models";
-import { camelToCapitalizedWords } from "../../utils";
+import { camelToCapitalizedWords, debounce } from "../../utils";
 
 export type JobType = "Fixed Price" | "Hourly Rate" | "Unspecified" | "None";
 
@@ -14,6 +14,7 @@ interface FilterComponentProps {
     selectedInstruments: string[],
     selectedStatuses: JobStatus[],
     selectedExperience: JobExperience[],
+    titleFilter: string,
   ) => void;
   availableSkills: string[];
   availableInstruments: string[];
@@ -42,6 +43,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   const [selectedJobExperience, setSelectedJobExperience] = useState<
     JobExperience[]
   >([]);
+  const [titleFilter, setTitleFilter] = useState<string>("");
 
   const skillOptions = availableSkills.map((skill) => ({
     value: skill,
@@ -63,6 +65,28 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     label: exp,
   }));
 
+  // Debounced filter change handler
+  const debouncedFilterChange = useCallback(
+    debounce((value: string) => {
+      onFilterChange(
+        jobType,
+        fixedPriceRange,
+        hourlyRateRange,
+        selectedSkills,
+        selectedInstruments,
+        selectedStatuses,
+        selectedJobExperience,
+        value,
+      );
+    }, 300),
+    [jobType, fixedPriceRange, hourlyRateRange, selectedSkills, selectedInstruments, selectedStatuses, selectedJobExperience]
+  );
+
+  const handleTitleFilterChange = (value: string) => {
+    setTitleFilter(value);
+    debouncedFilterChange(value);
+  };
+
   const handleJobTypeChange = (value: JobType) => {
     setJobType(value);
     onFilterChange(
@@ -73,6 +97,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedInstruments,
       selectedStatuses,
       selectedJobExperience,
+      titleFilter,
     );
   };
 
@@ -90,6 +115,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedInstruments,
       selectedStatuses,
       selectedJobExperience,
+      titleFilter,
     );
   };
 
@@ -104,6 +130,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedInstruments,
       selectedStatuses,
       selectedJobExperience,
+      titleFilter,
     );
   };
 
@@ -120,6 +147,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedInstruments,
       selectedStatuses,
       selectedJobExperience,
+      titleFilter,
     );
   };
 
@@ -136,6 +164,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       instruments,
       selectedStatuses,
       selectedJobExperience,
+      titleFilter,
     );
   };
 
@@ -152,6 +181,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedInstruments,
       statuses,
       selectedJobExperience,
+      titleFilter,
     );
   };
 
@@ -168,12 +198,26 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedInstruments,
       selectedStatuses,
       experiences,
+      titleFilter,
     );
   };
 
   return (
     <div className="rounded-md">
       <div className="flex flex-wrap gap-6">
+        {/* Title Filter */}
+        <div className="flex flex-col w-full md:w-1/4">
+          <label className="mb-1 text-sm font-semibold text-gray-700">
+            Search in Title
+          </label>
+          <input
+            type="text"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Filter by job title..."
+            value={titleFilter}
+            onChange={(e) => handleTitleFilterChange(e.target.value)}
+          />
+        </div>
         {/* Job Type */}
         <div className="flex flex-col w-full md:w-1/4">
           <label className="mb-1 text-sm font-semibold text-gray-700">

@@ -1,7 +1,7 @@
 // src/feature/filters/utils/filterJobs.util.ts
 import { JobStatus, UpworkJob, JobExperience } from "../../../models";
 import { JobType } from "../Filters";
-import { toolRegexMap } from "../../../utils";
+import { toolRegexMap, matchesBooleanSearch } from "../../../utils";
 
 export const filterJobs = (
   jobs: UpworkJob[],
@@ -12,8 +12,14 @@ export const filterJobs = (
   selectedInstruments: string[],
   selectedStatuses: JobStatus[],
   selectedExperience: JobExperience[],
+  titleFilter: string = "",
 ): UpworkJob[] => {
   return jobs.filter((job) => {
+    // Skip filtering if no title filter is provided or use boolean search
+    if (titleFilter && !matchesBooleanSearch(job.title, titleFilter)) {
+      return false;
+    }
+
     const fixedPrice = Number(job.fixed_price) || null;
 
     // Job Type Filter
