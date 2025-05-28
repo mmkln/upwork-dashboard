@@ -20,6 +20,7 @@ const SkillBadges: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
   const skillsData = jobs.reduce((acc: { [key: string]: number }, job) => {
     if (job.skills) {
       job.skills.forEach((skill: string) => {
+        skill = skill.trim();
         if (!acc[skill]) {
           acc[skill] = 1;
         } else {
