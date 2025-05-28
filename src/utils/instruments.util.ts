@@ -3,6 +3,7 @@
 export const instruments: Array<string | string[]> = [
   "Active Campaign",
   "Airtable",
+  "Apify",
   "Apollo",
   "Amwork",
   "Automation Anywhere",
