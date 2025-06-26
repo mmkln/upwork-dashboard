@@ -21,6 +21,7 @@ export const instruments: Array<string | string[]> = [
   "Drawio",
   "Dumpling",
   "Fireflies",
+  ["Follow Up Boss", "FollowUpBoss", "fub"],
   "Funnelytics",
   "getimg",
   ["GoHighLevel", "GHL", "Go High Level", "gohighlevel"],
