@@ -26,6 +26,7 @@ export const instruments: Array<string | string[]> = [
   "getimg",
   ["GoHighLevel", "GHL", "Go High Level", "gohighlevel"],
   "Harvest",
+  ["HeyGen", "Movio"],
   "HubSpot",
   ["Keap", "keap"],
   "Klaviyo",
