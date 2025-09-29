@@ -64,6 +64,7 @@ export const instruments: Array<string | string[]> = [
   "Twilio",
   ["Unbounce", "unbounce"],
   "Vapi",
+  "Wazuh",
   "Webflow",
   "Whimsical",
   "Wix",
