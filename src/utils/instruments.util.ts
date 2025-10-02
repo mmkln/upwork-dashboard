@@ -61,6 +61,7 @@ export const instruments: Array<string | string[]> = [
   "Shopify",
   "Slack",
   "Softr",
+  "Stripe",
   "Squarespace",
   "Supabase",
   ["TikTok", "tiktok"],
