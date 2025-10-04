@@ -32,6 +32,7 @@ export const instruments: Array<string | string[]> = [
   ["HeyGen", "Movio"],
   "HubSpot",
   "Instantly",
+  "JustCall",
   ["Keap", "keap"],
   "Klaviyo",
   "Leadpages",
