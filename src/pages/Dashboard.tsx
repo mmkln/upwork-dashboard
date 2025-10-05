@@ -103,6 +103,7 @@ const Dashboard: React.FC = () => {
     selectedStatuses: JobStatus[],
     selectedExperience: JobExperience[],
     titleFilter: string,
+    bookmarked?: boolean,
   ) => {
     const jobs = filterJobs(
       jobsData,
@@ -114,6 +115,7 @@ const Dashboard: React.FC = () => {
       selectedStatuses,
       selectedExperience,
       titleFilter,
+      bookmarked,
     );
     setFilteredJobsData(jobs);
   };

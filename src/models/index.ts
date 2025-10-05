@@ -15,6 +15,7 @@ export interface UpworkJob {
   created_at: string;
   status: JobStatus;
   connects: string | null;
+  is_bookmarked: boolean;
 }
 
 export enum JobExperience {

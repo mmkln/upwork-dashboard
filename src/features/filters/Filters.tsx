@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import Select from "react-select";
 import { JobStatus, JobExperience } from "../../models";
 import { camelToCapitalizedWords, debounce } from "../../utils";
@@ -15,6 +15,7 @@ interface FilterComponentProps {
     selectedStatuses: JobStatus[],
     selectedExperience: JobExperience[],
     titleFilter: string,
+    bookmarked?: boolean,
   ) => void;
   availableSkills: string[];
   availableInstruments: string[];
@@ -44,6 +45,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     JobExperience[]
   >([]);
   const [titleFilter, setTitleFilter] = useState<string>("");
+  const [bookmarked, setBookmarked] = useState<boolean | undefined>(undefined);
 
   const skillOptions = availableSkills.map((skill) => ({
     value: skill,
@@ -77,9 +79,19 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
         selectedStatuses,
         selectedJobExperience,
         value,
+        bookmarked,
       );
     }, 300),
-    [jobType, fixedPriceRange, hourlyRateRange, selectedSkills, selectedInstruments, selectedStatuses, selectedJobExperience]
+    [
+      jobType,
+      fixedPriceRange,
+      hourlyRateRange,
+      selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
+      selectedJobExperience,
+      bookmarked,
+    ],
   );
 
   const handleTitleFilterChange = (value: string) => {
@@ -98,6 +110,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedStatuses,
       selectedJobExperience,
       titleFilter,
+      bookmarked,
     );
   };
 
@@ -116,11 +129,15 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedStatuses,
       selectedJobExperience,
       titleFilter,
+      bookmarked,
     );
   };
 
   const handleHourlyRateChange = (min: number, max: number) => {
-    const range: [number, number] = [min, max];
+    // Add validation similar to fixed price
+    const validatedMin = Math.max(0, min);
+    const validatedMax = Math.max(validatedMin, max);
+    const range: [number, number] = [validatedMin, validatedMax];
     setHourlyRateRange(range);
     onFilterChange(
       jobType,
@@ -131,6 +148,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedStatuses,
       selectedJobExperience,
       titleFilter,
+      bookmarked,
     );
   };
 
@@ -148,6 +166,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedStatuses,
       selectedJobExperience,
       titleFilter,
+      bookmarked,
     );
   };
 
@@ -165,6 +184,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedStatuses,
       selectedJobExperience,
       titleFilter,
+      bookmarked,
     );
   };
 
@@ -182,6 +202,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       statuses,
       selectedJobExperience,
       titleFilter,
+      bookmarked,
     );
   };
 
@@ -199,6 +220,23 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedStatuses,
       experiences,
       titleFilter,
+      bookmarked,
+    );
+  };
+
+  const handleBookmarkedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const bookmarked = e.target.checked;
+    setBookmarked(bookmarked);
+    onFilterChange(
+      jobType,
+      fixedPriceRange,
+      hourlyRateRange,
+      selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
+      selectedJobExperience,
+      titleFilter,
+      bookmarked,
     );
   };
 
@@ -405,6 +443,19 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
             className="react-select-container"
             classNamePrefix="react-select"
           />
+        </div>
+
+        {/* Bookmarked filter */}
+        <div className="flex items-center">
+          <label className="flex items-center text-sm font-semibold text-gray-700">
+            <input
+              type="checkbox"
+              checked={bookmarked === true}
+              onChange={handleBookmarkedChange}
+              className="mr-2"
+            />
+            Only bookmarked jobs
+          </label>
         </div>
       </div>
     </div>
