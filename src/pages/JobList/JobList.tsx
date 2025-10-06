@@ -41,6 +41,13 @@ const JobList: React.FC = () => {
     return jobs.reverse();
   };
 
+  const updateJob = (job: UpworkJob) => {
+    const updatedJobs = jobsData.map((j) => (j.id === job.id ? job : j));
+    setJobsData(updatedJobs);
+    const updatedFilteredJobs = filteredJobsData.map((j) => (j.id === job.id ? job : j));
+    setFilteredJobsData(updatedFilteredJobs);
+  };
+
   const openJobDetails = (job: UpworkJob) => {
     setSelectedJob(job);
   };
@@ -176,13 +183,14 @@ const JobList: React.FC = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 pt-4">
         {filteredJobsData.map((job) => (
-          <JobListItem key={job.id} job={job} onClick={openJobDetails} />
+          <JobListItem key={job.id} job={job} onClick={openJobDetails} onJobUpdate={updateJob} />
         ))}
         {selectedJob && (
           <JobDetails
             job={selectedJob}
             isOpen={true}
             onClose={closeJobDetails}
+            onJobUpdate={updateJob}
           />
         )}
       </div>

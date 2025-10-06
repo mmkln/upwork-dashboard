@@ -1,6 +1,6 @@
 // src/components/JobListItem.tsx
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UpworkJob, JobExperience, JobStatus } from "../../../models";
 import { updateUpworkJob } from "../../../services";
 import { JobStatusSelect } from "../../../components";
@@ -9,15 +9,17 @@ import Card from "../../../components/ui/Card";
 interface JobListItemProps {
   job: UpworkJob;
   onClick: (job: UpworkJob) => void;
+  onJobUpdate: (job: UpworkJob) => void;
 }
 
-const JobListItem: React.FC<JobListItemProps> = ({ job, onClick }) => {
+const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate }) => {
   const [jobData, setJobData] = useState<UpworkJob>(job);
 
   const handleStatusChange = (status: JobStatus) => {
     updateUpworkJob({ ...jobData, status })
       .then((updatedJob) => {
         setJobData(updatedJob);
+        onJobUpdate(updatedJob);
       })
       .catch((error) => {
         console.error("Error updating job status:", error);
@@ -28,11 +30,16 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onClick }) => {
     updateUpworkJob({ ...jobData, is_bookmarked: !jobData.is_bookmarked })
       .then((updatedJob) => {
         setJobData(updatedJob);
+        onJobUpdate(updatedJob);
       })
       .catch((error) => {
         console.error("Error updating job bookmark:", error);
       });
   };
+
+  useEffect(() => {
+    setJobData(job);
+  }, [job]);
 
   return (
     <Card shadow={true}>
