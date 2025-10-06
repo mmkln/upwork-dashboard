@@ -67,7 +67,7 @@ const JobList: React.FC = () => {
     selectedStatuses: JobStatus[],
     selectedExperience: JobExperience[],
     titleFilter: string,
-    bookmarked?: boolean,
+    bookmarked: boolean,
   ) => {
     console.log({ jobType, fixedPriceRange, hourlyRateRange, selectedSkills });
     const jobs = filterJobs(

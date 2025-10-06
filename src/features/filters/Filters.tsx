@@ -15,7 +15,7 @@ interface FilterComponentProps {
     selectedStatuses: JobStatus[],
     selectedExperience: JobExperience[],
     titleFilter: string,
-    bookmarked?: boolean,
+    bookmarked: boolean,
   ) => void;
   availableSkills: string[];
   availableInstruments: string[];
@@ -45,7 +45,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     JobExperience[]
   >([]);
   const [titleFilter, setTitleFilter] = useState<string>("");
-  const [bookmarked, setBookmarked] = useState<boolean | undefined>(undefined);
+  const [bookmarked, setBookmarked] = useState<boolean>(false);
 
   const skillOptions = availableSkills.map((skill) => ({
     value: skill,

@@ -13,7 +13,7 @@ export const filterJobs = (
   selectedStatuses: JobStatus[],
   selectedExperience: JobExperience[],
   titleFilter: string = "",
-  bookmarked?: boolean,
+  bookmarked: boolean,
 ): UpworkJob[] => {
   return jobs.filter((job) => {
     // Skip filtering if no title filter is provided or use boolean search
@@ -71,7 +71,7 @@ export const filterJobs = (
 
     // Bookmarked Filter
     const matchesBookmarked =
-      bookmarked == false || job.is_bookmarked === bookmarked;
+      !bookmarked || job.is_bookmarked === bookmarked;
 
     return (
       matchesJobType &&
