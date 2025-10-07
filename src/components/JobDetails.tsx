@@ -139,7 +139,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
 
         <div className="mt-8 flex flex-col gap-8">
             <div>
-                <h3 className="text-md font-semibold text-gray-800 mb-2">
+                <h3 className="text-sm font-semibold text-gray-800 mb-2">
                     Description
                 </h3>
                 <div className="max-h-60 overflow-y-auto p-3 rounded bg-gray-100">
@@ -147,7 +147,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
                 </div>
             </div>
             <div>
-                <h3 className="text-md font-semibold text-gray-800 mb-2">
+                <h3 className="text-sm font-semibold text-gray-800 mb-2">
                     Skills
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -163,7 +163,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
             </div>
             <div className="flex flex-wrap gap-14">
                 <div>
-                    <h3 className="text-md font-semibold text-gray-800 mb-2">Payment</h3>
+                    <h3 className="text-sm font-semibold text-gray-800 mb-2">Payment</h3>
                     <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-800">
                         ${job.hourly_rates?.length ? `${job.hourly_rates[0]}${job.hourly_rates[1] ? '-' + job.hourly_rates[1] : ''}` : job.fixed_price}
@@ -175,7 +175,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
                 </div>
                 {job.total_spent !== null && (
                     <div>
-                        <h3 className="text-md font-semibold text-gray-800 mb-2">
+                        <h3 className="text-sm font-semibold text-gray-800 mb-2">
                             Total Spent
                         </h3>
                         <p className="text-sm text-gray-600">${job.total_spent}</p>
@@ -183,7 +183,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
                 )}
                 {job.client_industry && (
                     <div>
-                        <h3 className="text-md font-semibold text-gray-800 mb-2">
+                        <h3 className="text-sm font-semibold text-gray-800 mb-2">
                             Industry
                         </h3>
                         <p className="text-sm text-gray-600">{job.client_industry}</p>
@@ -199,7 +199,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
                 className="p-1 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white active:bg-gray-200"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" className="w-5 h-5">
+                     stroke="currentColor" className="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/>
                 </svg>
@@ -208,7 +208,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
                 href={`https://www.upwork.com/jobs/${job.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 underline"
+                className="text-blue-500 text-sm underline"
             >
                 View Job on Upwork
             </a>
