@@ -61,6 +61,7 @@ export const instruments: Array<string | string[]> = [
   "SendGrid",
   "Shopify",
   "Slack",
+  "SmartLead",
   "Softr",
   "Stripe",
   "Squarespace",
