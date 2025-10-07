@@ -96,7 +96,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
             )}
           </div>
           <button
-            className="p-1 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
+            className="p-1 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white active:bg-gray-200"
             title={jobData.is_bookmarked ? "Remove from bookmarks" : "Bookmark job"}
             onClick={(event) => {
               event.stopPropagation();
@@ -154,40 +154,56 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
             </span>
           ))}
         </div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">Payment</h3>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-800">
-            ${job.hourly_rates?.length ? job.hourly_rates[0] : job.fixed_price}
-          </span>
-          <span className="text-xs text-gray-500">
-            {job.hourly_rates?.length ? "/ hr" : " (fixed)"}
-          </span>
+
+        <div className="mt-6 flex flex-wrap gap-14">
+            <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Payment</h3>
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-800">
+                        ${job.hourly_rates?.length ? `${job.hourly_rates[0]}${job.hourly_rates[1] ? '-' + job.hourly_rates[1] : ''}` : job.fixed_price}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                        {job.hourly_rates?.length ? "/ hr" : " (fixed)"}
+                    </span>
+                </div>
+            </div>
+            {job.total_spent !== null && (
+                <div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                        Client Total Spent
+                    </h3>
+                    <p className="text-sm text-gray-600">${job.total_spent}</p>
+                </div>
+            )}
+            {job.client_industry && (
+                <div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                        Client Industry
+                    </h3>
+                    <p className="text-sm text-gray-600">{job.client_industry}</p>
+                </div>
+            )}
         </div>
-        {job.client_industry && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Client Industry
-            </h3>
-            <p className="text-sm text-gray-600">{job.client_industry}</p>
-          </div>
-        )}
-        {job.total_spent !== null && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Client Total Spent
-            </h3>
-            <p className="text-sm text-gray-600">${job.total_spent}</p>
-          </div>
-        )}
-        <div className="mt-6">
-          <a
-            href={`https://www.upwork.com/jobs/${job.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 underline"
-          >
-            View Job on Upwork
-          </a>
+        <div className="mt-6 flex justify-end items-center gap-2">
+            <button
+                onClick={() => navigator.clipboard.writeText(`https://www.upwork.com/jobs/${job.id}`)}
+                title="Copy job link to clipboard"
+                className="p-1 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white active:bg-gray-200"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" className="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/>
+                </svg>
+            </button>
+            <a
+                href={`https://www.upwork.com/jobs/${job.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
+            >
+                View Job on Upwork
+            </a>
         </div>
       </div>
     </Modal>
