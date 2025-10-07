@@ -176,7 +176,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
                 {job.total_spent !== null && (
                     <div>
                         <h3 className="text-md font-semibold text-gray-800 mb-2">
-                            Client Total Spent
+                            Total Spent
                         </h3>
                         <p className="text-sm text-gray-600">${job.total_spent}</p>
                     </div>
@@ -184,7 +184,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
                 {job.client_industry && (
                     <div>
                         <h3 className="text-md font-semibold text-gray-800 mb-2">
-                            Client Industry
+                            Industry
                         </h3>
                         <p className="text-sm text-gray-600">{job.client_industry}</p>
                     </div>
