@@ -157,10 +157,10 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Payment</h3>
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-gray-800">
-            ${job.hourly_rates ? job.hourly_rates[0] : job.fixed_price}
+            ${job.hourly_rates?.length ? job.hourly_rates[0] : job.fixed_price}
           </span>
           <span className="text-xs text-gray-500">
-            {job.hourly_rates ? "/ hr" : " (fixed)"}
+            {job.hourly_rates?.length ? "/ hr" : " (fixed)"}
           </span>
         </div>
         {job.client_industry && (
