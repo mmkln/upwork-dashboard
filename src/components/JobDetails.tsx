@@ -137,56 +137,62 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
         {/*  </span>*/}
         {/*</div>*/}
 
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-          Description
-        </h3>
-        <div className="mb-4 max-h-60 overflow-y-auto p-3 rounded bg-gray-100">
-          <p className="text-sm leading-relaxed text-gray-600">{job.description}</p>
-        </div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-          Skills Required
-        </h3>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {job.skills.map((skill, index) => (
-            <span
-              key={index}
-              className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-14">
+        <div className="mt-8 flex flex-col gap-8">
             <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Payment</h3>
-                <div className="flex items-center gap-2">
+                <h3 className="text-md font-semibold text-gray-800 mb-2">
+                    Description
+                </h3>
+                <div className="max-h-60 overflow-y-auto p-3 rounded bg-gray-100">
+                    <p className="text-sm leading-relaxed text-gray-600">{job.description}</p>
+                </div>
+            </div>
+            <div>
+                <h3 className="text-md font-semibold text-gray-800 mb-2">
+                    Skills
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                    {job.skills.map((skill, index) => (
+                        <span
+                            key={index}
+                            className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+                        >
+                        {skill}
+                    </span>
+                    ))}
+                </div>
+            </div>
+            <div className="flex flex-wrap gap-14">
+                <div>
+                    <h3 className="text-md font-semibold text-gray-800 mb-2">Payment</h3>
+                    <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-800">
                         ${job.hourly_rates?.length ? `${job.hourly_rates[0]}${job.hourly_rates[1] ? '-' + job.hourly_rates[1] : ''}` : job.fixed_price}
                     </span>
-                    <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500">
                         {job.hourly_rates?.length ? "/ hr" : " (fixed)"}
                     </span>
+                    </div>
                 </div>
+                {job.total_spent !== null && (
+                    <div>
+                        <h3 className="text-md font-semibold text-gray-800 mb-2">
+                            Client Total Spent
+                        </h3>
+                        <p className="text-sm text-gray-600">${job.total_spent}</p>
+                    </div>
+                )}
+                {job.client_industry && (
+                    <div>
+                        <h3 className="text-md font-semibold text-gray-800 mb-2">
+                            Client Industry
+                        </h3>
+                        <p className="text-sm text-gray-600">{job.client_industry}</p>
+                    </div>
+                )}
             </div>
-            {job.total_spent !== null && (
-                <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                        Client Total Spent
-                    </h3>
-                    <p className="text-sm text-gray-600">${job.total_spent}</p>
-                </div>
-            )}
-            {job.client_industry && (
-                <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                        Client Industry
-                    </h3>
-                    <p className="text-sm text-gray-600">{job.client_industry}</p>
-                </div>
-            )}
         </div>
-        <div className="mt-6 flex justify-end items-center gap-2">
+
+        <div className="mt-8 flex justify-end items-center gap-2">
             <button
                 onClick={() => navigator.clipboard.writeText(`https://www.upwork.com/jobs/${job.id}`)}
                 title="Copy job link to clipboard"
