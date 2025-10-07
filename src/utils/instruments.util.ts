@@ -35,6 +35,7 @@ export const instruments: Array<string | string[]> = [
   "JustCall",
   ["Keap", "keap"],
   "Klaviyo",
+  ["KoalaWriter", "Koala Writer"],
   "Leadpages",
   "Luma",
   "Mailchimp",
