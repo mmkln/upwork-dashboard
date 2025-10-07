@@ -4,7 +4,7 @@ import React from "react";
 const AccountButton: React.FC = () => (
   <a
     href="#"
-    className="flex items-center w-full px-2 py-2 mt-auto bg-gray-800 hover:bg-gray-700 hover:text-gray-300 transition-colors duration-300 rounded"
+    className="flex items-center w-full px-2 py-2 mt-auto bg-[#002e82] hover:bg-[#023ca5] hover:text-gray-300 transition-colors duration-300 rounded"
   >
     <div className="flex items-center justify-center">
       <div className="flex items-center justify-center w-8 h-8">
