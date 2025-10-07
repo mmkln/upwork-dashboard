@@ -140,7 +140,9 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
         <h3 className="text-lg font-semibold text-gray-800 mb-2">
           Description
         </h3>
-        <p className="text-sm text-gray-600 mb-4">{job.description}</p>
+        <div className="mb-4 max-h-60 overflow-y-auto p-3 rounded bg-gray-100">
+          <p className="text-sm leading-relaxed text-gray-600">{job.description}</p>
+        </div>
         <h3 className="text-lg font-semibold text-gray-800 mb-2">
           Skills Required
         </h3>
