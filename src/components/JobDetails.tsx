@@ -52,7 +52,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
           transform: "translate(-50%, -50%)",
           zIndex: 1000,
           backgroundColor: "#ffffff",
-          padding: "20px",
+          padding: "24px",
           borderRadius: "8px",
           maxWidth: "90%",
           maxHeight: "90%",
@@ -72,11 +72,11 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
       <div>
         <button
           onClick={onClose}
-          className="float-right text-gray-500 text-2xl"
+          className="absolute top-3.5 right-3 leading-3 text-gray-500 text-2xl"
         >
           &times;
         </button>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4 mt-2">
           {job.title}
         </h2>
         <div className="flex justify-between items-center mb-4">
@@ -192,7 +192,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
             </div>
         </div>
 
-        <div className="mt-8 flex justify-end items-center gap-2">
+        <div className="mt-6 flex justify-end items-center gap-2">
             <button
                 onClick={() => navigator.clipboard.writeText(`https://www.upwork.com/jobs/${job.id}`)}
                 title="Copy job link to clipboard"
