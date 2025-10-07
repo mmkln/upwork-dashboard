@@ -148,7 +148,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
           {job.skills.map((skill, index) => (
             <span
               key={index}
-              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+              className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
             >
               {skill}
             </span>
