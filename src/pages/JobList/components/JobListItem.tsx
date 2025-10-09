@@ -10,9 +10,10 @@ interface JobListItemProps {
   job: UpworkJob;
   onClick: (job: UpworkJob) => void;
   onJobUpdate: (job: UpworkJob) => void;
+  isLastClicked?: boolean;
 }
 
-const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate }) => {
+const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate, isLastClicked = false }) => {
   const [jobData, setJobData] = useState<UpworkJob>(job);
 
   const handleStatusChange = (status: JobStatus) => {
@@ -42,7 +43,7 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate }) 
   }, [job]);
 
   return (
-    <Card shadow={true}>
+    <Card shadow={true} isHighlighted={isLastClicked}>
       <div className="group p-4 cursor-pointer" onClick={() => onClick(job)}>
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs text-blue-600">

@@ -15,6 +15,7 @@ const JobList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedJob, setSelectedJob] = useState<UpworkJob | null>(null);
   const [filteredJobsData, setFilteredJobsData] = useState<UpworkJob[]>([]);
+  const [lastClickedJobId, setLastClickedJobId] = useState<string | null>(null);
   const availableStatuses = Object.values(JobStatus);
   const availableInstruments: string[] = instruments.map((toolEntry) =>
     Array.isArray(toolEntry) ? toolEntry[0] : toolEntry,
@@ -50,6 +51,7 @@ const JobList: React.FC = () => {
 
   const openJobDetails = (job: UpworkJob) => {
     setSelectedJob(job);
+    setLastClickedJobId(job.id);
   };
 
   const closeJobDetails = () => {
@@ -183,9 +185,16 @@ const JobList: React.FC = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 pt-4">
         {filteredJobsData.map((job) => (
-          <JobListItem key={job.id} job={job} onClick={openJobDetails} onJobUpdate={updateJob} />
+          <JobListItem 
+            key={job.id} 
+            job={job} 
+            onClick={openJobDetails} 
+            onJobUpdate={updateJob}
+            isLastClicked={lastClickedJobId === job.id}
+          />
         ))}
         {selectedJob && (
+            // TODO: implement buttons to go to next/previous job in the filtered list
           <JobDetails
             job={selectedJob}
             isOpen={true}
