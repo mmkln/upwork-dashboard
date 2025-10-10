@@ -26,7 +26,7 @@ export const instruments: Array<string | string[]> = [
   "Funnelytics",
   "getimg",
   ["GoHighLevel", "GHL", "Go High Level", "gohighlevel"],
-  "Google Data Studio",
+  ["Looker Studio", "Google Data Studio"],
   "Google Analytics",
   "Harvest",
   ["HeyGen", "Movio"],
