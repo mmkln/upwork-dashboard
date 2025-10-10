@@ -44,6 +44,7 @@ export const instruments: Array<string | string[]> = [
   "Manychat",
   ["Marketo", "marketo"],
   "Mautic",
+  "Metabase",
   "MindManager",
   "Monday",
   "n8n",
