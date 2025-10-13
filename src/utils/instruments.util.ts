@@ -59,6 +59,7 @@ export const instruments: Array<string | string[]> = [
   "Pipedrive",
   "Play.ai",
   "Podio",
+  "Postmark",
   ["Power BI", "PowerBI"],
   "QuickBooks",
   "Redash",
