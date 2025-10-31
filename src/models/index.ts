@@ -5,7 +5,9 @@ export interface UpworkJob {
   description: string;
   client_industry: string | null;
   client_rating: number | null;
-  country: string;
+  readonly country: string;
+  readonly country_raw: string;
+  readonly country_code: string;
   experience: string;
   hourly_rates: number[] | null;
   skills: string[];

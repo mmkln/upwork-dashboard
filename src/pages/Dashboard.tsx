@@ -170,23 +170,24 @@ const Dashboard: React.FC = () => {
             <PaymentTypeChart jobs={filteredJobsData} />
           </div>
         </div>
-        <div className="flex gap-4">
-          <div className="max-w-md min-w-80">
-            <AvgMinMaxJobRatesByCountry jobs={filteredJobsData} />
-          </div>
-          <div className="max-w-md min-w-80">
-            <JobRatesByCountryMinMax jobs={filteredJobsData} />
-          </div>
-          {/*<div className="max-w-md min-w-80">*/}
-          {/*  <JobRatesByCountryAvg jobs={jobsData} />*/}
-          {/*</div>*/}
-          <div className="max-w-md min-w-80">
-            <JobRatesByCountryAvg2 jobs={filteredJobsData} />
-          </div>
-          <div className="max-w-md min-w-80">
-            <JobRatesByCountryMed jobs={filteredJobsData} />
-          </div>
-        </div>
+        // TODO: fix or remove these charts
+        {/*<div className="flex gap-4">*/}
+        {/*  <div className="max-w-md min-w-80">*/}
+        {/*    <AvgMinMaxJobRatesByCountry jobs={filteredJobsData} />*/}
+        {/*  </div>*/}
+        {/*  <div className="max-w-md min-w-80">*/}
+        {/*    <JobRatesByCountryMinMax jobs={filteredJobsData} />*/}
+        {/*  </div>*/}
+        {/*  /!*<div className="max-w-md min-w-80">*!/*/}
+        {/*  /!*  <JobRatesByCountryAvg jobs={jobsData} />*!/*/}
+        {/*  /!*</div>*!/*/}
+        {/*  <div className="max-w-md min-w-80">*/}
+        {/*    <JobRatesByCountryAvg2 jobs={filteredJobsData} />*/}
+        {/*  </div>*/}
+        {/*  <div className="max-w-md min-w-80">*/}
+        {/*    <JobRatesByCountryMed jobs={filteredJobsData} />*/}
+        {/*  </div>*/}
+        {/*</div>*/}
 
         {/*<div>*/}
         {/*  {tiles.map((tile, index) => (*/}
@@ -208,7 +209,10 @@ const Dashboard: React.FC = () => {
         <ClientRatingVsAverageRateChart jobs={filteredJobsData} />
         <ClientSpendingByIndustryChart jobs={filteredJobsData} />
         <JobsOverTimeChart jobs={filteredJobsData} />
+        {/* TODO: fix calculation in SkillsAverageRateChart*/}
         <SkillsAverageRateChart jobs={filteredJobsData} />
+        {/* TODO: implement chart Skills by total spent*/}
+        {/* TODO: implement chart Instruments by Average Rate*/}
         <SkillsStackedBarChart jobs={filteredJobsData} />
         <SkillsBubbleChart jobs={filteredJobsData} />
         {/*<SkillsPieChart jobs={jobsData} />*/}

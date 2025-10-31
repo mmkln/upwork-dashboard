@@ -57,15 +57,13 @@ const JobStats: React.FC<JobStatsProps> = ({ jobs }) => {
     return acc + (job.total_spent ? Number(job.total_spent) : 0);
   }, 0);
 
-  const uniqueCountries = jobs.reduce((list: string[], job) => {
-    if (job.country && !list.includes(job.country)) list.push(job.country);
-    return list;
-  }, []);
+  const uniqueCountries = Array.from(
+    new Set(jobs.map((job) => job.country_code || "ZZ")),
+  );
 
-  // Кількість унікальних навичок
   const uniqueSkills = Array.from(
     new Set(jobs.flatMap((job) => job.skills)),
-  ).length;
+  );
 
   // Статистика по статусах
   const statusCounts = jobs.reduce(
@@ -112,7 +110,7 @@ const JobStats: React.FC<JobStatsProps> = ({ jobs }) => {
             </div>
             <div className="bg-gray-100 p-4 rounded-lg">
               <h3 className="text-lg font-medium">Unique Skills</h3>
-              <p className="text-2xl">{uniqueSkills}</p>
+              <p className="text-2xl">{uniqueSkills.length}</p>
             </div>
           </div>
         </div>
