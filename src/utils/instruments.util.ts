@@ -1,4 +1,41 @@
 // instruments.util.ts
+const videoAndAnimationInstruments: Array<string | string[]> = [
+    // Editing / Motion
+    ["Adobe Premiere Pro", "Premiere Pro", "Adobe Premiere", "Premiere"],
+    ["Adobe After Effects", "After Effects", "AfterEffects"],
+    ["DaVinci Resolve", "Da Vinci Resolve"],
+    ["Final Cut Pro", "Final Cut", "FCPX", "FCP"],
+    ["CapCut", "CapCut Pro"],
+
+    // Graphics for video
+    ["Adobe Photoshop", "Photoshop"],
+    ["Adobe Illustrator", "Illustrator"],
+    ["Canva", "Canva Pro"],
+
+    // 3D / CGI / Render / Engines
+    ["Blender", "Blender 3D"],
+    ["Cinema 4D", "C4D", "Cinema4D"],
+    ["3ds Max", "3dsMax", "3D Studio Max"],
+    ["Maya", "Autodesk Maya"],
+    ["Houdini", "SideFX Houdini"],
+    ["Unreal Engine", "Unreal", "UE5", "UE4"],
+    ["Octane Render", "OctaneRender", "Octane"],
+    ["Redshift", "Maxon Redshift"],
+    ["Cycles", "Blender Cycles", "Cycles X"],
+
+    // AI Video / Voice
+    ["Runway", "RunwayML", "Runway Gen-3 Alpha", "Runway Gen 3", "Gen-3", "Gen3"],
+    "Sora",
+    ["ElevenLabs", "Eleven Labs"],
+
+    // Mobile / Social editors
+    ["VN Video Editor", "VN"],
+
+    // Platforms (часто згадуються як вимога у відео-задачах)
+    ["YouTube", "YouTube Shorts"],
+    ["Instagram", "Instagram Reels", "IG Reels"],
+];
+
 
 export const instruments: Array<string | string[]> = [
   "Active Campaign",
@@ -91,6 +128,7 @@ export const instruments: Array<string | string[]> = [
   "Xero",
   "Zapier",
   "Zoho",
+  ...videoAndAnimationInstruments,
 ];
 
 // Escape special characters for regex
