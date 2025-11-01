@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import update from "immutability-helper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend"; // Бекенд для drag-and-drop
-import { fetchUpworkJobs } from "../services";
-import { JobExperience, JobStatus, UpworkJob } from "../models";
+import { fetchUpworkJobs, fetchJobCollections } from "../services";
+import { JobExperience, JobStatus, UpworkJob, JobCollection } from "../models";
 import {
   AverageRateByCountry,
   AverageRateByExperience,
@@ -45,6 +45,7 @@ import { instruments } from "../utils";
 
 const Dashboard: React.FC = () => {
   const [jobsData, setJobsData] = useState<UpworkJob[]>([]);
+  const [collections, setCollections] = useState<JobCollection[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filteredJobsData, setFilteredJobsData] = useState<UpworkJob[]>([]);
   const availableStatuses = Object.values(JobStatus);
@@ -55,9 +56,16 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const loadJobs = async () => {
       try {
-        const jobs = await fetchUpworkJobs();
+        const [jobs, jobCollections] = await Promise.all([
+          fetchUpworkJobs(),
+          fetchJobCollections().catch((error) => {
+            console.warn("Failed to fetch collections", error);
+            return [] as JobCollection[];
+          }),
+        ]);
         setJobsData(jobs);
         setFilteredJobsData(jobs);
+        setCollections(jobCollections);
       } catch (error) {
         console.error("Error fetching jobs:", error);
       } finally {
@@ -101,6 +109,7 @@ const Dashboard: React.FC = () => {
     selectedSkills: string[],
     selectedInstruments: string[],
     selectedStatuses: JobStatus[],
+    selectedCollectionIds: number[],
     selectedExperience: JobExperience[],
     titleFilter: string,
     bookmarked: boolean,
@@ -113,6 +122,7 @@ const Dashboard: React.FC = () => {
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedCollectionIds,
       selectedExperience,
       titleFilter,
       bookmarked,
@@ -128,6 +138,7 @@ const Dashboard: React.FC = () => {
           availableSkills={availableSkills}
           availableInstruments={availableInstruments}
           availableStatuses={availableStatuses}
+          availableCollections={collections}
         />
       </div>
       <div className="mx-auto p-6 flex flex-col gap-4">

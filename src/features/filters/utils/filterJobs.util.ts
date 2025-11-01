@@ -11,6 +11,7 @@ export const filterJobs = (
   selectedSkills: string[],
   selectedInstruments: string[],
   selectedStatuses: JobStatus[],
+  selectedCollectionIds: number[],
   selectedExperience: JobExperience[],
   titleFilter: string = "",
   bookmarked: boolean,
@@ -73,11 +74,19 @@ export const filterJobs = (
     const matchesBookmarked =
       !bookmarked || job.is_bookmarked === bookmarked;
 
+    const jobCollectionIds = job.collections ?? [];
+    const matchesCollections =
+      selectedCollectionIds.length === 0 ||
+      jobCollectionIds.some((collectionId) =>
+        selectedCollectionIds.includes(collectionId),
+      );
+
     return (
       matchesJobType &&
       matchesSkills &&
       matchesInstruments &&
       matchesStatuses &&
+      matchesCollections &&
       matchesExperience &&
       matchesBookmarked
     );

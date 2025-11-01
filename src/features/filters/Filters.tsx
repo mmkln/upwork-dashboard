@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Select from "react-select";
 import { JobStatus, JobExperience } from "../../models";
 import { camelToCapitalizedWords, debounce } from "../../utils";
@@ -13,6 +13,7 @@ interface FilterComponentProps {
     selectedSkills: string[],
     selectedInstruments: string[],
     selectedStatuses: JobStatus[],
+    selectedCollectionIds: number[],
     selectedExperience: JobExperience[],
     titleFilter: string,
     bookmarked: boolean,
@@ -20,6 +21,7 @@ interface FilterComponentProps {
   availableSkills: string[];
   availableInstruments: string[];
   availableStatuses: JobStatus[];
+  availableCollections: { id: number; name: string }[];
 }
 
 const INITIAL_HOURLY_RATE_MAX = 500;
@@ -30,6 +32,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   availableSkills,
   availableInstruments,
   availableStatuses,
+  availableCollections,
 }) => {
   const [jobType, setJobType] = useState<JobType>("None");
   const [fixedPriceRange, setFixedPriceRange] = useState<
@@ -41,6 +44,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [selectedInstruments, setSelectedInstruments] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<JobStatus[]>([]);
+  const [selectedCollections, setSelectedCollections] = useState<number[]>([]);
   const [selectedJobExperience, setSelectedJobExperience] = useState<
     JobExperience[]
   >([]);
@@ -62,10 +66,38 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     label: camelToCapitalizedWords(status),
   }));
 
+  const collectionOptions = availableCollections.map((collection) => ({
+    value: collection.id,
+    label: collection.name,
+  }));
+
   const experienceOptions = Object.values(JobExperience).map((exp) => ({
     value: exp,
     label: exp,
   }));
+
+  useEffect(() => {
+    setSelectedCollections((prev) => {
+      const validIds = prev.filter((id) =>
+        availableCollections.some((collection) => collection.id === id),
+      );
+      if (validIds.length !== prev.length) {
+        onFilterChange(
+          jobType,
+          fixedPriceRange,
+          hourlyRateRange,
+          selectedSkills,
+          selectedInstruments,
+          selectedStatuses,
+          validIds,
+          selectedJobExperience,
+          titleFilter,
+          bookmarked,
+        );
+      }
+      return validIds;
+    });
+  }, [availableCollections, bookmarked, fixedPriceRange, hourlyRateRange, jobType, onFilterChange, selectedInstruments, selectedJobExperience, selectedSkills, selectedStatuses, titleFilter]);
 
   // Debounced filter change handler
   const debouncedFilterChange = useCallback(
@@ -74,14 +106,15 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
         jobType,
         fixedPriceRange,
         hourlyRateRange,
-        selectedSkills,
-        selectedInstruments,
-        selectedStatuses,
-        selectedJobExperience,
-        value,
-        bookmarked,
-      );
-    }, 300),
+      selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
+      selectedCollections,
+      selectedJobExperience,
+      value,
+      bookmarked,
+    );
+  }, 300),
     [
       jobType,
       fixedPriceRange,
@@ -89,6 +122,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedCollections,
       selectedJobExperience,
       bookmarked,
     ],
@@ -108,6 +142,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedCollections,
       selectedJobExperience,
       titleFilter,
       bookmarked,
@@ -127,6 +162,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedCollections,
       selectedJobExperience,
       titleFilter,
       bookmarked,
@@ -146,6 +182,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedCollections,
       selectedJobExperience,
       titleFilter,
       bookmarked,
@@ -164,6 +201,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       skills,
       selectedInstruments,
       selectedStatuses,
+      selectedCollections,
       selectedJobExperience,
       titleFilter,
       bookmarked,
@@ -182,6 +220,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       instruments,
       selectedStatuses,
+      selectedCollections,
       selectedJobExperience,
       titleFilter,
       bookmarked,
@@ -200,6 +239,26 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       statuses,
+      selectedCollections,
+      selectedJobExperience,
+      titleFilter,
+      bookmarked,
+    );
+  };
+
+  const handleCollectionsChange = (selectedOptions: any) => {
+    const collections = selectedOptions
+      ? selectedOptions.map((option: any) => Number(option.value))
+      : [];
+    setSelectedCollections(collections);
+    onFilterChange(
+      jobType,
+      fixedPriceRange,
+      hourlyRateRange,
+      selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
+      collections,
       selectedJobExperience,
       titleFilter,
       bookmarked,
@@ -218,6 +277,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedCollections,
       experiences,
       titleFilter,
       bookmarked,
@@ -234,6 +294,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedCollections,
       selectedJobExperience,
       titleFilter,
       bookmarked,
@@ -424,6 +485,27 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
             placeholder="Select statuses..."
             className="react-select-container"
             classNamePrefix="react-select"
+          />
+        </div>
+
+        {/* Collections */}
+        <div className="flex flex-col w-full md:w-1/4">
+          <label className="mb-1 text-sm font-semibold text-gray-700">
+            Collections
+          </label>
+          <Select
+            isMulti
+            options={collectionOptions}
+            value={collectionOptions.filter((option) =>
+              selectedCollections.includes(option.value),
+            )}
+            onChange={handleCollectionsChange}
+            placeholder={
+              collectionOptions.length ? "Select collections..." : "No collections"
+            }
+            className="react-select-container"
+            classNamePrefix="react-select"
+            isDisabled={collectionOptions.length === 0}
           />
         </div>
 

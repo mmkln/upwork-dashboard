@@ -18,6 +18,7 @@ export interface UpworkJob {
   status: JobStatus;
   connects: string | null;
   is_bookmarked: boolean;
+  collections?: number[];
 }
 
 export enum JobExperience {
@@ -37,4 +38,18 @@ export enum JobStatus {
   Closed = "closed", // Завдання закрите (неважливо завершене чи ні)
   Declined = "declined", // Заявка відхилена
   Withdrawn = "withdrawn", // Заявка знята самим фрілансером
+}
+
+export interface JobCollection {
+  id: number;
+  name: string;
+  description: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AuthUser {
+  id: number;
+  username: string;
+  email?: string | null;
 }

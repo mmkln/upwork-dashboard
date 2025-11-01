@@ -75,7 +75,7 @@ const Sidebar: React.FC = () => {
         {/*  currentPath={location.pathname}*/}
         {/*/>*/}
       </SidebarSection>
-      {/*<AccountButton />*/}
+      <AccountButton />
     </div>
   );
 };

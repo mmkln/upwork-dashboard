@@ -1,8 +1,8 @@
 // src/components/JobList.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Modal from "react-modal";
-import { UpworkJob, JobStatus, JobExperience } from "../../models";
-import { fetchUpworkJobs } from "../../services";
+import { UpworkJob, JobStatus, JobExperience, JobCollection } from "../../models";
+import { fetchUpworkJobs, fetchJobCollections } from "../../services";
 import { JobDetails } from "../../components";
 import { filterJobs, Filters, JobType } from "../../features";
 import { JobListItem } from "./components";
@@ -12,6 +12,7 @@ Modal.setAppElement("#root");
 
 const JobList: React.FC = () => {
   const [jobsData, setJobsData] = useState<UpworkJob[]>([]);
+  const [collections, setCollections] = useState<JobCollection[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedJob, setSelectedJob] = useState<UpworkJob | null>(null);
   const [filteredJobsData, setFilteredJobsData] = useState<UpworkJob[]>([]);
@@ -21,13 +22,27 @@ const JobList: React.FC = () => {
     Array.isArray(toolEntry) ? toolEntry[0] : toolEntry,
   );
 
+  const collectionNameById = useMemo(() => {
+    return collections.reduce<Record<number, string>>((acc, collection) => {
+      acc[collection.id] = collection.name;
+      return acc;
+    }, {});
+  }, [collections]);
+
   useEffect(() => {
     const loadJobs = async () => {
       try {
-        const fetchedJobs = await fetchUpworkJobs();
+        const [fetchedJobs, fetchedCollections] = await Promise.all([
+          fetchUpworkJobs(),
+          fetchJobCollections().catch((error) => {
+            console.warn("Failed to fetch collections", error);
+            return [] as JobCollection[];
+          }),
+        ]);
         const sortedJobs = sortJobs(fetchedJobs);
         setJobsData(sortedJobs);
         setFilteredJobsData(sortedJobs);
+        setCollections(fetchedCollections);
       } catch (error) {
         console.error("Error fetching jobs:", error);
       } finally {
@@ -47,6 +62,7 @@ const JobList: React.FC = () => {
     setJobsData(updatedJobs);
     const updatedFilteredJobs = filteredJobsData.map((j) => (j.id === job.id ? job : j));
     setFilteredJobsData(updatedFilteredJobs);
+    setSelectedJob((prev) => (prev?.id === job.id ? job : prev));
   };
 
   const openJobDetails = (job: UpworkJob) => {
@@ -74,6 +90,7 @@ const JobList: React.FC = () => {
     selectedSkills: string[],
     selectedInstruments: string[],
     selectedStatuses: JobStatus[],
+    selectedCollectionIds: number[],
     selectedExperience: JobExperience[],
     titleFilter: string,
     bookmarked: boolean,
@@ -87,6 +104,7 @@ const JobList: React.FC = () => {
       selectedSkills,
       selectedInstruments,
       selectedStatuses,
+      selectedCollectionIds,
       selectedExperience,
       titleFilter,
       bookmarked,
@@ -131,6 +149,7 @@ const JobList: React.FC = () => {
           availableSkills={availableSkills}
           availableInstruments={availableInstruments}
           availableStatuses={availableStatuses}
+          availableCollections={collections}
         />
       </div>
       <div className="flex items-center justify-between px-6">
@@ -191,6 +210,7 @@ const JobList: React.FC = () => {
             onClick={openJobDetails} 
             onJobUpdate={updateJob}
             isLastClicked={lastClickedJobId === job.id}
+            collectionNameById={collectionNameById}
           />
         ))}
         {selectedJob && (
@@ -200,6 +220,7 @@ const JobList: React.FC = () => {
             isOpen={true}
             onClose={closeJobDetails}
             onJobUpdate={updateJob}
+            collectionNameById={collectionNameById}
           />
         )}
       </div>

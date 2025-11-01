@@ -11,9 +11,10 @@ interface JobListItemProps {
   onClick: (job: UpworkJob) => void;
   onJobUpdate: (job: UpworkJob) => void;
   isLastClicked?: boolean;
+  collectionNameById: Record<number, string>;
 }
 
-const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate, isLastClicked = false }) => {
+const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate, isLastClicked = false, collectionNameById }) => {
   const [jobData, setJobData] = useState<UpworkJob>(job);
 
   const handleStatusChange = (status: JobStatus) => {
@@ -41,6 +42,13 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate, is
   useEffect(() => {
     setJobData(job);
   }, [job]);
+
+  const collectionBadges = (jobData.collections ?? job.collections ?? []).map(
+    (collectionId) => ({
+      id: collectionId,
+      name: collectionNameById[collectionId],
+    }),
+  ).filter((entry): entry is { id: number; name: string } => Boolean(entry.name));
 
   return (
     <Card shadow={true} isHighlighted={isLastClicked}>
@@ -110,6 +118,18 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate, is
             </span>
           ))}
         </div>
+        {collectionBadges.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {collectionBadges.map(({ id, name }) => (
+              <span
+                key={id}
+                className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full border border-blue-100"
+              >
+                {name}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-800">

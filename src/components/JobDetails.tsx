@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { JobStatus, UpworkJob } from "../models";
 import { JobStatusSelect } from ".";
@@ -9,10 +9,21 @@ interface JobDetailsProps {
   isOpen: boolean;
   onClose: () => void;
   onJobUpdate: (job: UpworkJob) => void;
+  collectionNameById: Record<number, string>;
 }
 
-const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpdate }) => {
+const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpdate, collectionNameById }) => {
   const [jobData, setJobData] = useState<UpworkJob>(job);
+  useEffect(() => {
+    setJobData(job);
+  }, [job]);
+
+  const collectionBadges = (jobData.collections ?? job.collections ?? []).map(
+    (collectionId) => ({
+      id: collectionId,
+      name: collectionNameById[collectionId],
+    }),
+  ).filter((entry): entry is { id: number; name: string } => Boolean(entry.name));
   const handleStatusChange = (status: JobStatus) => {
     updateUpworkJob({ ...jobData, status })
       .then((updatedJob) => {
@@ -126,6 +137,23 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
             )}
           </button>
         </div>
+        {collectionBadges.length > 0 && (
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold text-gray-800 mb-2">
+              Collections
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {collectionBadges.map(({ id, name }) => (
+                <span
+                  key={id}
+                  className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full border border-blue-100"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
         {/*<div className="mb-4">*/}
         {/*  <h3 className="text-lg font-semibold text-gray-800 mb-2">Status</h3>*/}
         {/*  <span*/}
