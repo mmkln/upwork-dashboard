@@ -40,5 +40,6 @@ export { default as Tile } from "./oldCharts/Tile";
 export { default as PaymentTypeChart } from "./oldCharts/PaymentTypeChart";
 export { default as JobDetails } from "./JobDetails";
 export { default as InstrumentBadges } from "./oldCharts/InstrumentBadges";
+export { default as TopInstrumentsByAverageRate } from "./oldCharts/TopInstrumentsByAverageRate";
 
 export * from "./elements";

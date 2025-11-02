@@ -39,6 +39,7 @@ import {
   Tile,
   PaymentTypeChart,
   InstrumentBadges,
+  TopInstrumentsByAverageRate,
 } from "../components";
 import { filterJobs, Filters, JobType } from "../features";
 import { instruments } from "../utils";
@@ -155,7 +156,7 @@ const Dashboard: React.FC = () => {
             <KeywordFrequency jobs={filteredJobsData} limit={50} />
           </div>
           <div className="max-w-96 min-w-80">
-            <InstrumentBadges jobs={filteredJobsData} />
+            <InstrumentBadges jobs={filteredJobsData} limit={50}/>
           </div>
           <div className="max-w-96 min-w-80">
             <SkillBadges jobs={filteredJobsData} limit={50} />
@@ -179,6 +180,13 @@ const Dashboard: React.FC = () => {
         <div className="flex gap-4">
           <div className="max-w-96 min-w-80">
             <PaymentTypeChart jobs={filteredJobsData} />
+          </div>
+          <div className="max-w-md min-w-80">
+            <TopInstrumentsByAverageRate
+              jobs={filteredJobsData}
+              limit={15}
+              minOccurrences={2}
+            />
           </div>
         </div>
         // TODO: fix or remove these charts
