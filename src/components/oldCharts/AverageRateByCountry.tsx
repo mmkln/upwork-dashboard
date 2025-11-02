@@ -17,9 +17,9 @@ const roundToSignificant = (num: number): number => {
 };
 
 const AverageRateByCountry: React.FC<AverageRateByCountryProps> = ({
-                                                                       jobs,
-                                                                       limit,
-                                                                   }) => {
+    jobs,
+    limit,
+}) => {
     const countryData = jobs.reduce(
         (
             acc: {

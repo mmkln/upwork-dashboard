@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import update from "immutability-helper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend"; // Бекенд для drag-and-drop
@@ -49,9 +49,18 @@ const Dashboard: React.FC = () => {
   const [collections, setCollections] = useState<JobCollection[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filteredJobsData, setFilteredJobsData] = useState<UpworkJob[]>([]);
-  const availableStatuses = Object.values(JobStatus);
-  const availableInstruments: string[] = instruments.map((toolEntry) =>
-    Array.isArray(toolEntry) ? toolEntry[0] : toolEntry,
+
+  const availableStatuses = useMemo(
+    () => Object.values(JobStatus),
+    [],
+  );
+
+  const availableInstruments = useMemo(
+    () =>
+      instruments.map((toolEntry) =>
+        Array.isArray(toolEntry) ? toolEntry[0] : toolEntry,
+      ),
+    [],
   );
 
   useEffect(() => {
@@ -93,8 +102,12 @@ const Dashboard: React.FC = () => {
     );
   };
 
-  const availableSkills = Array.from(
-    new Set(jobsData.flatMap((job) => job.skills)),
+  const availableSkills = useMemo(
+    () =>
+      Array.from(
+        new Set(jobsData.flatMap((job) => job.skills)),
+      ),
+    [jobsData],
   );
 
   if (loading) {
