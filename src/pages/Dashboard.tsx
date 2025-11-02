@@ -42,7 +42,16 @@ import {
   TopInstrumentsByAverageRate,
 } from "../components";
 import { filterJobs, Filters, JobType } from "../features";
-import { instruments } from "../utils";
+import type { CategoryValueItem } from "../components/charts";
+import {
+  instruments,
+  toolRegexMap,
+  computeJobRate,
+  createSearchableContent,
+} from "../utils";
+
+const MIN_TOOL_OCCURRENCES_PERCENTAGE = 0.02;
+const TOOL_REGEX_ENTRIES = Object.entries(toolRegexMap);
 
 const Dashboard: React.FC = () => {
   const [jobsData, setJobsData] = useState<UpworkJob[]>([]);
@@ -110,6 +119,77 @@ const Dashboard: React.FC = () => {
     [jobsData],
   );
 
+  const jobInstrumentMeta = useMemo(() => {
+    return jobsData.reduce<
+      Map<string, { rate: number | null; instruments: string[] }>
+    >((acc, job) => {
+      const rate = computeJobRate(job);
+
+      if (rate == null) {
+        acc.set(job.id, { rate: null, instruments: [] });
+        return acc;
+      }
+
+      const searchableContent = createSearchableContent(job);
+      if (!searchableContent) {
+        acc.set(job.id, { rate, instruments: [] });
+        return acc;
+      }
+
+      const instrumentsMatched: string[] = [];
+      for (const [tool, regexes] of TOOL_REGEX_ENTRIES) {
+        if (regexes.some((regex) => regex.test(searchableContent))) {
+          instrumentsMatched.push(tool);
+        }
+      }
+
+      acc.set(job.id, { rate, instruments: instrumentsMatched });
+      return acc;
+    }, new Map<string, { rate: number | null; instruments: string[] }>());
+  }, [jobsData]);
+
+  const instrumentAverageRates = useMemo<CategoryValueItem[]>(() => {
+    if (!filteredJobsData.length) {
+      return [];
+    }
+
+    const accumulator: Record<
+      string,
+      {
+        totalRate: number;
+        count: number;
+      }
+    > = {};
+
+    filteredJobsData.forEach((job) => {
+      const meta = jobInstrumentMeta.get(job.id);
+      if (!meta || meta.rate == null || meta.instruments.length === 0) {
+        return;
+      }
+
+      const rate = meta.rate;
+      meta.instruments.forEach((instrument) => {
+        if (!accumulator[instrument]) {
+          accumulator[instrument] = { totalRate: rate, count: 1 };
+        } else {
+          accumulator[instrument].totalRate += rate;
+          accumulator[instrument].count += 1;
+        }
+      });
+    });
+
+    return Object.entries(accumulator)
+      .filter(([, { count }]) => count >= filteredJobsData.length * MIN_TOOL_OCCURRENCES_PERCENTAGE)
+      .map<CategoryValueItem>(
+        ([label, { totalRate, count }]) => ({
+          label,
+          value: Number((totalRate / count).toFixed(2)),
+          count,
+        }),
+      )
+      .sort((a, b) => b.value - a.value);
+  }, [filteredJobsData, jobInstrumentMeta]);
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -169,7 +249,7 @@ const Dashboard: React.FC = () => {
             <KeywordFrequency jobs={filteredJobsData} limit={50} />
           </div>
           <div className="max-w-96 min-w-80">
-            <InstrumentBadges jobs={filteredJobsData} limit={50}/>
+            <InstrumentBadges jobs={filteredJobsData} limit={50} />
           </div>
           <div className="max-w-96 min-w-80">
             <SkillBadges jobs={filteredJobsData} limit={50} />
@@ -196,9 +276,8 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="max-w-md min-w-80">
             <TopInstrumentsByAverageRate
-              jobs={filteredJobsData}
+              data={instrumentAverageRates}
               limit={15}
-              minOccurrences={2}
             />
           </div>
         </div>

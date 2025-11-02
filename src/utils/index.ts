@@ -6,3 +6,4 @@ export * from "./string.util";
 export * from "./debounce.util";
 export * from "./booleanSearch.util";
 export * from "./country.util";
+export * from "./rate.util";
