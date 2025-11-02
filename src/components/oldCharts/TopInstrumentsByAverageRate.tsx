@@ -11,7 +11,7 @@ interface TopInstrumentsByAverageRateProps {
 }
 
 const DEFAULT_LIMIT = 15;
-const DEFAULT_MIN_OCCURRENCES = 2;
+const DEFAULT_MIN_OCCURRENCES = 10;
 
 const roundToSignificant = (value: number): number => {
   if (!Number.isFinite(value) || value <= 0) {
