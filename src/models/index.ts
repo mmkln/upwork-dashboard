@@ -1,7 +1,7 @@
 // src/models/index.ts
 export interface UpworkJob {
   id: string;
-  average_rate: number | null;
+  average_rate: number | null; // Client average spend rate
   description: string;
   client_industry: string | null;
   client_rating: number | null;

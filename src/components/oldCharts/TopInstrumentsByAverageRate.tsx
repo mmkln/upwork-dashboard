@@ -37,9 +37,12 @@ const TopInstrumentsByAverageRate: React.FC<
   return (
     <Card>
       <div className="p-6">
-        <h2 className="text-lg font-semibold mb-6">
+        <h2 className="text-lg font-semibold mb-2">
           Top Instruments by Avg Hourly Rate
         </h2>
+        <p className="text-xs text-gray-500 mb-4">
+          Average uses jobs with hourly rates; count reflects all matches.
+        </p>
         {chartData.length ? (
           <div className="overflow-y-auto h-[21.5rem]">
             <ValueByCategoryChart

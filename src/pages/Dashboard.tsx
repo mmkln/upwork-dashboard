@@ -46,11 +46,12 @@ import type { CategoryValueItem } from "../components/charts";
 import {
   instruments,
   toolRegexMap,
-  computeJobRate,
+  parseRate,
   createSearchableContent,
 } from "../utils";
 
 const MIN_TOOL_OCCURRENCES_PERCENTAGE = 0.02;
+const MIN_TOOL_OCCURRENCES_ABSOLUTE = 2;
 const TOOL_REGEX_ENTRIES = Object.entries(toolRegexMap);
 
 const Dashboard: React.FC = () => {
@@ -121,31 +122,55 @@ const Dashboard: React.FC = () => {
 
   const jobInstrumentMeta = useMemo(() => {
     return jobsData.reduce<
-      Map<string, { rate: number | null; instruments: string[] }>
+      Map<
+        string,
+        {
+          hourlyRate: number | null;
+          fallbackRate: number | null;
+          instruments: string[];
+        }
+      >
     >((acc, job) => {
-      const rate = computeJobRate(job);
+      const hourlyRates = Array.isArray(job.hourly_rates)
+        ? job.hourly_rates
+            .map((rate) => parseRate(rate))
+            .filter((rate): rate is number => rate != null)
+        : [];
 
-      if (rate == null) {
-        acc.set(job.id, { rate: null, instruments: [] });
-        return acc;
-      }
+      const hourlyRate =
+        hourlyRates.length > 0
+          ? hourlyRates.reduce((sum, current) => sum + current, 0) /
+            hourlyRates.length
+          : null;
+
+      const fallbackRate =
+        hourlyRate == null ? parseRate(job.average_rate) : null;
 
       const searchableContent = createSearchableContent(job);
-      if (!searchableContent) {
-        acc.set(job.id, { rate, instruments: [] });
-        return acc;
-      }
-
       const instrumentsMatched: string[] = [];
-      for (const [tool, regexes] of TOOL_REGEX_ENTRIES) {
-        if (regexes.some((regex) => regex.test(searchableContent))) {
-          instrumentsMatched.push(tool);
+
+      if (searchableContent) {
+        for (const [tool, regexes] of TOOL_REGEX_ENTRIES) {
+          if (regexes.some((regex) => regex.test(searchableContent))) {
+            instrumentsMatched.push(tool);
+          }
         }
       }
 
-      acc.set(job.id, { rate, instruments: instrumentsMatched });
+      acc.set(job.id, {
+        hourlyRate,
+        fallbackRate,
+        instruments: instrumentsMatched,
+      });
       return acc;
-    }, new Map<string, { rate: number | null; instruments: string[] }>());
+    }, new Map<
+      string,
+      {
+        hourlyRate: number | null;
+        fallbackRate: number | null;
+        instruments: string[];
+      }
+    >());
   }, [jobsData]);
 
   const instrumentAverageRates = useMemo<CategoryValueItem[]>(() => {
@@ -153,40 +178,55 @@ const Dashboard: React.FC = () => {
       return [];
     }
 
+    const minOccurrences = Math.max(
+      MIN_TOOL_OCCURRENCES_ABSOLUTE,
+      Math.floor(filteredJobsData.length * MIN_TOOL_OCCURRENCES_PERCENTAGE),
+    );
+
     const accumulator: Record<
       string,
       {
         totalRate: number;
-        count: number;
+        withRateCount: number;
+        totalCount: number;
       }
     > = {};
 
     filteredJobsData.forEach((job) => {
       const meta = jobInstrumentMeta.get(job.id);
-      if (!meta || meta.rate == null || meta.instruments.length === 0) {
+      if (!meta || meta.instruments.length === 0) {
         return;
       }
 
-      const rate = meta.rate;
       meta.instruments.forEach((instrument) => {
         if (!accumulator[instrument]) {
-          accumulator[instrument] = { totalRate: rate, count: 1 };
-        } else {
-          accumulator[instrument].totalRate += rate;
-          accumulator[instrument].count += 1;
+          accumulator[instrument] = {
+            totalRate: 0,
+            withRateCount: 0,
+            totalCount: 0,
+          };
+        }
+
+        const bucket = accumulator[instrument];
+        bucket.totalCount += 1;
+
+        if (meta.hourlyRate != null) {
+          bucket.totalRate += meta.hourlyRate;
+          bucket.withRateCount += 1;
         }
       });
     });
 
     return Object.entries(accumulator)
-      .filter(([, { count }]) => count >= filteredJobsData.length * MIN_TOOL_OCCURRENCES_PERCENTAGE)
-      .map<CategoryValueItem>(
-        ([label, { totalRate, count }]) => ({
-          label,
-          value: Number((totalRate / count).toFixed(2)),
-          count,
-        }),
-      )
+      .filter(([, { totalCount }]) => totalCount >= minOccurrences)
+      .map(([label, { totalRate, withRateCount, totalCount }]) => ({
+        label,
+        value:
+          withRateCount > 0
+            ? Number((totalRate / withRateCount).toFixed(2))
+            : 0,
+        count: totalCount,
+      }))
       .sort((a, b) => b.value - a.value);
   }, [filteredJobsData, jobInstrumentMeta]);
 
