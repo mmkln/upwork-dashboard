@@ -32,11 +32,6 @@ export const parseRate = (value: unknown): number | null => {
 };
 
 export const computeJobRate = (job: UpworkJob): number | null => {
-  const directRate = parseRate(job.average_rate);
-  if (directRate != null && directRate > 0) {
-    return directRate;
-  }
-
   const hourlyRates = Array.isArray(job.hourly_rates)
     ? job.hourly_rates
         .map((rate) => parseRate(rate))
@@ -44,7 +39,8 @@ export const computeJobRate = (job: UpworkJob): number | null => {
     : [];
 
   if (hourlyRates.length === 0) {
-    return null;
+    const directRate = parseRate(job.average_rate);
+    return directRate != null && directRate > 0 ? directRate : null;
   }
 
   const total = hourlyRates.reduce((sum, current) => sum + current, 0);
