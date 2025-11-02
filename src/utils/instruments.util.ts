@@ -36,6 +36,17 @@ const videoAndAnimationInstruments: Array<string | string[]> = [
     ["Instagram", "Instagram Reels", "IG Reels"],
 ];
 
+const uiUxDesignInstruments: Array<string | string[]> = [
+    "Figma",
+    ["Adobe XD", "AdobeXD", "XD"],
+    "Sketch",
+    ["Adobe Photoshop", "Photoshop"],
+    ["Adobe Illustrator", "Illustrator"],
+    ["Canva", "Canva Pro"],
+    "Framer",
+    "Elementor",
+    "WordPress",
+];
 
 export const instruments: Array<string | string[]> = [
   "Active Campaign",
@@ -129,6 +140,7 @@ export const instruments: Array<string | string[]> = [
   "Zapier",
   "Zoho",
   ...videoAndAnimationInstruments,
+  ...uiUxDesignInstruments,
 ];
 
 // Escape special characters for regex
