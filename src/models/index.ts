@@ -53,3 +53,19 @@ export interface AuthUser {
   username: string;
   email?: string | null;
 }
+
+export interface PreparedJobMeta {
+  normalizedTitle: string;
+  normalizedDescription: string;
+  searchableText: string;
+  skillsSet: Set<string>;
+  skillsLowerSet: Set<string>;
+  matchedInstruments: Set<string>;
+  hourlyRateValues: number[];
+  hourlyRateAverage: number | null;
+  hasHourlyRates: boolean;
+  fixedPriceValue: number | null;
+  collectionsSet: Set<number>;
+}
+
+export type PreparedUpworkJob = UpworkJob & PreparedJobMeta;

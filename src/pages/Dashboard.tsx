@@ -3,7 +3,12 @@ import update from "immutability-helper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend"; // Бекенд для drag-and-drop
 import { fetchUpworkJobs, fetchJobCollections } from "../services";
-import { JobExperience, JobStatus, UpworkJob, JobCollection } from "../models";
+import {
+  JobExperience,
+  JobStatus,
+  PreparedUpworkJob,
+  JobCollection,
+} from "../models";
 import {
   AverageRateByCountry,
   AverageRateByExperience,
@@ -43,22 +48,17 @@ import {
 } from "../components";
 import { filterJobs, Filters, JobType } from "../features";
 import type { CategoryValueItem } from "../components/charts";
-import {
-  instruments,
-  toolRegexMap,
-  parseRate,
-  createSearchableContent,
-} from "../utils";
+import { instruments, prepareJobs } from "../utils";
 
 const MIN_TOOL_OCCURRENCES_PERCENTAGE = 0.02;
 const MIN_TOOL_OCCURRENCES_ABSOLUTE = 2;
-const TOOL_REGEX_ENTRIES = Object.entries(toolRegexMap);
 
 const Dashboard: React.FC = () => {
-  const [jobsData, setJobsData] = useState<UpworkJob[]>([]);
+  const [jobsData, setJobsData] = useState<PreparedUpworkJob[]>([]);
   const [collections, setCollections] = useState<JobCollection[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [filteredJobsData, setFilteredJobsData] = useState<UpworkJob[]>([]);
+  const [filteredJobsData, setFilteredJobsData] =
+    useState<PreparedUpworkJob[]>([]);
 
   const availableStatuses = useMemo(
     () => Object.values(JobStatus),
@@ -83,8 +83,9 @@ const Dashboard: React.FC = () => {
             return [] as JobCollection[];
           }),
         ]);
-        setJobsData(jobs);
-        setFilteredJobsData(jobs);
+        const preparedJobs = prepareJobs(jobs);
+        setJobsData(preparedJobs);
+        setFilteredJobsData(preparedJobs);
         setCollections(jobCollections);
       } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -120,59 +121,6 @@ const Dashboard: React.FC = () => {
     [jobsData],
   );
 
-  const jobInstrumentMeta = useMemo(() => {
-    return jobsData.reduce<
-      Map<
-        string,
-        {
-          hourlyRate: number | null;
-          fallbackRate: number | null;
-          instruments: string[];
-        }
-      >
-    >((acc, job) => {
-      const hourlyRates = Array.isArray(job.hourly_rates)
-        ? job.hourly_rates
-            .map((rate) => parseRate(rate))
-            .filter((rate): rate is number => rate != null)
-        : [];
-
-      const hourlyRate =
-        hourlyRates.length > 0
-          ? hourlyRates.reduce((sum, current) => sum + current, 0) /
-            hourlyRates.length
-          : null;
-
-      const fallbackRate =
-        hourlyRate == null ? parseRate(job.average_rate) : null;
-
-      const searchableContent = createSearchableContent(job);
-      const instrumentsMatched: string[] = [];
-
-      if (searchableContent) {
-        for (const [tool, regexes] of TOOL_REGEX_ENTRIES) {
-          if (regexes.some((regex) => regex.test(searchableContent))) {
-            instrumentsMatched.push(tool);
-          }
-        }
-      }
-
-      acc.set(job.id, {
-        hourlyRate,
-        fallbackRate,
-        instruments: instrumentsMatched,
-      });
-      return acc;
-    }, new Map<
-      string,
-      {
-        hourlyRate: number | null;
-        fallbackRate: number | null;
-        instruments: string[];
-      }
-    >());
-  }, [jobsData]);
-
   const instrumentAverageRates = useMemo<CategoryValueItem[]>(() => {
     if (!filteredJobsData.length) {
       return [];
@@ -193,12 +141,11 @@ const Dashboard: React.FC = () => {
     > = {};
 
     filteredJobsData.forEach((job) => {
-      const meta = jobInstrumentMeta.get(job.id);
-      if (!meta || meta.instruments.length === 0) {
+      if (job.matchedInstruments.size === 0) {
         return;
       }
 
-      meta.instruments.forEach((instrument) => {
+      job.matchedInstruments.forEach((instrument) => {
         if (!accumulator[instrument]) {
           accumulator[instrument] = {
             totalRate: 0,
@@ -210,15 +157,18 @@ const Dashboard: React.FC = () => {
         const bucket = accumulator[instrument];
         bucket.totalCount += 1;
 
-        if (meta.hourlyRate != null) {
-          bucket.totalRate += meta.hourlyRate;
+        if (job.hourlyRateAverage != null) {
+          bucket.totalRate += job.hourlyRateAverage;
           bucket.withRateCount += 1;
         }
       });
     });
 
     return Object.entries(accumulator)
-      .filter(([, { totalCount }]) => totalCount >= minOccurrences)
+      .filter(
+        ([, { totalCount, withRateCount }]) =>
+          totalCount >= minOccurrences && withRateCount > 0,
+      )
       .map(([label, { totalRate, withRateCount, totalCount }]) => ({
         label,
         value:
@@ -228,7 +178,7 @@ const Dashboard: React.FC = () => {
         count: totalCount,
       }))
       .sort((a, b) => b.value - a.value);
-  }, [filteredJobsData, jobInstrumentMeta]);
+  }, [filteredJobsData]);
 
   if (loading) {
     return <p>Loading...</p>;

@@ -1,21 +1,28 @@
 // src/components/JobList.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import Modal from "react-modal";
-import { UpworkJob, JobStatus, JobExperience, JobCollection } from "../../models";
+import {
+  UpworkJob,
+  JobStatus,
+  JobExperience,
+  JobCollection,
+  PreparedUpworkJob,
+} from "../../models";
 import { fetchUpworkJobs, fetchJobCollections } from "../../services";
 import { JobDetails } from "../../components";
 import { filterJobs, Filters, JobType } from "../../features";
 import { JobListItem } from "./components";
-import { instruments } from "../../utils";
+import { instruments, prepareJobs } from "../../utils";
 
 Modal.setAppElement("#root");
 
 const JobList: React.FC = () => {
-  const [jobsData, setJobsData] = useState<UpworkJob[]>([]);
+  const [jobsData, setJobsData] = useState<PreparedUpworkJob[]>([]);
   const [collections, setCollections] = useState<JobCollection[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedJob, setSelectedJob] = useState<UpworkJob | null>(null);
-  const [filteredJobsData, setFilteredJobsData] = useState<UpworkJob[]>([]);
+  const [selectedJob, setSelectedJob] = useState<PreparedUpworkJob | null>(null);
+  const [filteredJobsData, setFilteredJobsData] =
+    useState<PreparedUpworkJob[]>([]);
   const [lastClickedJobId, setLastClickedJobId] = useState<string | null>(null);
   const availableStatuses = Object.values(JobStatus);
   const availableInstruments: string[] = instruments.map((toolEntry) =>
@@ -39,7 +46,8 @@ const JobList: React.FC = () => {
             return [] as JobCollection[];
           }),
         ]);
-        const sortedJobs = sortJobs(fetchedJobs);
+        const preparedJobs = prepareJobs(fetchedJobs);
+        const sortedJobs = sortJobs(preparedJobs);
         setJobsData(sortedJobs);
         setFilteredJobsData(sortedJobs);
         setCollections(fetchedCollections);
@@ -53,20 +61,31 @@ const JobList: React.FC = () => {
     loadJobs();
   }, []);
 
-  const sortJobs = (jobs: UpworkJob[]): UpworkJob[] => {
+  const sortJobs = (jobs: PreparedUpworkJob[]): PreparedUpworkJob[] => {
     return jobs.reverse();
   };
 
   const updateJob = (job: UpworkJob) => {
-    const updatedJobs = jobsData.map((j) => (j.id === job.id ? job : j));
+    const [preparedJob] = prepareJobs([job]);
+    const updatedJobs = jobsData.map((j) =>
+      j.id === preparedJob.id ? preparedJob : j,
+    );
     setJobsData(updatedJobs);
-    const updatedFilteredJobs = filteredJobsData.map((j) => (j.id === job.id ? job : j));
+    const updatedFilteredJobs = filteredJobsData.map((j) =>
+      j.id === preparedJob.id ? preparedJob : j,
+    );
     setFilteredJobsData(updatedFilteredJobs);
-    setSelectedJob((prev) => (prev?.id === job.id ? job : prev));
+    setSelectedJob((prev) => (prev?.id === preparedJob.id ? preparedJob : prev));
   };
 
   const openJobDetails = (job: UpworkJob) => {
-    setSelectedJob(job);
+    const existing = jobsData.find((item) => item.id === job.id);
+    if (existing) {
+      setSelectedJob(existing);
+    } else {
+      const [preparedJob] = prepareJobs([job]);
+      setSelectedJob(preparedJob);
+    }
     setLastClickedJobId(job.id);
   };
 
@@ -75,8 +94,9 @@ const JobList: React.FC = () => {
   };
 
   // Отримуємо унікальний список скілів із jobsData
-  const availableSkills = Array.from(
-    new Set(jobsData.flatMap((job) => job.skills)),
+  const availableSkills = useMemo(
+    () => Array.from(new Set(jobsData.flatMap((job) => job.skills))),
+    [jobsData],
   );
 
   if (loading) {
