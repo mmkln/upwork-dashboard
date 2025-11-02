@@ -49,6 +49,41 @@ const uiUxDesignInstruments: Array<string | string[]> = [
     "WooCommerce",
 ];
 
+const gameDevelopmentInstruments: Array<string | string[]> = [
+    ["Unity", "Unity3D"],
+    "Phaser",
+    // ["Unreal Engine", "Unreal", "UE5", "UE4"], // Included in videoAndAnimationInstruments
+    ["Godot", "Godot Engine"],
+    ["Cocos2d-x", "Cocos2d"],
+    ["GameMaker Studio", "GameMaker"],
+    ["MetaHuman", "MetaHumans"],
+
+    // Realtime / web graphics & animation
+    ["Three.js", "threejs"],
+    "WebGL",
+    ["GSAP", "GreenSock", "GreenSock Animation Platform"],
+
+    // DCC / 3D suites
+    // ["Blender", "Blender 3D"], // Included in videoAndAnimationInstruments
+    // ["Cinema 4D", "C4D", "Maxon Cinema 4D"], // Included in videoAndAnimationInstruments
+    // ["Autodesk Maya", "Maya"], // Included in videoAndAnimationInstruments
+    // ["Autodesk 3ds Max", "3ds Max", "3D Studio Max"], // Included in videoAndAnimationInstruments
+    "SketchUp",
+    "Lumion",
+    ["Revit", "Autodesk Revit"],
+
+    // Render engines / pipelines
+    // ["Cycles", "Blender Cycles"], // Included in videoAndAnimationInstruments
+    // ["Octane Render", "Octane"], // Included in videoAndAnimationInstruments
+    // ["Redshift", "Maxon Redshift"], // Included in videoAndAnimationInstruments
+    "KeyShot",
+
+    // AI motion / mocap & video tools
+    "DeepMotion",
+    ["Kaiber", "Kaiber.ai"],
+    ["Radical Motion", "RadicalMotion"],
+];
+
 export const instruments: Array<string | string[]> = [
   "Active Campaign",
   "Airtable",
@@ -142,6 +177,7 @@ export const instruments: Array<string | string[]> = [
   "Zoho",
   ...videoAndAnimationInstruments,
   ...uiUxDesignInstruments,
+  ...gameDevelopmentInstruments,
 ];
 
 // Escape special characters for regex
