@@ -46,6 +46,7 @@ const uiUxDesignInstruments: Array<string | string[]> = [
     "Framer",
     "Elementor",
     "WordPress",
+    "WooCommerce",
 ];
 
 export const instruments: Array<string | string[]> = [
