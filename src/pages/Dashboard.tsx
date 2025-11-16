@@ -45,6 +45,7 @@ import {
   PaymentTypeChart,
   InstrumentBadges,
   TopInstrumentsByAverageRate,
+  JobsByIndustryChart,
 } from "../components";
 import { filterJobs, Filters, JobType } from "../features";
 import type { CategoryValueItem } from "../components/charts";
@@ -269,6 +270,9 @@ const Dashboard: React.FC = () => {
               data={instrumentAverageRates}
               limit={15}
             />
+          </div>
+          <div className="max-w-md min-w-80">
+            <JobsByIndustryChart jobs={filteredJobsData} limit={20} />
           </div>
         </div>
         // TODO: fix or remove these charts

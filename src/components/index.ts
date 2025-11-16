@@ -41,5 +41,6 @@ export { default as PaymentTypeChart } from "./oldCharts/PaymentTypeChart";
 export { default as JobDetails } from "./JobDetails";
 export { default as InstrumentBadges } from "./oldCharts/InstrumentBadges";
 export { default as TopInstrumentsByAverageRate } from "./oldCharts/TopInstrumentsByAverageRate";
+export { default as JobsByIndustryChart } from "./oldCharts/JobsByIndustryChart";
 
 export * from "./elements";
