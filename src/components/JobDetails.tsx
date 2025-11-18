@@ -10,12 +10,23 @@ interface JobDetailsProps {
   onClose: () => void;
   onJobUpdate: (job: UpworkJob) => void;
   collectionNameById: Record<number, string>;
+  availableCollections: { id: number; name: string }[];
 }
 
-const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpdate, collectionNameById }) => {
+const JobDetails: React.FC<JobDetailsProps> = ({
+  job,
+  isOpen,
+  onClose,
+  onJobUpdate,
+  collectionNameById,
+  availableCollections,
+}) => {
   const [jobData, setJobData] = useState<UpworkJob>(job);
+  const [selectedCollectionToAdd, setSelectedCollectionToAdd] = useState<number | "">("");
+  const [isUpdatingCollections, setIsUpdatingCollections] = useState(false);
   useEffect(() => {
     setJobData(job);
+    setSelectedCollectionToAdd("");
   }, [job]);
 
   const collectionBadges = (jobData.collections ?? job.collections ?? []).map(
@@ -44,6 +55,39 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
       .catch((error) => {
         console.error("Error updating job bookmark:", error);
       });
+  };
+
+  const updateCollections = (collectionIds: number[]) => {
+    setIsUpdatingCollections(true);
+    const previous = jobData.collections ?? job.collections ?? [];
+    setJobData({ ...jobData, collections: collectionIds });
+    onJobUpdate({ ...jobData, collections: collectionIds });
+    updateUpworkJob({ ...jobData, collections: collectionIds })
+      .then((updatedJob) => {
+        setJobData(updatedJob);
+        onJobUpdate(updatedJob);
+      })
+      .catch((error) => {
+        console.error("Error updating job collections:", error);
+        setJobData({ ...jobData, collections: previous });
+        onJobUpdate({ ...jobData, collections: previous });
+      })
+      .finally(() => setIsUpdatingCollections(false));
+  };
+
+  const handleRemoveCollection = (collectionId: number) => {
+    const current = jobData.collections ?? job.collections ?? [];
+    const updated = current.filter((id) => id !== collectionId);
+    updateCollections(updated);
+  };
+
+  const handleAddCollection = () => {
+    if (selectedCollectionToAdd === "") return;
+    const current = jobData.collections ?? job.collections ?? [];
+    if (current.includes(selectedCollectionToAdd)) return;
+    const updated = [...current, selectedCollectionToAdd];
+    updateCollections(updated);
+    setSelectedCollectionToAdd("");
   };
 
   return (
@@ -137,23 +181,67 @@ const JobDetails: React.FC<JobDetailsProps> = ({ job, isOpen, onClose, onJobUpda
             )}
           </button>
         </div>
-        {collectionBadges.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-sm font-semibold text-gray-800 mb-2">
-              Collections
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {collectionBadges.map(({ id, name }) => (
+        <div className="mb-4">
+          <h3 className="text-sm font-semibold text-gray-800 mb-2">
+            Collections
+          </h3>
+          <div className="flex flex-wrap gap-2 items-center">
+            {collectionBadges.length > 0 ? (
+              collectionBadges.map(({ id, name }) => (
                 <span
                   key={id}
-                  className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full border border-blue-100"
+                  className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full border border-blue-100"
                 >
                   {name}
+                  <button
+                    className="text-blue-600 hover:text-blue-800"
+                    onClick={() => handleRemoveCollection(id)}
+                    title="Remove from collection"
+                  >
+                    ×
+                  </button>
                 </span>
-              ))}
-            </div>
+              ))
+            ) : (
+              <span className="text-xs text-gray-500">No collections</span>
+            )}
+            {availableCollections.length > 0 && (
+              <div className="flex items-center gap-2 text-xs">
+                <select
+                  className="border border-gray-300 rounded px-2 py-1 text-xs"
+                  value={selectedCollectionToAdd}
+                  onChange={(e) =>
+                    setSelectedCollectionToAdd(
+                      e.target.value ? Number(e.target.value) : "",
+                    )
+                  }
+                  disabled={isUpdatingCollections}
+                >
+                  <option value="">Add to collection</option>
+                  {availableCollections
+                    .filter(
+                      (collection) =>
+                        !(jobData.collections ?? job.collections ?? []).includes(
+                          collection.id,
+                        ),
+                    )
+                    .map((collection) => (
+                      <option key={collection.id} value={collection.id}>
+                        {collection.name}
+                      </option>
+                    ))}
+                </select>
+                <button
+                  className="px-2 py-1 bg-blue-600 text-white rounded disabled:opacity-50"
+                  disabled={selectedCollectionToAdd === "" || isUpdatingCollections}
+                  onClick={handleAddCollection}
+                >
+                  {isUpdatingCollections ? "..." : "Add"}
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
         {/*<div className="mb-4">*/}
         {/*  <h3 className="text-lg font-semibold text-gray-800 mb-2">Status</h3>*/}
         {/*  <span*/}

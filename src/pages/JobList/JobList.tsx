@@ -397,7 +397,7 @@ const JobList: React.FC = () => {
             onChange={handlePageSizeChange}
             disabled={loading}
           >
-            {[20, 50, 100, 200].map((size) => (
+            {[20, 200, 2000].map((size) => (
               <option key={size} value={size}>
                 {size}
               </option>
@@ -477,6 +477,7 @@ const JobList: React.FC = () => {
             onJobUpdate={updateJob}
             isLastClicked={lastClickedJobId === job.id}
             collectionNameById={collectionNameById}
+            availableCollections={collections}
           />
         ))}
         {selectedJob && (
@@ -487,6 +488,7 @@ const JobList: React.FC = () => {
             onClose={closeJobDetails}
             onJobUpdate={updateJob}
             collectionNameById={collectionNameById}
+            availableCollections={collections}
           />
         )}
       </div>

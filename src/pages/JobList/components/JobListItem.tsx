@@ -12,10 +12,20 @@ interface JobListItemProps {
   onJobUpdate: (job: UpworkJob) => void;
   isLastClicked?: boolean;
   collectionNameById: Record<number, string>;
+  availableCollections: { id: number; name: string }[];
 }
 
-const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate, isLastClicked = false, collectionNameById }) => {
+const JobListItem: React.FC<JobListItemProps> = ({
+  job,
+  onClick,
+  onJobUpdate,
+  isLastClicked = false,
+  collectionNameById,
+  availableCollections,
+}) => {
   const [jobData, setJobData] = useState<UpworkJob>(job);
+  const [selectedCollectionToAdd, setSelectedCollectionToAdd] = useState<number | "">("");
+  const [isUpdatingCollections, setIsUpdatingCollections] = useState(false);
 
   const handleStatusChange = (status: JobStatus) => {
     updateUpworkJob({ ...jobData, status })
@@ -49,6 +59,41 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate, is
       name: collectionNameById[collectionId],
     }),
   ).filter((entry): entry is { id: number; name: string } => Boolean(entry.name));
+
+  const updateCollections = (collectionIds: number[]) => {
+    setIsUpdatingCollections(true);
+    const previous = jobData.collections ?? job.collections ?? [];
+    setJobData({ ...jobData, collections: collectionIds });
+    onJobUpdate({ ...jobData, collections: collectionIds });
+    updateUpworkJob({ ...jobData, collections: collectionIds })
+      .then((updatedJob) => {
+        setJobData(updatedJob);
+        onJobUpdate(updatedJob);
+      })
+      .catch((error) => {
+        console.error("Error updating job collections:", error);
+        setJobData({ ...jobData, collections: previous });
+        onJobUpdate({ ...jobData, collections: previous });
+      })
+      .finally(() => setIsUpdatingCollections(false));
+  };
+
+  const handleRemoveCollection = (collectionId: number, event?: React.MouseEvent) => {
+    event?.stopPropagation();
+    const current = jobData.collections ?? job.collections ?? [];
+    const updated = current.filter((id) => id !== collectionId);
+    updateCollections(updated);
+  };
+
+  const handleAddCollection = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (selectedCollectionToAdd === "") return;
+    const current = jobData.collections ?? job.collections ?? [];
+    if (current.includes(selectedCollectionToAdd)) return;
+    const updated = [...current, selectedCollectionToAdd];
+    updateCollections(updated);
+    setSelectedCollectionToAdd("");
+  };
 
   return (
     <Card shadow={true} isHighlighted={isLastClicked}>
@@ -118,18 +163,71 @@ const JobListItem: React.FC<JobListItemProps> = ({ job, onClick, onJobUpdate, is
             </span>
           ))}
         </div>
-        {collectionBadges.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {collectionBadges.map(({ id, name }) => (
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          {collectionBadges.length > 0 ? (
+            collectionBadges.map(({ id, name }) => (
               <span
                 key={id}
-                className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full border border-blue-100"
+                className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full border border-blue-100"
+                onClick={(e) => e.stopPropagation()}
               >
                 {name}
+                <button
+                  className="text-blue-600 hover:text-blue-800"
+                  title="Remove from collection"
+                  onClick={(e) => handleRemoveCollection(id, e)}
+                >
+                  ×
+                </button>
               </span>
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <span
+              className="text-xs text-gray-500"
+              onClick={(e) => e.stopPropagation()}
+            >
+              No collections
+            </span>
+          )}
+          {availableCollections.length > 0 && (
+            <div
+              className="flex items-center gap-2 text-xs"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <select
+                className="border border-gray-300 rounded px-2 py-1 text-xs"
+                value={selectedCollectionToAdd}
+                onChange={(e) =>
+                  setSelectedCollectionToAdd(
+                    e.target.value ? Number(e.target.value) : "",
+                  )
+                }
+                disabled={isUpdatingCollections}
+              >
+                <option value="">Add to collection</option>
+                {availableCollections
+                  .filter(
+                    (collection) =>
+                      !(jobData.collections ?? job.collections ?? []).includes(
+                        collection.id,
+                      ),
+                  )
+                  .map((collection) => (
+                    <option key={collection.id} value={collection.id}>
+                      {collection.name}
+                    </option>
+                  ))}
+              </select>
+              <button
+                className="px-2 py-1 bg-blue-600 text-white rounded disabled:opacity-50"
+                disabled={selectedCollectionToAdd === "" || isUpdatingCollections}
+                onClick={handleAddCollection}
+              >
+                {isUpdatingCollections ? "..." : "Add"}
+              </button>
+            </div>
+          )}
+        </div>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-800">
