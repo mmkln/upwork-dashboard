@@ -47,7 +47,13 @@ import {
   TopInstrumentsByAverageRate,
   JobsByIndustryChart,
 } from "../components";
-import { filterJobs, Filters, JobType } from "../features";
+import {
+  filterJobs,
+  JobType,
+  FilterState,
+  FiltersLauncher,
+  DEFAULT_FILTERS,
+} from "../features";
 import type { CategoryValueItem } from "../components/charts";
 import { instruments, prepareJobs } from "../utils";
 
@@ -60,6 +66,8 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [filteredJobsData, setFilteredJobsData] =
     useState<PreparedUpworkJob[]>([]);
+  const [activeFilters, setActiveFilters] =
+    useState<FilterState>(DEFAULT_FILTERS);
 
   const availableStatuses = useMemo(
     () => Object.values(JobStatus),
@@ -73,6 +81,13 @@ const Dashboard: React.FC = () => {
       ),
     [],
   );
+
+  const collectionNameById = useMemo(() => {
+    return collections.reduce<Record<number, string>>((acc, collection) => {
+      acc[collection.id] = collection.name;
+      return acc;
+    }, {});
+  }, [collections]);
 
   useEffect(() => {
     const loadJobs = async () => {
@@ -199,6 +214,18 @@ const Dashboard: React.FC = () => {
     titleFilter: string,
     bookmarked: boolean,
   ) => {
+    setActiveFilters({
+      jobType,
+      fixedPriceRange,
+      hourlyRateRange,
+      selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
+      selectedCollectionIds,
+      selectedExperience,
+      titleFilter,
+      bookmarked,
+    });
     const jobs = filterJobs(
       jobsData,
       jobType,
@@ -217,15 +244,15 @@ const Dashboard: React.FC = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="p-6">
-        <Filters
-          onFilterChange={onFilterChanged}
-          availableSkills={availableSkills}
-          availableInstruments={availableInstruments}
-          availableStatuses={availableStatuses}
-          availableCollections={collections}
-        />
-      </div>
+      <FiltersLauncher
+        activeFilters={activeFilters}
+        onFilterChange={onFilterChanged}
+        availableSkills={availableSkills}
+        availableInstruments={availableInstruments}
+        availableStatuses={availableStatuses}
+        availableCollections={collections}
+        collectionNameById={collectionNameById}
+      />
       <div className="mx-auto p-6 flex flex-col gap-4">
         <div className="flex gap-4">
           <div className=" max-w-3xl">

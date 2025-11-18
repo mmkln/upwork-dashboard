@@ -83,7 +83,20 @@ export const login = async (
   return response.data;
 };
 
-export interface JobQueryParams extends PaginationParams {}
+export interface JobQueryParams extends PaginationParams {
+  search?: string;
+  job_type?: "fixed" | "hourly" | "unspecified";
+  fixed_price_min?: number;
+  fixed_price_max?: number;
+  hourly_rate_min?: number;
+  hourly_rate_max?: number;
+  skills?: string;
+  instruments?: string;
+  statuses?: string;
+  collections?: string;
+  experience?: string;
+  bookmarked?: boolean;
+}
 
 const normalizeJob = (job: UpworkJob): UpworkJob => ({
   ...job,

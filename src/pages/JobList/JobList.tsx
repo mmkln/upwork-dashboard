@@ -1,6 +1,5 @@
 // src/components/JobList.tsx
 import React, { useEffect, useMemo, useState } from "react";
-import Modal from "react-modal";
 import {
   UpworkJob,
   JobStatus,
@@ -10,36 +9,64 @@ import {
 } from "../../models";
 import { fetchUpworkJobs, fetchJobCollections } from "../../services";
 import { JobDetails } from "../../components";
-import { filterJobs, Filters, JobType } from "../../features";
+import {
+  FilterState,
+  FiltersLauncher,
+  JobType,
+  DEFAULT_FILTERS,
+} from "../../features";
 import { JobListItem } from "./components";
 import { instruments, prepareJobs } from "../../utils";
 
-Modal.setAppElement("#root");
+const mapFiltersToQuery = (filters: FilterState) => {
+  const params: Record<string, string | number | boolean | undefined> = {};
 
-type FilterState = {
-  jobType: JobType;
-  fixedPriceRange: [number, number] | null;
-  hourlyRateRange: [number, number] | null;
-  selectedSkills: string[];
-  selectedInstruments: string[];
-  selectedStatuses: JobStatus[];
-  selectedCollectionIds: number[];
-  selectedExperience: JobExperience[];
-  titleFilter: string;
-  bookmarked: boolean;
-};
+  if (filters.titleFilter.trim()) {
+    params.search = filters.titleFilter.trim();
+  }
 
-const DEFAULT_FILTERS: FilterState = {
-  jobType: "None",
-  fixedPriceRange: [0, 5000],
-  hourlyRateRange: [0, 500],
-  selectedSkills: [],
-  selectedInstruments: [],
-  selectedStatuses: [],
-  selectedCollectionIds: [],
-  selectedExperience: [],
-  titleFilter: "",
-  bookmarked: false,
+  switch (filters.jobType) {
+    case "Fixed Price":
+      params.job_type = "fixed";
+      if (filters.fixedPriceRange) {
+        params.fixed_price_min = filters.fixedPriceRange[0];
+        params.fixed_price_max = filters.fixedPriceRange[1];
+      }
+      break;
+    case "Hourly Rate":
+      params.job_type = "hourly";
+      if (filters.hourlyRateRange) {
+        params.hourly_rate_min = filters.hourlyRateRange[0];
+        params.hourly_rate_max = filters.hourlyRateRange[1];
+      }
+      break;
+    case "Unspecified":
+      params.job_type = "unspecified";
+      break;
+    default:
+      break;
+  }
+
+  if (filters.selectedSkills.length) {
+    params.skills = filters.selectedSkills.join(",");
+  }
+  if (filters.selectedInstruments.length) {
+    params.instruments = filters.selectedInstruments.join(",");
+  }
+  if (filters.selectedStatuses.length) {
+    params.statuses = filters.selectedStatuses.join(",");
+  }
+  if (filters.selectedCollectionIds.length) {
+    params.collections = filters.selectedCollectionIds.join(",");
+  }
+  if (filters.selectedExperience.length) {
+    params.experience = filters.selectedExperience.join(",");
+  }
+  if (filters.bookmarked) {
+    params.bookmarked = true;
+  }
+
+  return params;
 };
 
 const JobList: React.FC = () => {
@@ -76,12 +103,14 @@ const JobList: React.FC = () => {
         const paginatedJobs = await fetchUpworkJobs({
           page,
           page_size: pageSize,
+          ...mapFiltersToQuery(activeFilters),
         });
         if (!isMounted) return;
 
         const preparedJobs = prepareJobs(paginatedJobs.results);
         const sortedJobs = sortJobs(preparedJobs);
         setJobsData(sortedJobs);
+        setFilteredJobsData(sortedJobs);
         setTotalJobs(paginatedJobs.count);
         const totalPageCount =
           paginatedJobs.count > 0
@@ -109,7 +138,7 @@ const JobList: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [page, pageSize]);
+  }, [page, pageSize, activeFilters]);
 
   useEffect(() => {
     let isMounted = true;
@@ -260,42 +289,6 @@ const JobList: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const filtered = filterJobs(
-      jobsData,
-      activeFilters.jobType,
-      activeFilters.fixedPriceRange,
-      activeFilters.hourlyRateRange,
-      activeFilters.selectedSkills,
-      activeFilters.selectedInstruments,
-      activeFilters.selectedStatuses,
-      activeFilters.selectedCollectionIds,
-      activeFilters.selectedExperience,
-      activeFilters.titleFilter,
-      activeFilters.bookmarked,
-    );
-    setFilteredJobsData(filtered);
-    setLastFilterSlug(
-      buildFilterSlug(
-        activeFilters.jobType,
-        activeFilters.fixedPriceRange,
-        activeFilters.hourlyRateRange,
-        activeFilters.selectedSkills,
-        activeFilters.selectedInstruments,
-        activeFilters.selectedStatuses,
-        activeFilters.selectedCollectionIds,
-        activeFilters.selectedExperience,
-        activeFilters.titleFilter,
-        activeFilters.bookmarked,
-        collectionNameById,
-      ),
-    );
-  }, [activeFilters, collectionNameById, jobsData]);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
   const onFilterChanged = (
     jobType: JobType,
     fixedPriceRange: [number, number] | null,
@@ -308,7 +301,7 @@ const JobList: React.FC = () => {
     titleFilter: string,
     bookmarked: boolean,
   ) => {
-    setActiveFilters({
+    const nextFilters: FilterState = {
       jobType,
       fixedPriceRange,
       hourlyRateRange,
@@ -319,7 +312,23 @@ const JobList: React.FC = () => {
       selectedExperience,
       titleFilter,
       bookmarked,
-    });
+    };
+    setActiveFilters(nextFilters);
+    setLastFilterSlug(
+      buildFilterSlug(
+        nextFilters.jobType,
+        nextFilters.fixedPriceRange,
+        nextFilters.hourlyRateRange,
+        nextFilters.selectedSkills,
+        nextFilters.selectedInstruments,
+        nextFilters.selectedStatuses,
+        nextFilters.selectedCollectionIds,
+        nextFilters.selectedExperience,
+        nextFilters.titleFilter,
+        nextFilters.bookmarked,
+        collectionNameById,
+      ),
+    );
     setPage(1);
   };
 
@@ -355,15 +364,19 @@ const JobList: React.FC = () => {
 
   return (
     <>
-      <div className="p-6">
-        <Filters
-          onFilterChange={onFilterChanged}
-          availableSkills={availableSkills}
-          availableInstruments={availableInstruments}
-          availableStatuses={availableStatuses}
-          availableCollections={collections}
-        />
-      </div>
+      {loading && (
+        <div className="px-6 pt-4 text-sm text-gray-500">Loading jobs…</div>
+      )}
+      <FiltersLauncher
+        activeFilters={activeFilters}
+        onFilterChange={onFilterChanged}
+        availableSkills={availableSkills}
+        availableInstruments={availableInstruments}
+        availableStatuses={availableStatuses}
+        availableCollections={collections}
+        collectionNameById={collectionNameById}
+      />
+
       <div className="flex flex-col gap-4 px-6 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
           <p className="text-lg font-medium text-gray-800">

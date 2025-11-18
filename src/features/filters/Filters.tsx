@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import Select from "react-select";
 import { JobStatus, JobExperience } from "../../models";
 import { camelToCapitalizedWords, debounce } from "../../utils";
+import { FilterState } from "./types";
 
 export type JobType = "Fixed Price" | "Hourly Rate" | "Unspecified" | "None";
 
@@ -22,6 +23,7 @@ interface FilterComponentProps {
   availableInstruments: string[];
   availableStatuses: JobStatus[];
   availableCollections: { id: number; name: string }[];
+  initialFilters?: FilterState;
 }
 
 const INITIAL_HOURLY_RATE_MAX = 500;
@@ -33,23 +35,38 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   availableInstruments,
   availableStatuses,
   availableCollections,
+  initialFilters,
 }) => {
-  const [jobType, setJobType] = useState<JobType>("None");
+  const [jobType, setJobType] = useState<JobType>(initialFilters?.jobType ?? "None");
   const [fixedPriceRange, setFixedPriceRange] = useState<
     [number, number] | null
-  >([0, INITIAL_FIXED_PRICE_MAX]);
+  >(initialFilters?.fixedPriceRange ?? [0, INITIAL_FIXED_PRICE_MAX]);
   const [hourlyRateRange, setHourlyRateRange] = useState<
     [number, number] | null
-  >([0, INITIAL_HOURLY_RATE_MAX]);
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [selectedInstruments, setSelectedInstruments] = useState<string[]>([]);
-  const [selectedStatuses, setSelectedStatuses] = useState<JobStatus[]>([]);
-  const [selectedCollections, setSelectedCollections] = useState<number[]>([]);
+  >(initialFilters?.hourlyRateRange ?? [0, INITIAL_HOURLY_RATE_MAX]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(initialFilters?.selectedSkills ?? []);
+  const [selectedInstruments, setSelectedInstruments] = useState<string[]>(initialFilters?.selectedInstruments ?? []);
+  const [selectedStatuses, setSelectedStatuses] = useState<JobStatus[]>(initialFilters?.selectedStatuses ?? []);
+  const [selectedCollections, setSelectedCollections] = useState<number[]>(initialFilters?.selectedCollectionIds ?? []);
   const [selectedJobExperience, setSelectedJobExperience] = useState<
     JobExperience[]
-  >([]);
-  const [titleFilter, setTitleFilter] = useState<string>("");
-  const [bookmarked, setBookmarked] = useState<boolean>(false);
+  >(initialFilters?.selectedExperience ?? []);
+  const [titleFilter, setTitleFilter] = useState<string>(initialFilters?.titleFilter ?? "");
+  const [bookmarked, setBookmarked] = useState<boolean>(initialFilters?.bookmarked ?? false);
+
+  useEffect(() => {
+    if (!initialFilters) return;
+    setJobType(initialFilters.jobType);
+    setFixedPriceRange(initialFilters.fixedPriceRange ?? [0, INITIAL_FIXED_PRICE_MAX]);
+    setHourlyRateRange(initialFilters.hourlyRateRange ?? [0, INITIAL_HOURLY_RATE_MAX]);
+    setSelectedSkills(initialFilters.selectedSkills ?? []);
+    setSelectedInstruments(initialFilters.selectedInstruments ?? []);
+    setSelectedStatuses(initialFilters.selectedStatuses ?? []);
+    setSelectedCollections(initialFilters.selectedCollectionIds ?? []);
+    setSelectedJobExperience(initialFilters.selectedExperience ?? []);
+    setTitleFilter(initialFilters.titleFilter ?? "");
+    setBookmarked(initialFilters.bookmarked ?? false);
+  }, [initialFilters]);
 
   const skillOptions = availableSkills.map((skill) => ({
     value: skill,
@@ -106,15 +123,15 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
         jobType,
         fixedPriceRange,
         hourlyRateRange,
-      selectedSkills,
-      selectedInstruments,
-      selectedStatuses,
-      selectedCollections,
-      selectedJobExperience,
-      value,
-      bookmarked,
-    );
-  }, 300),
+        selectedSkills,
+        selectedInstruments,
+        selectedStatuses,
+        selectedCollections,
+        selectedJobExperience,
+        value,
+        bookmarked,
+      );
+    }, 300),
     [
       jobType,
       fixedPriceRange,
