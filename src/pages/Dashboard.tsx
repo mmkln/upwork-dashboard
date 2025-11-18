@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import update from "immutability-helper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend"; // Бекенд для drag-and-drop
-import { fetchUpworkJobs, fetchJobCollections } from "../services";
+import { fetchAllUpworkJobs, fetchJobCollections } from "../services";
 import {
   JobExperience,
   JobStatus,
@@ -78,7 +78,7 @@ const Dashboard: React.FC = () => {
     const loadJobs = async () => {
       try {
         const [jobs, jobCollections] = await Promise.all([
-          fetchUpworkJobs(),
+          fetchAllUpworkJobs(),
           fetchJobCollections().catch((error) => {
             console.warn("Failed to fetch collections", error);
             return [] as JobCollection[];

@@ -1,5 +1,11 @@
 import axios from "axios";
-import { AuthUser, JobCollection, UpworkJob } from "../models";
+import {
+  AuthUser,
+  JobCollection,
+  PaginatedResponse,
+  PaginationParams,
+  UpworkJob,
+} from "../models";
 import { environment } from "../environments";
 
 export const AUTH_STORAGE_KEY = "authToken";
@@ -77,13 +83,64 @@ export const login = async (
   return response.data;
 };
 
-// Функція для отримання всіх робіт
-export const fetchUpworkJobs = async (): Promise<UpworkJob[]> => {
-  const response = await apiClient.get<UpworkJob[]>("/jobs/");
-  return response.data.map((job) => ({
-    ...job,
-    collections: job.collections ?? [],
-  }));
+export interface JobQueryParams extends PaginationParams {}
+
+const normalizeJob = (job: UpworkJob): UpworkJob => ({
+  ...job,
+  collections: job.collections ?? [],
+});
+
+const normalizeUpworkJobsResponse = (
+  data: PaginatedResponse<UpworkJob> | UpworkJob[],
+): PaginatedResponse<UpworkJob> => {
+  if (Array.isArray(data)) {
+    return {
+      count: data.length,
+      next: null,
+      previous: null,
+      results: data.map(normalizeJob),
+    };
+  }
+  return {
+    ...data,
+    results: data.results.map(normalizeJob),
+  };
+};
+
+// Функція для отримання робіт із пагінацією
+export const fetchUpworkJobs = async (
+  params?: JobQueryParams,
+): Promise<PaginatedResponse<UpworkJob>> => {
+  const response = await apiClient.get<
+    PaginatedResponse<UpworkJob> | UpworkJob[]
+  >("/jobs/", {
+    params,
+  });
+
+  return normalizeUpworkJobsResponse(response.data);
+};
+
+export const fetchAllUpworkJobs = async (
+  pageSize = 2000,
+): Promise<UpworkJob[]> => {
+  let page = 1;
+  let hasNext = true;
+  const jobs: UpworkJob[] = [];
+
+  while (hasNext) {
+    const { results, next } = await fetchUpworkJobs({
+      page,
+      page_size: pageSize,
+    });
+    jobs.push(...results);
+    if (next) {
+      page += 1;
+    } else {
+      hasNext = false;
+    }
+  }
+
+  return jobs;
 };
 
 export const createUpworkJob = async (

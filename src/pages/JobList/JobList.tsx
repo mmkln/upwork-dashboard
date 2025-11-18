@@ -16,6 +16,32 @@ import { instruments, prepareJobs } from "../../utils";
 
 Modal.setAppElement("#root");
 
+type FilterState = {
+  jobType: JobType;
+  fixedPriceRange: [number, number] | null;
+  hourlyRateRange: [number, number] | null;
+  selectedSkills: string[];
+  selectedInstruments: string[];
+  selectedStatuses: JobStatus[];
+  selectedCollectionIds: number[];
+  selectedExperience: JobExperience[];
+  titleFilter: string;
+  bookmarked: boolean;
+};
+
+const DEFAULT_FILTERS: FilterState = {
+  jobType: "None",
+  fixedPriceRange: [0, 5000],
+  hourlyRateRange: [0, 500],
+  selectedSkills: [],
+  selectedInstruments: [],
+  selectedStatuses: [],
+  selectedCollectionIds: [],
+  selectedExperience: [],
+  titleFilter: "",
+  bookmarked: false,
+};
+
 const JobList: React.FC = () => {
   const [jobsData, setJobsData] = useState<PreparedUpworkJob[]>([]);
   const [collections, setCollections] = useState<JobCollection[]>([]);
@@ -25,6 +51,11 @@ const JobList: React.FC = () => {
     useState<PreparedUpworkJob[]>([]);
   const [lastClickedJobId, setLastClickedJobId] = useState<string | null>(null);
   const [lastFilterSlug, setLastFilterSlug] = useState<string>("all");
+  const [activeFilters, setActiveFilters] =
+    useState<FilterState>(DEFAULT_FILTERS);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(50);
+  const [totalJobs, setTotalJobs] = useState<number>(0);
   const availableStatuses = Object.values(JobStatus);
   const availableInstruments: string[] = instruments.map((toolEntry) =>
     Array.isArray(toolEntry) ? toolEntry[0] : toolEntry,
@@ -38,28 +69,66 @@ const JobList: React.FC = () => {
   }, [collections]);
 
   useEffect(() => {
+    let isMounted = true;
     const loadJobs = async () => {
+      setLoading(true);
       try {
-        const [fetchedJobs, fetchedCollections] = await Promise.all([
-          fetchUpworkJobs(),
-          fetchJobCollections().catch((error) => {
-            console.warn("Failed to fetch collections", error);
-            return [] as JobCollection[];
-          }),
-        ]);
-        const preparedJobs = prepareJobs(fetchedJobs);
+        const paginatedJobs = await fetchUpworkJobs({
+          page,
+          page_size: pageSize,
+        });
+        if (!isMounted) return;
+
+        const preparedJobs = prepareJobs(paginatedJobs.results);
         const sortedJobs = sortJobs(preparedJobs);
         setJobsData(sortedJobs);
-        setFilteredJobsData(sortedJobs);
-        setCollections(fetchedCollections);
+        setTotalJobs(paginatedJobs.count);
+        const totalPageCount =
+          paginatedJobs.count > 0
+            ? Math.ceil(paginatedJobs.count / pageSize)
+            : 1;
+        if (page > totalPageCount) {
+          setPage(totalPageCount);
+        }
       } catch (error) {
-        console.error("Error fetching jobs:", error);
+        if (isMounted) {
+          console.error("Error fetching jobs:", error);
+          setJobsData([]);
+          setFilteredJobsData([]);
+          setTotalJobs(0);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadJobs();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [page, pageSize]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadCollections = async () => {
+      try {
+        const fetchedCollections = await fetchJobCollections();
+        if (!isMounted) return;
+        setCollections(fetchedCollections);
+      } catch (error) {
+        console.warn("Failed to fetch collections", error);
+      }
+    };
+
+    loadCollections();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const sortJobs = (jobs: PreparedUpworkJob[]): PreparedUpworkJob[] => {
@@ -100,6 +169,62 @@ const JobList: React.FC = () => {
     [jobsData],
   );
 
+  const totalPages =
+    totalJobs > 0 ? Math.ceil(totalJobs / pageSize) : 1;
+  const isFirstPage = page <= 1;
+  const isLastPage = page >= totalPages || totalJobs === 0;
+
+  const goToPage = (nextPage: number) => {
+    const safePage = Math.min(Math.max(1, nextPage), totalPages || 1);
+    if (safePage !== page) {
+      setPage(safePage);
+      setLastClickedJobId(null);
+      setSelectedJob(null);
+    }
+  };
+
+  const handlePageSizeChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const newSize = Number(event.target.value);
+    if (!Number.isNaN(newSize) && newSize > 0) {
+      setPageSize(newSize);
+      setPage(1);
+    }
+  };
+
+  useEffect(() => {
+    const filtered = filterJobs(
+      jobsData,
+      activeFilters.jobType,
+      activeFilters.fixedPriceRange,
+      activeFilters.hourlyRateRange,
+      activeFilters.selectedSkills,
+      activeFilters.selectedInstruments,
+      activeFilters.selectedStatuses,
+      activeFilters.selectedCollectionIds,
+      activeFilters.selectedExperience,
+      activeFilters.titleFilter,
+      activeFilters.bookmarked,
+    );
+    setFilteredJobsData(filtered);
+    setLastFilterSlug(
+      buildFilterSlug(
+        activeFilters.jobType,
+        activeFilters.fixedPriceRange,
+        activeFilters.hourlyRateRange,
+        activeFilters.selectedSkills,
+        activeFilters.selectedInstruments,
+        activeFilters.selectedStatuses,
+        activeFilters.selectedCollectionIds,
+        activeFilters.selectedExperience,
+        activeFilters.titleFilter,
+        activeFilters.bookmarked,
+        collectionNameById,
+      ),
+    );
+  }, [activeFilters, collectionNameById, jobsData]);
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -116,9 +241,7 @@ const JobList: React.FC = () => {
     titleFilter: string,
     bookmarked: boolean,
   ) => {
-    console.log({ jobType, fixedPriceRange, hourlyRateRange, selectedSkills });
-    const jobs = filterJobs(
-      jobsData,
+    setActiveFilters({
       jobType,
       fixedPriceRange,
       hourlyRateRange,
@@ -129,23 +252,8 @@ const JobList: React.FC = () => {
       selectedExperience,
       titleFilter,
       bookmarked,
-    );
-    setFilteredJobsData(jobs);
-    setLastFilterSlug(
-      buildFilterSlug(
-        jobType,
-        fixedPriceRange,
-        hourlyRateRange,
-        selectedSkills,
-        selectedInstruments,
-        selectedStatuses,
-        selectedCollectionIds,
-        selectedExperience,
-        titleFilter,
-        bookmarked,
-        collectionNameById,
-      ),
-    );
+    });
+    setPage(1);
   };
 
   const buildFilterSlug = (
@@ -256,54 +364,95 @@ const JobList: React.FC = () => {
           availableCollections={collections}
         />
       </div>
-      <div className="flex items-center justify-between px-6">
-        <p className="text-lg font-medium text-gray-800">
-          {filteredJobsData.length} job
-          {filteredJobsData.length !== 1 ? "s" : ""} found
-        </p>
-        <div className="flex space-x-2">
-          <button
-            className="p-2 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
-            title="Copy jobs to clipboard"
-            onClick={handleCopy}
-            disabled={filteredJobsData.length === 0}
+      <div className="flex flex-col gap-4 px-6 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-1">
+          <p className="text-lg font-medium text-gray-800">
+            Showing {filteredJobsData.length} of {totalJobs || filteredJobsData.length} job
+            {filteredJobsData.length !== 1 ? "s" : ""}
+          </p>
+          <p className="text-sm text-gray-600">
+            Page {page} of {totalPages} {totalJobs ? `(total ${totalJobs})` : ""}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="text-sm font-medium text-gray-700">
+            Page size
+          </label>
+          <select
+            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
+            value={pageSize}
+            onChange={handlePageSizeChange}
+            disabled={loading}
           >
-            <svg
-              className="w-6 h-6"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
+            {[20, 50, 100, 200].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+          <div className="flex items-center gap-2">
+            <button
+              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => goToPage(page - 1)}
+              disabled={isFirstPage || loading}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-              />
-            </svg>
-          </button>
-          <button
-            className="p-2 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
-            title="Export jobs as JSON file"
-            onClick={handleDownload}
-            disabled={filteredJobsData.length === 0}
-          >
-            <svg
-              className="w-6 h-6"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {page} / {totalPages}
+            </span>
+            <button
+              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => goToPage(page + 1)}
+              disabled={isLastPage || loading}
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-              />
-            </svg>
-          </button>
+              Next
+            </button>
+          </div>
+          <div className="flex space-x-2">
+            <button
+              className="p-2 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
+              title="Copy jobs to clipboard"
+              onClick={handleCopy}
+              disabled={filteredJobsData.length === 0}
+            >
+              <svg
+                className="w-6 h-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
+                />
+              </svg>
+            </button>
+            <button
+              className="p-2 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
+              title="Export jobs as JSON file"
+              onClick={handleDownload}
+              disabled={filteredJobsData.length === 0}
+            >
+              <svg
+                className="w-6 h-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 pt-4">

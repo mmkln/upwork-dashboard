@@ -1,5 +1,6 @@
 export {
   fetchUpworkJobs,
+  fetchAllUpworkJobs,
   updateUpworkJob,
   createUpworkJob,
   fetchJobCollections,
