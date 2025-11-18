@@ -196,10 +196,6 @@ const Dashboard: React.FC = () => {
       .sort((a, b) => b.value - a.value);
   }, [filteredJobsData]);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
   const today = new Date();
 
   const onFilterChanged = (
@@ -244,6 +240,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      {loading && (
+        <div className="px-6 pt-4 text-sm text-gray-500">Loading jobs…</div>
+      )}
       <FiltersLauncher
         activeFilters={activeFilters}
         onFilterChange={onFilterChanged}
