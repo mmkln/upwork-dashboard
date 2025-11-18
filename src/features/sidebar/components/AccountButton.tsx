@@ -23,13 +23,15 @@ const AccountButton: React.FC = () => {
     <button
       type="button"
       onClick={handleClick}
-      className="group mt-auto flex w-full items-center rounded bg-[#002e82] px-2 py-2 text-gray-200 transition-colors duration-300 hover:bg-[#023ca5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#001844] focus:ring-blue-500"
+      className="group mt-auto flex w-full items-center rounded bg-[#002e82] px-2 py-2 text-gray-200 transition-colors duration-300 hover:bg-[#023ca5] overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#001844] focus:ring-blue-500"
       title={user ? `Signed in as ${user.username}` : "Sign in"}
     >
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#023ca5] text-sm font-semibold text-white">
+      <div className="flex w-8 h-8 items-center justify-center">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#023ca5] text-sm font-semibold text-white">
         {initials}
       </div>
-      <div className="ml-3 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
+      </div>
+      <div className="ml-3 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
         <p className="text-xs uppercase tracking-wide text-gray-300">
           {user ? user.username : "Guest"}
         </p>
