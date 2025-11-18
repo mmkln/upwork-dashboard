@@ -9,16 +9,20 @@ import {
 import "./App.css";
 
 import { Dashboard, JobList, Login } from "./pages";
-import { Sidebar } from "./features";
+import { Sidebar, FiltersProvider, CollectionsProvider } from "./features";
 import RequireAuth from "./features/auth/RequireAuth";
 
 const AppShell: React.FC = () => (
-  <div className="relative flex h-screen bg-[#fafafc]">
-    <Sidebar />
-    <div className="flex-1 ml-20 overflow-y-auto p-6">
-      <Outlet />
-    </div>
-  </div>
+  <FiltersProvider>
+    <CollectionsProvider>
+      <div className="relative flex h-screen bg-[#fafafc]">
+        <Sidebar />
+        <div className="flex-1 ml-20 overflow-y-auto p-6">
+          <Outlet />
+        </div>
+      </div>
+    </CollectionsProvider>
+  </FiltersProvider>
 );
 
 function App() {

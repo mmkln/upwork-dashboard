@@ -2,13 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import update from "immutability-helper";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend"; // Бекенд для drag-and-drop
-import { fetchAllUpworkJobs, fetchJobCollections } from "../services";
-import {
-  JobExperience,
-  JobStatus,
-  PreparedUpworkJob,
-  JobCollection,
-} from "../models";
+import { fetchAllUpworkJobs, fetchUpworkJobs } from "../services";
+import { JobExperience, JobStatus, PreparedUpworkJob } from "../models";
 import {
   AverageRateByCountry,
   AverageRateByExperience,
@@ -50,24 +45,75 @@ import {
 import {
   filterJobs,
   JobType,
-  FilterState,
   FiltersLauncher,
-  DEFAULT_FILTERS,
+  useFilters,
+  useCollections,
 } from "../features";
 import type { CategoryValueItem } from "../components/charts";
 import { instruments, prepareJobs } from "../utils";
 
 const MIN_TOOL_OCCURRENCES_PERCENTAGE = 0.02;
 const MIN_TOOL_OCCURRENCES_ABSOLUTE = 2;
+const DASHBOARD_PAGE_SIZE = 2000;
+
+const mapFiltersToQuery = (filters: ReturnType<typeof useFilters>["filters"]) => {
+  const params: Record<string, string | number | boolean | undefined> = {};
+
+  if (filters.titleFilter.trim()) {
+    params.search = filters.titleFilter.trim();
+  }
+
+  switch (filters.jobType) {
+    case "Fixed Price":
+      params.job_type = "fixed";
+      if (filters.fixedPriceRange) {
+        params.fixed_price_min = filters.fixedPriceRange[0];
+        params.fixed_price_max = filters.fixedPriceRange[1];
+      }
+      break;
+    case "Hourly Rate":
+      params.job_type = "hourly";
+      if (filters.hourlyRateRange) {
+        params.hourly_rate_min = filters.hourlyRateRange[0];
+        params.hourly_rate_max = filters.hourlyRateRange[1];
+      }
+      break;
+    case "Unspecified":
+      params.job_type = "unspecified";
+      break;
+    default:
+      break;
+  }
+
+  if (filters.selectedSkills.length) {
+    params.skills = filters.selectedSkills.join(",");
+  }
+  if (filters.selectedInstruments.length) {
+    params.instruments = filters.selectedInstruments.join(",");
+  }
+  if (filters.selectedStatuses.length) {
+    params.statuses = filters.selectedStatuses.join(",");
+  }
+  if (filters.selectedCollectionIds.length) {
+    params.collections = filters.selectedCollectionIds.join(",");
+  }
+  if (filters.selectedExperience.length) {
+    params.experience = filters.selectedExperience.join(",");
+  }
+  if (filters.bookmarked) {
+    params.bookmarked = true;
+  }
+
+  return params;
+};
 
 const Dashboard: React.FC = () => {
   const [jobsData, setJobsData] = useState<PreparedUpworkJob[]>([]);
-  const [collections, setCollections] = useState<JobCollection[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filteredJobsData, setFilteredJobsData] =
     useState<PreparedUpworkJob[]>([]);
-  const [activeFilters, setActiveFilters] =
-    useState<FilterState>(DEFAULT_FILTERS);
+  const { filters: activeFilters, setFilters } = useFilters();
+  const { collections, refreshCollections } = useCollections();
 
   const availableStatuses = useMemo(
     () => Object.values(JobStatus),
@@ -90,27 +136,77 @@ const Dashboard: React.FC = () => {
   }, [collections]);
 
   useEffect(() => {
+    let cancelled = false;
     const loadJobs = async () => {
       try {
-        const [jobs, jobCollections] = await Promise.all([
-          fetchAllUpworkJobs(),
-          fetchJobCollections().catch((error) => {
-            console.warn("Failed to fetch collections", error);
-            return [] as JobCollection[];
-          }),
-        ]);
-        const preparedJobs = prepareJobs(jobs);
-        setJobsData(preparedJobs);
-        setFilteredJobsData(preparedJobs);
-        setCollections(jobCollections);
+        const allJobs: PreparedUpworkJob[] = [];
+        let page = 1;
+        const queryParams = {
+          page,
+          page_size: DASHBOARD_PAGE_SIZE,
+          ...mapFiltersToQuery(activeFilters),
+        };
+        while (true) {
+          const pageResult = await fetchUpworkJobs({
+            ...queryParams,
+            page,
+          });
+          if (cancelled) return;
+          allJobs.push(...prepareJobs(pageResult.results));
+          if (!pageResult.next) break;
+          page += 1;
+        }
+        if (cancelled) return;
+        setJobsData(allJobs);
+        setFilteredJobsData(
+          filterJobs(
+            allJobs,
+            activeFilters.jobType,
+            activeFilters.fixedPriceRange,
+            activeFilters.hourlyRateRange,
+            activeFilters.selectedSkills,
+            activeFilters.selectedInstruments,
+            activeFilters.selectedStatuses,
+            activeFilters.selectedCollectionIds,
+            activeFilters.selectedExperience,
+            activeFilters.titleFilter,
+            activeFilters.bookmarked,
+          ),
+        );
+        refreshCollections();
       } catch (error) {
-        console.error("Error fetching jobs:", error);
+        if (!cancelled) {
+          console.error("Error fetching jobs:", error);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
     loadJobs();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [activeFilters, refreshCollections]);
+
+  useEffect(() => {
+    setFilteredJobsData(
+      filterJobs(
+        jobsData,
+        activeFilters.jobType,
+        activeFilters.fixedPriceRange,
+        activeFilters.hourlyRateRange,
+        activeFilters.selectedSkills,
+        activeFilters.selectedInstruments,
+        activeFilters.selectedStatuses,
+        activeFilters.selectedCollectionIds,
+        activeFilters.selectedExperience,
+        activeFilters.titleFilter,
+        activeFilters.bookmarked,
+      ),
+    );
+  }, [activeFilters, jobsData]);
 
   const [tiles, setTiles] = useState([
     { id: "1", component: <AverageRateByCountry jobs={jobsData} /> },
@@ -210,7 +306,7 @@ const Dashboard: React.FC = () => {
     titleFilter: string,
     bookmarked: boolean,
   ) => {
-    setActiveFilters({
+    const nextFilters = {
       jobType,
       fixedPriceRange,
       hourlyRateRange,
@@ -221,19 +317,20 @@ const Dashboard: React.FC = () => {
       selectedExperience,
       titleFilter,
       bookmarked,
-    });
+    };
+    setFilters(nextFilters);
     const jobs = filterJobs(
       jobsData,
-      jobType,
-      fixedPriceRange,
-      hourlyRateRange,
-      selectedSkills,
-      selectedInstruments,
-      selectedStatuses,
-      selectedCollectionIds,
-      selectedExperience,
-      titleFilter,
-      bookmarked,
+      nextFilters.jobType,
+      nextFilters.fixedPriceRange,
+      nextFilters.hourlyRateRange,
+      nextFilters.selectedSkills,
+      nextFilters.selectedInstruments,
+      nextFilters.selectedStatuses,
+      nextFilters.selectedCollectionIds,
+      nextFilters.selectedExperience,
+      nextFilters.titleFilter,
+      nextFilters.bookmarked,
     );
     setFilteredJobsData(jobs);
   };

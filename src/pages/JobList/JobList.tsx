@@ -7,13 +7,14 @@ import {
   JobCollection,
   PreparedUpworkJob,
 } from "../../models";
-import { fetchUpworkJobs, fetchJobCollections } from "../../services";
+import { fetchUpworkJobs } from "../../services";
 import { JobDetails } from "../../components";
 import {
-  FilterState,
   FiltersLauncher,
   JobType,
-  DEFAULT_FILTERS,
+  FilterState,
+  useFilters,
+  useCollections,
 } from "../../features";
 import { JobListItem } from "./components";
 import { instruments, prepareJobs } from "../../utils";
@@ -71,16 +72,15 @@ const mapFiltersToQuery = (filters: FilterState) => {
 
 const JobList: React.FC = () => {
   const PAGE_SIZE_OPTIONS = [20, 50, 100, 200, 2000];
+  const { filters: activeFilters, setFilters } = useFilters();
+  const { collections, refreshCollections } = useCollections();
   const [jobsData, setJobsData] = useState<PreparedUpworkJob[]>([]);
-  const [collections, setCollections] = useState<JobCollection[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedJob, setSelectedJob] = useState<PreparedUpworkJob | null>(null);
   const [filteredJobsData, setFilteredJobsData] =
     useState<PreparedUpworkJob[]>([]);
   const [lastClickedJobId, setLastClickedJobId] = useState<string | null>(null);
   const [lastFilterSlug, setLastFilterSlug] = useState<string>("all");
-  const [activeFilters, setActiveFilters] =
-    useState<FilterState>(DEFAULT_FILTERS);
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(PAGE_SIZE_OPTIONS[1]);
   const [totalJobs, setTotalJobs] = useState<number>(0);
@@ -142,24 +142,8 @@ const JobList: React.FC = () => {
   }, [page, pageSize, activeFilters]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const loadCollections = async () => {
-      try {
-        const fetchedCollections = await fetchJobCollections();
-        if (!isMounted) return;
-        setCollections(fetchedCollections);
-      } catch (error) {
-        console.warn("Failed to fetch collections", error);
-      }
-    };
-
-    loadCollections();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    refreshCollections();
+  }, [refreshCollections]);
 
   const sortJobs = (jobs: PreparedUpworkJob[]): PreparedUpworkJob[] => {
     return jobs.reverse();
@@ -314,7 +298,7 @@ const JobList: React.FC = () => {
       titleFilter,
       bookmarked,
     };
-    setActiveFilters(nextFilters);
+    setFilters(nextFilters);
     setLastFilterSlug(
       buildFilterSlug(
         nextFilters.jobType,
@@ -332,6 +316,25 @@ const JobList: React.FC = () => {
     );
     setPage(1);
   };
+
+  useEffect(() => {
+    setLastFilterSlug(
+      buildFilterSlug(
+        activeFilters.jobType,
+        activeFilters.fixedPriceRange,
+        activeFilters.hourlyRateRange,
+        activeFilters.selectedSkills,
+        activeFilters.selectedInstruments,
+        activeFilters.selectedStatuses,
+        activeFilters.selectedCollectionIds,
+        activeFilters.selectedExperience,
+        activeFilters.titleFilter,
+        activeFilters.bookmarked,
+        collectionNameById,
+      ),
+    );
+    setPage(1);
+  }, [activeFilters, collectionNameById]);
 
   const handleCopy = () => {
     const jsonString = JSON.stringify(filteredJobsData, null, 2);
