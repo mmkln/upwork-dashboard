@@ -70,6 +70,7 @@ const mapFiltersToQuery = (filters: FilterState) => {
 };
 
 const JobList: React.FC = () => {
+  const PAGE_SIZE_OPTIONS = [20, 50, 100, 200, 2000];
   const [jobsData, setJobsData] = useState<PreparedUpworkJob[]>([]);
   const [collections, setCollections] = useState<JobCollection[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -81,7 +82,7 @@ const JobList: React.FC = () => {
   const [activeFilters, setActiveFilters] =
     useState<FilterState>(DEFAULT_FILTERS);
   const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(50);
+  const [pageSize, setPageSize] = useState<number>(PAGE_SIZE_OPTIONS[1]);
   const [totalJobs, setTotalJobs] = useState<number>(0);
   const availableStatuses = Object.values(JobStatus);
   const availableInstruments: string[] = instruments.map((toolEntry) =>
@@ -397,7 +398,7 @@ const JobList: React.FC = () => {
             onChange={handlePageSizeChange}
             disabled={loading}
           >
-            {[20, 200, 2000].map((size) => (
+            {PAGE_SIZE_OPTIONS.map((size) => (
               <option key={size} value={size}>
                 {size}
               </option>
