@@ -169,6 +169,73 @@ const JobList: React.FC = () => {
     [jobsData],
   );
 
+  function buildFilterSlug(
+    jobType: JobType,
+    fixedPriceRange: [number, number] | null,
+    hourlyRateRange: [number, number] | null,
+    selectedSkills: string[],
+    selectedInstruments: string[],
+    selectedStatuses: JobStatus[],
+    selectedCollectionIds: number[],
+    selectedExperience: JobExperience[],
+    titleFilter: string,
+    bookmarked: boolean,
+    collectionsLookup: Record<number, string>,
+  ): string {
+    const parts: string[] = [];
+
+    if (jobType && jobType !== "None") {
+      parts.push(`type-${jobType.replace(/\s+/g, "-").toLowerCase()}`);
+    }
+
+    const isDefaultFixed =
+      fixedPriceRange &&
+      fixedPriceRange[0] === 0 &&
+      fixedPriceRange[1] === 5000;
+    const isDefaultHourly =
+      hourlyRateRange &&
+      hourlyRateRange[0] === 0 &&
+      hourlyRateRange[1] === 500;
+
+    if (jobType === "Fixed Price" && fixedPriceRange && !isDefaultFixed) {
+      parts.push(`fixed-${fixedPriceRange[0]}-${fixedPriceRange[1]}`);
+    }
+    if (jobType === "Hourly Rate" && hourlyRateRange && !isDefaultHourly) {
+      parts.push(`hourly-${hourlyRateRange[0]}-${hourlyRateRange[1]}`);
+    }
+    if (selectedSkills.length) {
+      parts.push(`skills-${selectedSkills.join("+")}`);
+    }
+    if (selectedInstruments.length) {
+      parts.push(`tools-${selectedInstruments.join("+")}`);
+    }
+    if (selectedStatuses.length) {
+      parts.push(`status-${selectedStatuses.join("+")}`);
+    }
+    if (selectedCollectionIds.length) {
+      const names = selectedCollectionIds
+        .map((id) => collectionsLookup[id] || `id${id}`)
+        .join("+");
+      parts.push(`collections-${names}`);
+    }
+    if (selectedExperience.length) {
+      parts.push(`exp-${selectedExperience.join("+")}`);
+    }
+    if (titleFilter.trim()) {
+      parts.push(`q-${titleFilter.trim()}`);
+    }
+    if (bookmarked) {
+      parts.push("bookmarked");
+    }
+
+    const raw = parts.length ? parts.join("__") : "all";
+    return raw
+      .toLowerCase()
+      .replace(/[^a-z0-9+_\-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^[-_]+|[-_]+$/g, "");
+  }
+
   const totalPages =
     totalJobs > 0 ? Math.ceil(totalJobs / pageSize) : 1;
   const isFirstPage = page <= 1;
@@ -256,73 +323,6 @@ const JobList: React.FC = () => {
     setPage(1);
   };
 
-  const buildFilterSlug = (
-    jobType: JobType,
-    fixedPriceRange: [number, number] | null,
-    hourlyRateRange: [number, number] | null,
-    selectedSkills: string[],
-    selectedInstruments: string[],
-    selectedStatuses: JobStatus[],
-    selectedCollectionIds: number[],
-    selectedExperience: JobExperience[],
-    titleFilter: string,
-    bookmarked: boolean,
-    collectionsLookup: Record<number, string>,
-  ): string => {
-    const parts: string[] = [];
-
-    if (jobType && jobType !== "None") {
-      parts.push(`type-${jobType.replace(/\s+/g, "-").toLowerCase()}`);
-    }
-
-    const isDefaultFixed =
-      fixedPriceRange &&
-      fixedPriceRange[0] === 0 &&
-      fixedPriceRange[1] === 5000;
-    const isDefaultHourly =
-      hourlyRateRange &&
-      hourlyRateRange[0] === 0 &&
-      hourlyRateRange[1] === 500;
-
-    if (jobType === "Fixed Price" && fixedPriceRange && !isDefaultFixed) {
-      parts.push(`fixed-${fixedPriceRange[0]}-${fixedPriceRange[1]}`);
-    }
-    if (jobType === "Hourly Rate" && hourlyRateRange && !isDefaultHourly) {
-      parts.push(`hourly-${hourlyRateRange[0]}-${hourlyRateRange[1]}`);
-    }
-    if (selectedSkills.length) {
-      parts.push(`skills-${selectedSkills.join("+")}`);
-    }
-    if (selectedInstruments.length) {
-      parts.push(`tools-${selectedInstruments.join("+")}`);
-    }
-    if (selectedStatuses.length) {
-      parts.push(`status-${selectedStatuses.join("+")}`);
-    }
-    if (selectedCollectionIds.length) {
-      const names = selectedCollectionIds
-        .map((id) => collectionsLookup[id] || `id${id}`)
-        .join("+");
-      parts.push(`collections-${names}`);
-    }
-    if (selectedExperience.length) {
-      parts.push(`exp-${selectedExperience.join("+")}`);
-    }
-    if (titleFilter.trim()) {
-      parts.push(`q-${titleFilter.trim()}`);
-    }
-    if (bookmarked) {
-      parts.push("bookmarked");
-    }
-
-    const raw = parts.length ? parts.join("__") : "all";
-    return raw
-      .toLowerCase()
-      .replace(/[^a-z0-9+_\-]/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^[-_]+|[-_]+$/g, "");
-  };
-
   const handleCopy = () => {
     const jsonString = JSON.stringify(filteredJobsData, null, 2);
     navigator.clipboard
@@ -370,9 +370,9 @@ const JobList: React.FC = () => {
             Showing {filteredJobsData.length} of {totalJobs || filteredJobsData.length} job
             {filteredJobsData.length !== 1 ? "s" : ""}
           </p>
-          <p className="text-sm text-gray-600">
+          {/* <p className="text-sm text-gray-600">
             Page {page} of {totalPages} {totalJobs ? `(total ${totalJobs})` : ""}
-          </p>
+          </p> */}
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-sm font-medium text-gray-700">
