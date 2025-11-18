@@ -37,6 +37,7 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
   collectionNameById,
 }) => {
   const [isFiltersModalOpen, setFiltersModalOpen] = useState(false);
+  const [pendingFilters, setPendingFilters] = useState<FilterState>(activeFilters);
 
   const badges = useMemo(() => {
     const list: string[] = [];
@@ -124,10 +125,32 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
         </div>
         <div className="pt-4">
           <Filters
-            onFilterChange={(...args) => {
-              onFilterChange(...args);
+            onFilterChange={(
+              jobType,
+              fixedPriceRange,
+              hourlyRateRange,
+              selectedSkills,
+              selectedInstruments,
+              selectedStatuses,
+              selectedCollectionIds,
+              selectedExperience,
+              titleFilter,
+              bookmarked,
+            ) => {
+              setPendingFilters({
+                jobType,
+                fixedPriceRange,
+                hourlyRateRange,
+                selectedSkills,
+                selectedInstruments,
+                selectedStatuses,
+                selectedCollectionIds,
+                selectedExperience,
+                titleFilter,
+                bookmarked,
+              });
             }}
-            initialFilters={activeFilters}
+            initialFilters={pendingFilters}
             availableSkills={availableSkills}
             availableInstruments={availableInstruments}
             availableStatuses={availableStatuses}
@@ -137,9 +160,33 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
         <div className="flex justify-end gap-3 pt-4 border-t">
           <button
             className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50"
-            onClick={() => setFiltersModalOpen(false)}
+            onClick={() => {
+              setPendingFilters(activeFilters);
+              setFiltersModalOpen(false);
+            }}
           >
             Close
+          </button>
+          <button
+            className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            disabled={JSON.stringify(pendingFilters) === JSON.stringify(activeFilters)}
+            onClick={() => {
+              onFilterChange(
+                pendingFilters.jobType,
+                pendingFilters.fixedPriceRange,
+                pendingFilters.hourlyRateRange,
+                pendingFilters.selectedSkills,
+                pendingFilters.selectedInstruments,
+                pendingFilters.selectedStatuses,
+                pendingFilters.selectedCollectionIds,
+                pendingFilters.selectedExperience,
+                pendingFilters.titleFilter,
+                pendingFilters.bookmarked,
+              );
+              setFiltersModalOpen(false);
+            }}
+          >
+            Apply
           </button>
         </div>
       </Modal>
