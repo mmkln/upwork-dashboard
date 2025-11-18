@@ -1,6 +1,7 @@
 // src/components/JobListItem.tsx
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import Select from "react-select";
 import { UpworkJob, JobExperience, JobStatus } from "../../../models";
 import { updateUpworkJob } from "../../../services";
 import { JobStatusSelect } from "../../../components";
@@ -24,8 +25,22 @@ const JobListItem: React.FC<JobListItemProps> = ({
   availableCollections,
 }) => {
   const [jobData, setJobData] = useState<UpworkJob>(job);
-  const [selectedCollectionToAdd, setSelectedCollectionToAdd] = useState<number | "">("");
+  const [selectedCollectionsToAdd, setSelectedCollectionsToAdd] = useState<number[]>([]);
   const [isUpdatingCollections, setIsUpdatingCollections] = useState(false);
+
+  const availableOptions = useMemo(
+    () =>
+      availableCollections
+        .filter(
+          (collection) =>
+            !(jobData.collections ?? job.collections ?? []).includes(collection.id),
+        )
+        .map((collection) => ({
+          value: collection.id,
+          label: collection.name,
+        })),
+    [availableCollections, job.collections, jobData.collections],
+  );
 
   const handleStatusChange = (status: JobStatus) => {
     updateUpworkJob({ ...jobData, status })
@@ -87,12 +102,12 @@ const JobListItem: React.FC<JobListItemProps> = ({
 
   const handleAddCollection = (event: React.MouseEvent) => {
     event.stopPropagation();
-    if (selectedCollectionToAdd === "") return;
+    if (!selectedCollectionsToAdd.length) return;
     const current = jobData.collections ?? job.collections ?? [];
-    if (current.includes(selectedCollectionToAdd)) return;
-    const updated = [...current, selectedCollectionToAdd];
+    const merged = Array.from(new Set([...current, ...selectedCollectionsToAdd]));
+    const updated = merged;
     updateCollections(updated);
-    setSelectedCollectionToAdd("");
+    setSelectedCollectionsToAdd([]);
   };
 
   return (
@@ -194,33 +209,52 @@ const JobListItem: React.FC<JobListItemProps> = ({
               className="flex items-center gap-2 text-xs"
               onClick={(e) => e.stopPropagation()}
             >
-              <select
-                className="border border-gray-300 rounded px-2 py-1 text-xs"
-                value={selectedCollectionToAdd}
-                onChange={(e) =>
-                  setSelectedCollectionToAdd(
-                    e.target.value ? Number(e.target.value) : "",
-                  )
-                }
-                disabled={isUpdatingCollections}
-              >
-                <option value="">Add to collection</option>
-                {availableCollections
-                  .filter(
-                    (collection) =>
-                      !(jobData.collections ?? job.collections ?? []).includes(
-                        collection.id,
-                      ),
-                  )
-                  .map((collection) => (
-                    <option key={collection.id} value={collection.id}>
-                      {collection.name}
-                    </option>
-                  ))}
-              </select>
+              <div className="min-w-[180px]">
+                <Select
+                  isMulti
+                  classNamePrefix="select"
+                  value={availableOptions.filter((option) =>
+                    selectedCollectionsToAdd.includes(option.value),
+                  )}
+                  onChange={(options) =>
+                    setSelectedCollectionsToAdd(
+                      (options || []).map((opt) => opt.value as number),
+                    )
+                  }
+                  options={availableOptions}
+                  placeholder="Add to collections..."
+                  isDisabled={isUpdatingCollections}
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      minHeight: "34px",
+                      borderColor: "#d1d5db",
+                      boxShadow: "none",
+                      "&:hover": { borderColor: "#9ca3af" },
+                    }),
+                    valueContainer: (base) => ({
+                      ...base,
+                      padding: "2px 6px",
+                    }),
+                    indicatorsContainer: (base) => ({
+                      ...base,
+                      padding: "2px",
+                    }),
+                    multiValue: (base) => ({
+                      ...base,
+                      backgroundColor: "#e0ebff",
+                      color: "#1d4ed8",
+                    }),
+                    multiValueLabel: (base) => ({
+                      ...base,
+                      color: "#1d4ed8",
+                    }),
+                  }}
+                />
+              </div>
               <button
                 className="px-2 py-1 bg-blue-600 text-white rounded disabled:opacity-50"
-                disabled={selectedCollectionToAdd === "" || isUpdatingCollections}
+                disabled={selectedCollectionsToAdd.length === 0 || isUpdatingCollections}
                 onClick={handleAddCollection}
               >
                 {isUpdatingCollections ? "..." : "Add"}
