@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Modal from "react-modal";
 import Filters from "./Filters";
 import { FilterState } from "./types";
@@ -38,6 +38,16 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
 }) => {
   const [isFiltersModalOpen, setFiltersModalOpen] = useState(false);
   const [pendingFilters, setPendingFilters] = useState<FilterState>(activeFilters);
+  const isDirty = useMemo(
+    () => JSON.stringify(pendingFilters) !== JSON.stringify(activeFilters),
+    [pendingFilters, activeFilters],
+  );
+
+  useEffect(() => {
+    if (!isFiltersModalOpen) {
+      setPendingFilters(activeFilters);
+    }
+  }, [activeFilters, isFiltersModalOpen]);
 
   const badges = useMemo(() => {
     const list: string[] = [];
@@ -169,7 +179,7 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
           </button>
           <button
             className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
-            disabled={JSON.stringify(pendingFilters) === JSON.stringify(activeFilters)}
+            disabled={!isDirty}
             onClick={() => {
               onFilterChange(
                 pendingFilters.jobType,

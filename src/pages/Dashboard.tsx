@@ -51,6 +51,7 @@ import {
 } from "../features";
 import type { CategoryValueItem } from "../components/charts";
 import { instruments, prepareJobs } from "../utils";
+import { PageLoadingBar } from "../components/ui";
 
 const MIN_TOOL_OCCURRENCES_PERCENTAGE = 0.02;
 const MIN_TOOL_OCCURRENCES_ABSOLUTE = 2;
@@ -337,9 +338,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      {loading && (
-        <div className="px-6 pt-4 text-sm text-gray-500">Loading jobs…</div>
-      )}
+      <PageLoadingBar loading={loading} />
       <FiltersLauncher
         activeFilters={activeFilters}
         onFilterChange={onFilterChanged}

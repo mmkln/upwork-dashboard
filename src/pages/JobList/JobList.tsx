@@ -1,12 +1,6 @@
 // src/components/JobList.tsx
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  UpworkJob,
-  JobStatus,
-  JobExperience,
-  JobCollection,
-  PreparedUpworkJob,
-} from "../../models";
+import { UpworkJob, JobStatus, JobExperience, PreparedUpworkJob } from "../../models";
 import { fetchUpworkJobs } from "../../services";
 import { JobDetails } from "../../components";
 import {
@@ -18,6 +12,7 @@ import {
 } from "../../features";
 import { JobListItem } from "./components";
 import { instruments, prepareJobs } from "../../utils";
+import { PageLoadingBar } from "../../components/ui";
 
 const mapFiltersToQuery = (filters: FilterState) => {
   const params: Record<string, string | number | boolean | undefined> = {};
@@ -368,9 +363,7 @@ const JobList: React.FC = () => {
 
   return (
     <>
-      {loading && (
-        <div className="px-6 pt-4 text-sm text-gray-500">Loading jobs…</div>
-      )}
+      <PageLoadingBar loading={loading} />
       <FiltersLauncher
         activeFilters={activeFilters}
         onFilterChange={onFilterChanged}
