@@ -41,6 +41,7 @@ import {
   InstrumentBadges,
   TopInstrumentsByAverageRate,
   JobsByIndustryChart,
+  JobExportActions,
 } from "../components";
 import {
   filterJobs,
@@ -51,6 +52,7 @@ import {
 } from "../features";
 import type { CategoryValueItem } from "../components/charts";
 import { instruments, prepareJobs } from "../utils";
+import { buildFilterSlug } from "../features/filters/utils/filterSlug.util";
 import { PageLoadingBar } from "../components/ui";
 
 const MIN_TOOL_OCCURRENCES_PERCENTAGE = 0.02;
@@ -115,6 +117,7 @@ const Dashboard: React.FC = () => {
     useState<PreparedUpworkJob[]>([]);
   const { filters: activeFilters, setFilters } = useFilters();
   const { collections, refreshCollections } = useCollections();
+  const [filterSlug, setFilterSlug] = useState<string>("all");
 
   const availableStatuses = useMemo(
     () => Object.values(JobStatus),
@@ -207,7 +210,8 @@ const Dashboard: React.FC = () => {
         activeFilters.bookmarked,
       ),
     );
-  }, [activeFilters, jobsData]);
+    setFilterSlug(buildFilterSlug(activeFilters, collectionNameById));
+  }, [activeFilters, jobsData, collectionNameById]);
 
   const [tiles, setTiles] = useState([
     { id: "1", component: <AverageRateByCountry jobs={jobsData} /> },
@@ -348,6 +352,13 @@ const Dashboard: React.FC = () => {
         availableCollections={collections}
         collectionNameById={collectionNameById}
       />
+      <div className="flex justify-end px-6 pb-4">
+        <JobExportActions
+          jobs={filteredJobsData}
+          filterDescriptor={filterSlug}
+          filenamePrefix="dashboard-jobs"
+        />
+      </div>
       <div className="mx-auto p-6 flex flex-col gap-4">
         <div className="flex gap-4">
           <div className=" max-w-3xl">

@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { UpworkJob, JobStatus, JobExperience, PreparedUpworkJob } from "../../models";
 import { fetchUpworkJobs } from "../../services";
-import { JobDetails } from "../../components";
+import { JobDetails, JobExportActions } from "../../components";
 import {
   FiltersLauncher,
   JobType,
@@ -13,6 +13,7 @@ import {
 import { JobListItem } from "./components";
 import { instruments, prepareJobs } from "../../utils";
 import { PageLoadingBar } from "../../components/ui";
+import { buildFilterSlug } from "../../features/filters/utils/filterSlug.util";
 
 const mapFiltersToQuery = (filters: FilterState) => {
   const params: Record<string, string | number | boolean | undefined> = {};
@@ -178,73 +179,6 @@ const JobList: React.FC = () => {
     [jobsData],
   );
 
-  function buildFilterSlug(
-    jobType: JobType,
-    fixedPriceRange: [number, number] | null,
-    hourlyRateRange: [number, number] | null,
-    selectedSkills: string[],
-    selectedInstruments: string[],
-    selectedStatuses: JobStatus[],
-    selectedCollectionIds: number[],
-    selectedExperience: JobExperience[],
-    titleFilter: string,
-    bookmarked: boolean,
-    collectionsLookup: Record<number, string>,
-  ): string {
-    const parts: string[] = [];
-
-    if (jobType && jobType !== "None") {
-      parts.push(`type-${jobType.replace(/\s+/g, "-").toLowerCase()}`);
-    }
-
-    const isDefaultFixed =
-      fixedPriceRange &&
-      fixedPriceRange[0] === 0 &&
-      fixedPriceRange[1] === 5000;
-    const isDefaultHourly =
-      hourlyRateRange &&
-      hourlyRateRange[0] === 0 &&
-      hourlyRateRange[1] === 500;
-
-    if (jobType === "Fixed Price" && fixedPriceRange && !isDefaultFixed) {
-      parts.push(`fixed-${fixedPriceRange[0]}-${fixedPriceRange[1]}`);
-    }
-    if (jobType === "Hourly Rate" && hourlyRateRange && !isDefaultHourly) {
-      parts.push(`hourly-${hourlyRateRange[0]}-${hourlyRateRange[1]}`);
-    }
-    if (selectedSkills.length) {
-      parts.push(`skills-${selectedSkills.join("+")}`);
-    }
-    if (selectedInstruments.length) {
-      parts.push(`tools-${selectedInstruments.join("+")}`);
-    }
-    if (selectedStatuses.length) {
-      parts.push(`status-${selectedStatuses.join("+")}`);
-    }
-    if (selectedCollectionIds.length) {
-      const names = selectedCollectionIds
-        .map((id) => collectionsLookup[id] || `id${id}`)
-        .join("+");
-      parts.push(`collections-${names}`);
-    }
-    if (selectedExperience.length) {
-      parts.push(`exp-${selectedExperience.join("+")}`);
-    }
-    if (titleFilter.trim()) {
-      parts.push(`q-${titleFilter.trim()}`);
-    }
-    if (bookmarked) {
-      parts.push("bookmarked");
-    }
-
-    const raw = parts.length ? parts.join("__") : "all";
-    return raw
-      .toLowerCase()
-      .replace(/[^a-z0-9+_\-]/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^[-_]+|[-_]+$/g, "");
-  }
-
   const totalPages =
     totalJobs > 0 ? Math.ceil(totalJobs / pageSize) : 1;
   const isFirstPage = page <= 1;
@@ -294,72 +228,14 @@ const JobList: React.FC = () => {
       bookmarked,
     };
     setFilters(nextFilters);
-    setLastFilterSlug(
-      buildFilterSlug(
-        nextFilters.jobType,
-        nextFilters.fixedPriceRange,
-        nextFilters.hourlyRateRange,
-        nextFilters.selectedSkills,
-        nextFilters.selectedInstruments,
-        nextFilters.selectedStatuses,
-        nextFilters.selectedCollectionIds,
-        nextFilters.selectedExperience,
-        nextFilters.titleFilter,
-        nextFilters.bookmarked,
-        collectionNameById,
-      ),
-    );
+    setLastFilterSlug(buildFilterSlug(nextFilters, collectionNameById));
     setPage(1);
   };
 
   useEffect(() => {
-    setLastFilterSlug(
-      buildFilterSlug(
-        activeFilters.jobType,
-        activeFilters.fixedPriceRange,
-        activeFilters.hourlyRateRange,
-        activeFilters.selectedSkills,
-        activeFilters.selectedInstruments,
-        activeFilters.selectedStatuses,
-        activeFilters.selectedCollectionIds,
-        activeFilters.selectedExperience,
-        activeFilters.titleFilter,
-        activeFilters.bookmarked,
-        collectionNameById,
-      ),
-    );
+    setLastFilterSlug(buildFilterSlug(activeFilters, collectionNameById));
     setPage(1);
   }, [activeFilters, collectionNameById]);
-
-  const handleCopy = () => {
-    const jsonString = JSON.stringify(filteredJobsData, null, 2);
-    navigator.clipboard
-      .writeText(jsonString)
-      .then(() => {
-        alert("Jobs copied to clipboard!");
-      })
-      .catch((err) => {
-        console.error("Error while exporting", err);
-        alert("Could not copy jobs to clipboard");
-      });
-  };
-
-  const handleDownload = () => {
-    const jsonString = JSON.stringify(filteredJobsData, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    const date = new Date().toLocaleDateString();
-    const time = new Date().toLocaleTimeString();
-    const formattedDateTime = `${date}-${time}`
-      .replace(/\//g, "-")
-      .replace(/:/g, "-");
-    a.href = url;
-    const filterDescriptor = lastFilterSlug || "all";
-    a.download = `filtered-jobs-${filterDescriptor}-${formattedDateTime}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <>
@@ -419,50 +295,10 @@ const JobList: React.FC = () => {
               Next
             </button>
           </div>
-          <div className="flex space-x-2">
-            <button
-              className="p-2 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
-              title="Copy jobs to clipboard"
-              onClick={handleCopy}
-              disabled={filteredJobsData.length === 0}
-            >
-              <svg
-                className="w-6 h-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-                />
-              </svg>
-            </button>
-            <button
-              className="p-2 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
-              title="Export jobs as JSON file"
-              onClick={handleDownload}
-              disabled={filteredJobsData.length === 0}
-            >
-              <svg
-                className="w-6 h-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-                />
-              </svg>
-            </button>
-          </div>
+          <JobExportActions
+            jobs={filteredJobsData}
+            filterDescriptor={lastFilterSlug || "all"}
+          />
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 pt-4">
