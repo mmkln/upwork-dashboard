@@ -292,7 +292,9 @@ const JobDetails: React.FC<JobDetailsProps> = ({
                     Description
                 </h3>
                 <div className="max-h-60 overflow-y-auto p-3 rounded bg-gray-100">
-                    <p className="text-sm leading-relaxed text-gray-600">{job.description}</p>
+                    <p className="text-sm leading-relaxed text-gray-600 whitespace-pre-line">
+                      {job.description}
+                    </p>
                 </div>
             </div>
             <div>
