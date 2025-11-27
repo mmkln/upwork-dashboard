@@ -368,9 +368,18 @@ const Dashboard: React.FC = () => {
             <JobCalendar jobs={filteredJobsData} month={today} />
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-wrap">
           <div className="max-w-96 min-w-80">
             <KeywordFrequency jobs={filteredJobsData} limit={50} />
+          </div>
+          <div className="max-w-96 min-w-80">
+            <KeywordFrequency
+              jobs={filteredJobsData}
+              limit={50}
+              getText={(job) => job.title}
+              headingFormatter={(count) => `Top ${count} Job Title Keywords`}
+              copyName="Job Title Keywords"
+            />
           </div>
           <div className="max-w-96 min-w-80">
             <InstrumentBadges jobs={filteredJobsData} limit={50} />
