@@ -10,3 +10,4 @@ export {
   useCollections,
 } from "./filters/CollectionsProvider";
 export { filterJobs } from "./filters/utils/filterJobs.util";
+export { LoadingProvider, useGlobalLoading } from "./LoadingProvider";

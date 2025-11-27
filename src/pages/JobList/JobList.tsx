@@ -12,7 +12,6 @@ import {
 } from "../../features";
 import { JobListItem } from "./components";
 import { instruments, prepareJobs } from "../../utils";
-import { PageLoadingBar } from "../../components/ui";
 import { buildFilterSlug } from "../../features/filters/utils/filterSlug.util";
 
 const mapFiltersToQuery = (filters: FilterState) => {
@@ -239,7 +238,6 @@ const JobList: React.FC = () => {
 
   return (
     <>
-      <PageLoadingBar loading={loading} />
       <FiltersLauncher
         activeFilters={activeFilters}
         onFilterChange={onFilterChanged}

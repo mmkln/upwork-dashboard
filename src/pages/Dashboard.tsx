@@ -53,7 +53,6 @@ import {
 import type { CategoryValueItem } from "../components/charts";
 import { instruments, prepareJobs } from "../utils";
 import { buildFilterSlug } from "../features/filters/utils/filterSlug.util";
-import { PageLoadingBar } from "../components/ui";
 
 const MIN_TOOL_OCCURRENCES_PERCENTAGE = 0.02;
 const MIN_TOOL_OCCURRENCES_ABSOLUTE = 2;
@@ -112,7 +111,6 @@ const mapFiltersToQuery = (filters: ReturnType<typeof useFilters>["filters"]) =>
 
 const Dashboard: React.FC = () => {
   const [jobsData, setJobsData] = useState<PreparedUpworkJob[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [filteredJobsData, setFilteredJobsData] =
     useState<PreparedUpworkJob[]>([]);
   const { filters: activeFilters, setFilters } = useFilters();
@@ -181,10 +179,6 @@ const Dashboard: React.FC = () => {
       } catch (error) {
         if (!cancelled) {
           console.error("Error fetching jobs:", error);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
         }
       }
     };
@@ -342,7 +336,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <PageLoadingBar loading={loading} />
       <FiltersLauncher
         activeFilters={activeFilters}
         onFilterChange={onFilterChanged}

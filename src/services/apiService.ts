@@ -7,6 +7,10 @@ import {
   UpworkJob,
 } from "../models";
 import { environment } from "../environments";
+import {
+  decrementRequestLoaders,
+  incrementRequestLoaders,
+} from "../features/globalLoadingStore";
 
 export const AUTH_STORAGE_KEY = "authToken";
 
@@ -29,20 +33,38 @@ const apiClient = axios.create({
   },
 });
 
-apiClient.interceptors.request.use((config) => {
-  const token = getApiAuthToken();
-  if (token) {
-    if (!config.headers) {
-      config.headers = {} as any;
+apiClient.interceptors.request.use(
+  (config) => {
+    incrementRequestLoaders();
+    const token = getApiAuthToken();
+    if (token) {
+      if (!config.headers) {
+        config.headers = {} as any;
+      }
+      if (typeof (config.headers as any).set === "function") {
+        (config.headers as any).set("Authorization", `Token ${token}`);
+      } else {
+        (config.headers as any).Authorization = `Token ${token}`;
+      }
     }
-    if (typeof (config.headers as any).set === "function") {
-      (config.headers as any).set("Authorization", `Token ${token}`);
-    } else {
-      (config.headers as any).Authorization = `Token ${token}`;
-    }
-  }
-  return config;
-});
+    return config;
+  },
+  (error) => {
+    decrementRequestLoaders();
+    return Promise.reject(error);
+  },
+);
+
+apiClient.interceptors.response.use(
+  (response) => {
+    decrementRequestLoaders();
+    return response;
+  },
+  (error) => {
+    decrementRequestLoaders();
+    return Promise.reject(error);
+  },
+);
 
 const buildJobPayload = (jobData: Partial<UpworkJob>) => {
   const payload: Record<string, unknown> = { ...jobData };
