@@ -133,7 +133,7 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
             ×
           </button>
         </div>
-        <div className="pt-4">
+        <div className="py-4">
           <Filters
             onFilterChange={(
               jobType,
