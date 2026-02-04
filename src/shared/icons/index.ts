@@ -4,3 +4,5 @@ export { default as LogoutIcon } from "./LogoutIcon";
 export { default as NotificationIcon } from "./NotificationIcon";
 export { default as RadarIcon } from "./RadarIcon";
 export { default as SettingsIcon } from "./SettingsIcon";
+export { default as CardsViewIcon } from "./CardsViewIcon";
+export { default as TableViewIcon } from "./TableViewIcon";
