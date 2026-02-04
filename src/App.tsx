@@ -17,8 +17,7 @@ import {
 } from "./features";
 import RequireAuth from "./features/auth/RequireAuth";
 import { PageLoadingBar } from "./components/ui";
-import Header from "./layout/Header";
-import Sidebar from "./layout/Sidebar";
+import { Header, Sidebar } from "./layout";
 
 const GlobalLoadingIndicator: React.FC = () => {
   const { isLoading } = useGlobalLoading();
