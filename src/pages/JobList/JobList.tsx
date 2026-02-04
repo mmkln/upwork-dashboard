@@ -248,7 +248,7 @@ const JobList: React.FC = () => {
         collectionNameById={collectionNameById}
       />
 
-      <div className="flex flex-col gap-4 px-6 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
           <p className="text-lg font-medium text-gray-800">
             Showing {filteredJobsData.length} of {totalJobs || filteredJobsData.length} job
@@ -299,7 +299,7 @@ const JobList: React.FC = () => {
           />
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 pt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-4">
         {filteredJobsData.map((job) => (
           <JobListItem 
             key={job.id} 

@@ -345,14 +345,14 @@ const Dashboard: React.FC = () => {
         availableCollections={collections}
         collectionNameById={collectionNameById}
       />
-      <div className="flex justify-end px-6 pb-4">
+      <div className="flex justify-end pb-4">
         <JobExportActions
           jobs={filteredJobsData}
           filterDescriptor={filterSlug}
           filenamePrefix="dashboard-jobs"
         />
       </div>
-      <div className="mx-auto p-6 flex flex-col gap-4">
+      <div className="mx-auto flex flex-col gap-4">
         <div className="flex gap-4">
           <div className=" max-w-3xl">
             <JobStats jobs={filteredJobsData} />

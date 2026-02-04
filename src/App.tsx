@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import "./App.css";
 
-import { Dashboard, JobList, Login } from "./pages";
+import { Dashboard, JobList, Login, OpportunityRadar } from "./pages";
 import {
   Sidebar,
   FiltersProvider,
@@ -18,6 +18,7 @@ import {
 } from "./features";
 import RequireAuth from "./features/auth/RequireAuth";
 import { PageLoadingBar } from "./components/ui";
+import Header from "./components/Header";
 
 const GlobalLoadingIndicator: React.FC = () => {
   const { isLoading } = useGlobalLoading();
@@ -29,8 +30,11 @@ const AppShell: React.FC = () => (
     <CollectionsProvider>
       <div className="relative flex h-screen bg-[#fafafc]">
         <Sidebar />
-        <div className="flex-1 ml-20 overflow-y-auto p-6">
-          <Outlet />
+        <div className="flex-1 ml-[68px] flex flex-col overflow-hidden">
+          <Header />
+          <div className="flex-1 overflow-y-auto p-5 bg-[#FCFDFF]">
+            <Outlet />
+          </div>
         </div>
       </div>
     </CollectionsProvider>
@@ -48,6 +52,10 @@ function App() {
             <Route element={<AppShell />}>
               <Route path="/upwork-dashboard" element={<Dashboard />} />
               <Route path="/upwork-dashboard/jobs" element={<JobList />} />
+              <Route
+                path="/upwork-dashboard/radar"
+                element={<OpportunityRadar />}
+              />
             </Route>
           </Route>
           <Route
