@@ -1,10 +1,10 @@
 // Sidebar.tsx
 import React from "react";
 import { useLocation } from "react-router-dom";
-import Logo from "./components/Logo";
-import SidebarItem from "./components/SidebarItem";
-import SidebarSection from "./components/SidebarSection";
-import { DashboardIcon, JobsIcon, RadarIcon } from "../../shared/icons";
+import Logo from "./sidebar/Logo";
+import SidebarItem from "./sidebar/SidebarItem";
+import SidebarSection from "./sidebar/SidebarSection";
+import { DashboardIcon, JobsIcon, RadarIcon } from "../shared/icons";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -16,24 +16,24 @@ const Sidebar: React.FC = () => {
       </div>
       <div className="p-4">
         <SidebarSection>
-        <SidebarItem
-          icon={<DashboardIcon className="w-6 h-6" />}
-          label="Dashboard"
-          link="/upwork-dashboard"
-          currentPath={location.pathname}
-        />
-        <SidebarItem
-          icon={<JobsIcon className="w-6 h-6" />}
-          label="Jobs"
-          link="/upwork-dashboard/jobs"
-          currentPath={location.pathname}
-        />
-        <SidebarItem
-          icon={<RadarIcon className="w-6 h-6" />}
-          label="Radar"
-          link="/upwork-dashboard/radar"
-          currentPath={location.pathname}
-        />
+          <SidebarItem
+            icon={<DashboardIcon className="w-6 h-6" />}
+            label="Dashboard"
+            link="/upwork-dashboard"
+            currentPath={location.pathname}
+          />
+          <SidebarItem
+            icon={<JobsIcon className="w-6 h-6" />}
+            label="Jobs"
+            link="/upwork-dashboard/jobs"
+            currentPath={location.pathname}
+          />
+          <SidebarItem
+            icon={<RadarIcon className="w-6 h-6" />}
+            label="Radar"
+            link="/upwork-dashboard/radar"
+            currentPath={location.pathname}
+          />
           {/*<SidebarItem*/}
           {/*  icon={*/}
           {/*    <svg*/}

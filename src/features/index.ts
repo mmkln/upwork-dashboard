@@ -1,4 +1,3 @@
-export { default as Sidebar } from "./sidebar/Sidebar";
 export { default as Filters } from "./filters/Filters";
 export { default as FiltersLauncher } from "./filters/FiltersLauncher";
 export type { JobType } from "./filters/Filters";

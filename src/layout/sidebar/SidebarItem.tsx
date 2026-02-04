@@ -20,7 +20,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   return (
     <Link
       to={link}
-      className={`flex items-center gap-1.5 h-9 w-full p-1.5 rounded-lg transition-colors duration-300 overflow-hidden hover:bg-[#F6F8FF] text-[#575757] ${
+      className={`flex items-center gap-[6px] h-9 w-full rounded-lg transition-colors duration-300 overflow-hidden hover:bg-[#F6F8FF] text-[#575757] ${
         isActive ? "bg-[#F6F8FF]" : ""
       }`}
     >

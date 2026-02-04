@@ -10,7 +10,6 @@ import "./App.css";
 
 import { Dashboard, JobList, Login, OpportunityRadar } from "./pages";
 import {
-  Sidebar,
   FiltersProvider,
   CollectionsProvider,
   LoadingProvider,
@@ -18,7 +17,8 @@ import {
 } from "./features";
 import RequireAuth from "./features/auth/RequireAuth";
 import { PageLoadingBar } from "./components/ui";
-import Header from "./components/Header";
+import Header from "./layout/Header";
+import Sidebar from "./layout/Sidebar";
 
 const GlobalLoadingIndicator: React.FC = () => {
   const { isLoading } = useGlobalLoading();
