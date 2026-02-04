@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    font-size: 14px;
+    font-weight: 400;
+    color: #c8c8c8;
+  }
+}
