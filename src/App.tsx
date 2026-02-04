@@ -17,7 +17,7 @@ import {
 } from "./features";
 import RequireAuth from "./features/auth/RequireAuth";
 import { PageLoadingBar } from "./components/ui";
-import { Header, Sidebar } from "./layout";
+import { Header, PageContainer, Sidebar } from "./layout";
 
 const GlobalLoadingIndicator: React.FC = () => {
   const { isLoading } = useGlobalLoading();
@@ -31,8 +31,10 @@ const AppShell: React.FC = () => (
         <Sidebar />
         <div className="flex-1 ml-[68px] flex flex-col overflow-hidden">
           <Header />
-          <div className="flex-1 overflow-y-auto p-5 bg-[#FCFDFF]">
-            <Outlet />
+          <div className="flex-1 overflow-y-auto">
+            <PageContainer>
+              <Outlet />
+            </PageContainer>
           </div>
         </div>
       </div>
