@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import Logo from "./components/Logo";
 import SidebarItem from "./components/SidebarItem";
 import SidebarSection from "./components/SidebarSection";
+import { DashboardIcon, JobsIcon, RadarIcon } from "../../shared/icons";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -16,65 +17,19 @@ const Sidebar: React.FC = () => {
       <div className="p-4">
         <SidebarSection>
         <SidebarItem
-          icon={
-            <svg
-              className="w-6 h-6"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"
-              />
-            </svg>
-          }
-            label="Dashboard"
-            link="/upwork-dashboard"
-            currentPath={location.pathname}
-          />
+          icon={<DashboardIcon className="w-6 h-6" />}
+          label="Dashboard"
+          link="/upwork-dashboard"
+          currentPath={location.pathname}
+        />
         <SidebarItem
-          icon={
-            <svg
-              className="w-6 h-6"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
-              />
-            </svg>
-          }
+          icon={<JobsIcon className="w-6 h-6" />}
           label="Jobs"
           link="/upwork-dashboard/jobs"
           currentPath={location.pathname}
         />
         <SidebarItem
-          icon={
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M9.348 14.652C8.99968 14.3037 8.72336 13.8903 8.53485 13.4352C8.34633 12.9802 8.2493 12.4925 8.2493 12C8.2493 11.5074 8.34633 11.0197 8.53485 10.5647C8.72336 10.1096 8.99968 9.69619 9.348 9.34796M14.652 9.34796C15.0003 9.69619 15.2766 10.1096 15.4652 10.5647C15.6537 11.0197 15.7507 11.5074 15.7507 12C15.7507 12.4925 15.6537 12.9802 15.4652 13.4352C15.2766 13.8903 15.0003 14.3037 14.652 14.652M7.227 16.773C6.6002 16.1462 6.10299 15.402 5.76376 14.5831C5.42454 13.7641 5.24994 12.8864 5.24994 12C5.24994 11.1135 5.42454 10.2358 5.76376 9.41683C6.10299 8.59787 6.6002 7.85375 7.227 7.22696M16.773 7.22696C17.3998 7.85375 17.897 8.59787 18.2362 9.41683C18.5755 10.2358 18.7501 11.1135 18.7501 12C18.7501 12.8864 18.5755 13.7641 18.2362 14.5831C17.897 15.402 17.3998 16.1462 16.773 16.773M5.106 18.894C1.298 15.087 1.298 8.91396 5.106 5.10596M18.894 5.10596C22.702 8.91296 22.702 15.086 18.894 18.894M12 12H12.008V12.008H12V12ZM12.375 12C12.375 12.0994 12.3355 12.1948 12.2652 12.2651C12.1948 12.3354 12.0995 12.375 12 12.375C11.9005 12.375 11.8052 12.3354 11.7348 12.2651C11.6645 12.1948 11.625 12.0994 11.625 12C11.625 11.9005 11.6645 11.8051 11.7348 11.7348C11.8052 11.6645 11.9005 11.625 12 11.625C12.0995 11.625 12.1948 11.6645 12.2652 11.7348C12.3355 11.8051 12.375 11.9005 12.375 12Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          }
+          icon={<RadarIcon className="w-6 h-6" />}
           label="Radar"
           link="/upwork-dashboard/radar"
           currentPath={location.pathname}
