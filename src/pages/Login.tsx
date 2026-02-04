@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthProvider";
+import { Button, Input } from "../shared/ui";
 
 const Login: React.FC = () => {
   const { login, token } = useAuth();
@@ -91,7 +92,7 @@ const Login: React.FC = () => {
                 >
                   Username
                 </label>
-                <input
+                <Input
                   id="username"
                   name="username"
                   type="text"
@@ -99,7 +100,7 @@ const Login: React.FC = () => {
                   required
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
-                  className="block w-full rounded-[10px] border border-[#EFF0F0] h-10 px-4 placeholder:text-sm placeholder:font-normal placeholder:text-[#C8C8C8] focus:border-[#1823F0] focus:outline-none focus:ring-4 focus:ring-[#C4C4FD]"
+                  className="focus:ring-4"
                   placeholder="Enter your username..."
                 />
               </div>
@@ -111,7 +112,7 @@ const Login: React.FC = () => {
                 >
                   Password
                 </label>
-                <input
+                <Input
                   id="password"
                   name="password"
                   type="password"
@@ -119,19 +120,18 @@ const Login: React.FC = () => {
                   required
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="block w-full rounded-[10px] border border-[#EFF0F0] h-10 px-4 placeholder:text-sm placeholder:font-normal placeholder:text-[#C8C8C8] focus:border-[#1823F0] focus:outline-none focus:ring-2 focus:ring-[#C4C4FD]"
                   placeholder="Enter your password..."
                 />
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex justify-center items-center rounded-[10px] bg-[#1823F0] h-10 px-4 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#131CC0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-[#C4C4FD] disabled:cursor-not-allowed"
+              className="w-full"
             >
               {isSubmitting ? "Signing in..." : "Sign in"}
-            </button>
+            </Button>
           </form>
 
           <p className="text-xs font-normal text-center text-[#6B7280]">
