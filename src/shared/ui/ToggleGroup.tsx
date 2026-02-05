@@ -12,6 +12,7 @@ type ToggleGroupProps<T extends string> = {
   onChange: (value: T) => void;
   className?: string;
   name?: string;
+  size?: "xs" | "sm" | "md";
 };
 
 const ToggleGroup = <T extends string>({
@@ -20,9 +21,16 @@ const ToggleGroup = <T extends string>({
   onChange,
   className = "",
   name,
+  size = "sm",
 }: ToggleGroupProps<T>) => {
   const generatedId = useId();
   const groupName = name ?? `toggle-${generatedId}`;
+  const sizeClassName: Record<NonNullable<ToggleGroupProps<T>["size"]>, string> =
+    {
+      xs: "px-3 py-[4px] text-[10px]",
+      sm: "h-7 px-3 text-xs",
+      md: "h-9 px-4 text-sm",
+    };
 
   return (
     <div
@@ -34,7 +42,7 @@ const ToggleGroup = <T extends string>({
         return (
           <label
             key={item.value}
-            className={`flex cursor-pointer items-center gap-1 rounded-[6px] px-2 py-1 text-xs text-[#575757] transition-colors ${
+            className={`flex cursor-pointer items-center gap-1 rounded-[6px] text-[#575757] transition-colors ${sizeClassName[size]} ${
               selected ? "bg-white" : "bg-transparent"
             }`}
             title={item.label}
