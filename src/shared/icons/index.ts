@@ -6,3 +6,4 @@ export { default as RadarIcon } from "./RadarIcon";
 export { default as SettingsIcon } from "./SettingsIcon";
 export { default as CardsViewIcon } from "./CardsViewIcon";
 export { default as TableViewIcon } from "./TableViewIcon";
+export { default as PlusIcon } from "./PlusIcon";
