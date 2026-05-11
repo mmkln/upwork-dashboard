@@ -7,7 +7,8 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { UpworkJob } from "../../models"; // Переконайтеся, що шлях правильний
+import { UpworkJob } from "../../models";
+import { chartColors } from "../../shared/theme";
 
 interface PaymentTypeChartProps {
   jobs: UpworkJob[];
@@ -19,7 +20,7 @@ interface PaymentDataItem {
   percentage: string;
 }
 
-const COLORS = ["#4ADE80", "#60A5FA", "#D1D5DB"]; // Tailwind зелений, синій та сірий
+const COLORS = [chartColors.green, chartColors.primary, chartColors.slate];
 
 const RADIAN = Math.PI / 180;
 

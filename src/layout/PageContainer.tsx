@@ -9,7 +9,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
   children,
   className = "",
 }) => (
-  <div className={`w-full h-full p-5 bg-[#FCFDFF] ${className}`}>
+  <div className={`h-full w-full bg-surface-subtle p-10 ${className}`}>
     {children}
   </div>
 );

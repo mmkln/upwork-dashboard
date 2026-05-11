@@ -4,17 +4,22 @@ import { useLocation } from "react-router-dom";
 import Logo from "./sidebar/Logo";
 import SidebarItem from "./sidebar/SidebarItem";
 import SidebarSection from "./sidebar/SidebarSection";
-import { DashboardIcon, JobsIcon, RadarIcon } from "../shared/icons";
+import {
+  ArrowTrendingUpIcon,
+  DashboardIcon,
+  JobsIcon,
+  RadarIcon,
+} from "../shared/icons";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
 
   return (
-    <div className="fixed z-40 top-0 left-0 flex flex-col w-[68px] h-screen bg-white text-[#575757] transition-all duration-300 hover:w-44 group border-r border-[#EAEBEB]">
-      <div className="flex items-center justify-center p-4 h-[60px] border-b border-[#EAEBEB]">
+    <div className="fixed left-0 top-0 z-40 flex h-screen w-[72px] flex-col border-r border-border-subtle bg-surface text-text-secondary transition-all duration-300 hover:w-72 group">
+      <div className="flex h-20 items-center justify-center border-b border-border-subtle p-4">
         <Logo />
       </div>
-      <div className="p-4">
+      <nav className="px-3 py-4" aria-label="Primary navigation">
         <SidebarSection>
           <SidebarItem
             icon={<DashboardIcon className="w-6 h-6" />}
@@ -26,6 +31,12 @@ const Sidebar: React.FC = () => {
             icon={<JobsIcon className="w-6 h-6" />}
             label="Jobs"
             link="/upwork-dashboard/jobs"
+            currentPath={location.pathname}
+          />
+          <SidebarItem
+            icon={<ArrowTrendingUpIcon className="w-6 h-6" />}
+            label="Signals"
+            link="/upwork-dashboard/market-signals"
             currentPath={location.pathname}
           />
           <SidebarItem
@@ -54,7 +65,7 @@ const Sidebar: React.FC = () => {
           {/*  currentPath={location.pathname}*/}
           {/*/>*/}
         </SidebarSection>
-      </div>
+      </nav>
     </div>
   );
 };

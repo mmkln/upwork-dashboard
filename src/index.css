@@ -3,14 +3,105 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --surface: 0 0% 100%;
+    --surface-subtle: 210 40% 98%;
+    --surface-muted: 210 40% 96%;
+    --primary: 222 47% 11%;
+    --primary-hover: 217 33% 17%;
+    --primary-foreground: 0 0% 100%;
+    --action: 217 91% 60%;
+    --action-hover: 221 83% 53%;
+    --action-muted: 214 100% 97%;
+    --action-foreground: 0 0% 100%;
+    --secondary: 210 40% 98%;
+    --secondary-foreground: 215 25% 27%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 349 89% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --destructive-muted: 356 100% 97%;
+    --success: 160 84% 39%;
+    --success-foreground: 161 94% 24%;
+    --success-muted: 152 81% 96%;
+    --warning: 38 92% 50%;
+    --warning-muted: 48 96% 89%;
+    --border: 214 32% 91%;
+    --border-subtle: 214 32% 91%;
+    --border-strong: 213 27% 84%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+    --text-primary: 222 47% 11%;
+    --text-secondary: 215 16% 47%;
+    --text-muted: 215 20% 65%;
+    --text-placeholder: 215 20% 65%;
+    --text-inverted: 0 0% 100%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --surface: 0 0% 6%;
+    --surface-subtle: 0 0% 9%;
+    --surface-muted: 0 0% 15%;
+    --primary: 237 88% 62%;
+    --primary-hover: 237 88% 56%;
+    --primary-foreground: 0 0% 98%;
+    --action: 217 91% 60%;
+    --action-hover: 221 83% 53%;
+    --action-muted: 221 39% 16%;
+    --action-foreground: 0 0% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --destructive-muted: 0 35% 15%;
+    --success: 146 59% 58%;
+    --success-foreground: 146 59% 58%;
+    --success-muted: 146 35% 14%;
+    --warning: 38 92% 58%;
+    --warning-muted: 34 40% 15%;
+    --border: 0 0% 14.9%;
+    --border-subtle: 0 0% 16%;
+    --border-strong: 0 0% 24%;
+    --input: 0 0% 14.9%;
+    --ring: 238 87% 68%;
+    --text-primary: 0 0% 98%;
+    --text-secondary: 0 0% 75%;
+    --text-muted: 0 0% 64%;
+    --text-placeholder: 0 0% 50%;
+    --text-inverted: 0 0% 8%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
   body {
-    @apply font-sans;
+    @apply bg-background font-sans text-foreground;
   }
 
   input::placeholder,
   textarea::placeholder {
     font-size: 14px;
     font-weight: 400;
-    color: #c8c8c8;
+    color: hsl(var(--text-placeholder));
   }
 }

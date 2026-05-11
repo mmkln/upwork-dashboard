@@ -1,5 +1,7 @@
 import React from "react";
+import { Clipboard, Download } from "lucide-react";
 import { PreparedUpworkJob } from "../models";
+import { IconButton } from "../shared/ui";
 
 interface JobExportActionsProps {
   jobs: PreparedUpworkJob[];
@@ -53,49 +55,27 @@ const JobExportActions: React.FC<JobExportActionsProps> = ({
   };
 
   return (
-    <div className={`flex space-x-2 ${className}`}>
-      <button
-        className="p-2 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
+    <div className={`flex gap-2 ${className}`}>
+      <IconButton
+        variant="ghost"
+        size="md"
         title="Copy jobs to clipboard"
+        aria-label="Copy jobs to clipboard"
         onClick={handleCopy}
         disabled={!hasJobs}
       >
-        <svg
-          className="w-6 h-6"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6"
-          />
-        </svg>
-      </button>
-      <button
-        className="p-2 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white"
+        <Clipboard className="h-4 w-4" />
+      </IconButton>
+      <IconButton
+        variant="ghost"
+        size="md"
         title="Export jobs as JSON file"
+        aria-label="Export jobs as JSON file"
         onClick={handleDownload}
         disabled={!hasJobs}
       >
-        <svg
-          className="w-6 h-6"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-          />
-        </svg>
-      </button>
+        <Download className="h-4 w-4" />
+      </IconButton>
     </div>
   );
 };

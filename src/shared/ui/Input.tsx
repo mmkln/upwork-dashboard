@@ -1,12 +1,17 @@
 import React from "react";
+import { Input as ShadcnInput } from "components/shadcn/ui/input";
+import { cn } from "lib/utils";
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className = "", ...props }, ref) => (
-    <input
+  ({ className, ...props }, ref) => (
+    <ShadcnInput
       ref={ref}
-      className={`block w-full rounded-[10px] border border-[#EFF0F0] h-10 px-4 text-sm text-[#141414] placeholder:text-sm placeholder:font-normal placeholder:text-[#C8C8C8] focus:border-[#1823F0] focus:outline-none focus:ring-2 focus:ring-active-200 disabled:bg-[#EFF0F0] disabled:cursor-not-allowed ${className}`}
+      className={cn(
+        "h-10 rounded-[10px] border-input px-4 text-sm text-text-primary placeholder:text-sm placeholder:font-normal placeholder:text-text-placeholder focus:border-action focus-visible:ring-2 focus-visible:ring-ring disabled:bg-surface-muted",
+        className,
+      )}
       {...props}
     />
   ),

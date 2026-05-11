@@ -1,4 +1,6 @@
 import React from "react";
+import { Badge as ShadcnBadge } from "components/shadcn/ui/badge";
+import { cn } from "lib/utils";
 
 interface BadgeProps {
   label: string;
@@ -15,15 +17,18 @@ const Badge: React.FC<BadgeProps> = ({ label, value, maxRate }) => {
     label.length > 12 ? label.slice(0, 8).trim() + ".." : label;
 
   return (
-    <div
-      className="relative px-2 py-1 rounded-lg text-xs font-medium group/skill"
+    <ShadcnBadge
+      variant="secondary"
+      className={cn(
+        "group/skill relative rounded-lg border-transparent px-2 py-1 text-xs font-medium shadow-none",
+      )}
       style={{ backgroundColor, color }}
     >
       {displayLabel}
-      <div className="hidden group-hover/skill:flex absolute bottom-7 bg-white border border-gray-200 rounded-xl px-2 py-1 text-gray-800">
+      <div className="hidden group-hover/skill:flex absolute bottom-7 rounded-xl border border-border bg-popover px-2 py-1 text-popover-foreground">
         {label} <br /> ({value})
       </div>
-    </div>
+    </ShadcnBadge>
   );
 };
 

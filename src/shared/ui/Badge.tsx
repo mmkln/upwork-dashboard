@@ -1,30 +1,38 @@
 import React from "react";
+import { Badge as ShadcnBadge } from "components/shadcn/ui/badge";
+import { cn } from "lib/utils";
 
 type BadgeTone = "neutral" | "info" | "success" | "warning";
 
-export type BadgeProps = {
+export type BadgeProps = React.HTMLAttributes<HTMLDivElement> & {
   children: React.ReactNode;
   tone?: BadgeTone;
-  className?: string;
 };
 
 const toneClassName: Record<BadgeTone, string> = {
-  neutral: "bg-[#F5F5F5] text-[#575757]",
-  info: "bg-[#F6F8FF] text-[#575757]",
-  success: "bg-[#E7F8EE] text-[#1F7A4C]",
-  warning: "bg-[#FFF4E5] text-[#9A5B13]",
+  neutral: "bg-muted text-text-secondary",
+  info: "bg-accent text-accent-foreground",
+  success: "bg-success-muted text-success-foreground",
+  warning: "bg-warning-muted text-warning",
 };
 
 const Badge: React.FC<BadgeProps> = ({
   children,
   tone = "neutral",
-  className = "",
+  className,
+  ...props
 }) => (
-  <span
-    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${toneClassName[tone]} ${className}`}
+  <ShadcnBadge
+    variant="secondary"
+    className={cn(
+      "rounded-full border-transparent px-2 py-0.5 text-[11px] font-medium shadow-none hover:bg-current/0",
+      toneClassName[tone],
+      className,
+    )}
+    {...props}
   >
     {children}
-  </span>
+  </ShadcnBadge>
 );
 
 export default Badge;

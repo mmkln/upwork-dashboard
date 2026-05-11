@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
+import { Button } from "components/shadcn/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "components/shadcn/ui/dropdown-menu";
+import { cn } from "lib/utils";
 
 type DropdownProps = {
   label: React.ReactNode;
@@ -17,45 +24,31 @@ const Dropdown: React.FC<DropdownProps> = ({
   buttonClassName = "",
   menuClassName = "",
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!rootRef.current) {
-        return;
-      }
-
-      if (!rootRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   return (
-    <div className={`relative inline-flex ${className}`} ref={rootRef}>
-      <button
-        type="button"
-        className={`inline-flex items-center gap-2 rounded-[10px] border border-[#EFF0F0] bg-white px-3 py-2 text-xs font-medium text-[#575757] transition-colors duration-200 hover:bg-[#F6F8FF] focus:outline-none focus:ring-2 focus:ring-active-200 ${buttonClassName}`}
-        onClick={() => setIsOpen((prev) => !prev)}
-      >
-        {label}
-      </button>
-
-      {isOpen && (
-        <div
-          className={`absolute mt-2 min-w-[160px] rounded-[10px] border border-[#EFF0F0] bg-white p-2 shadow-lg ${
-            align === "left" ? "left-0" : "right-0"
-          } ${menuClassName}`}
+    <div className={cn("inline-flex", className)}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            className={cn(
+              "h-auto rounded-[10px] border-input bg-surface px-3 py-2 text-xs font-medium text-text-secondary hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring",
+              buttonClassName,
+            )}
+          >
+            {label}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align={align === "left" ? "start" : "end"}
+          className={cn(
+            "min-w-[160px] rounded-[10px] border-input bg-popover p-2 text-popover-foreground shadow-lg",
+            menuClassName,
+          )}
         >
           {children}
-        </div>
-      )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

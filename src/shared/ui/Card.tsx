@@ -1,16 +1,21 @@
 import React from "react";
+import { Card as ShadcnCard } from "components/shadcn/ui/card";
+import { cn } from "lib/utils";
 
-type CardProps = {
+type CardProps = React.HTMLAttributes<HTMLDivElement> & {
   children: React.ReactNode;
-  className?: string;
 };
 
-const Card: React.FC<CardProps> = ({ children, className = "" }) => (
-  <div
-    className={`rounded-[12px] border border-[#EFEFEF] bg-white p-5 ${className}`}
+const Card: React.FC<CardProps> = ({ children, className, ...props }) => (
+  <ShadcnCard
+    className={cn(
+      "rounded-[12px] border-border bg-card p-8 text-card-foreground shadow-none",
+      className,
+    )}
+    {...props}
   >
     {children}
-  </div>
+  </ShadcnCard>
 );
 
 export default Card;

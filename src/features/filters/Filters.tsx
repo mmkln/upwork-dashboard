@@ -1,6 +1,12 @@
 import React, { useState, useCallback, useEffect } from "react";
-import Select from "react-select";
 import { JobStatus, JobExperience } from "../../models";
+import {
+  Checkbox,
+  Input,
+  MultiSelect,
+  RangeInput,
+  Select as UiSelect,
+} from "../../shared/ui";
 import { camelToCapitalizedWords, debounce } from "../../utils";
 import { FilterState } from "./types";
 
@@ -206,10 +212,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     );
   };
 
-  const handleSkillsChange = (selectedOptions: any) => {
-    const skills = selectedOptions
-      ? selectedOptions.map((option: any) => option.value)
-      : [];
+  const handleSkillsChange = (skills: string[]) => {
     setSelectedSkills(skills);
     onFilterChange(
       jobType,
@@ -225,10 +228,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     );
   };
 
-  const handleInstrumentsChange = (selectedOptions: any) => {
-    const instruments = selectedOptions
-      ? selectedOptions.map((option: any) => option.value)
-      : [];
+  const handleInstrumentsChange = (instruments: string[]) => {
     setSelectedInstruments(instruments);
     onFilterChange(
       jobType,
@@ -244,10 +244,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     );
   };
 
-  const handleStatusesChange = (selectedOptions: any) => {
-    const statuses = selectedOptions
-      ? selectedOptions.map((option: any) => option.value)
-      : [];
+  const handleStatusesChange = (statuses: JobStatus[]) => {
     setSelectedStatuses(statuses);
     onFilterChange(
       jobType,
@@ -263,10 +260,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     );
   };
 
-  const handleCollectionsChange = (selectedOptions: any) => {
-    const collections = selectedOptions
-      ? selectedOptions.map((option: any) => Number(option.value))
-      : [];
+  const handleCollectionsChange = (collections: number[]) => {
     setSelectedCollections(collections);
     onFilterChange(
       jobType,
@@ -282,10 +276,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     );
   };
 
-  const handleExperienceChange = (selectedOptions: any) => {
-    const experiences = selectedOptions
-      ? selectedOptions.map((option: any) => option.value)
-      : [];
+  const handleExperienceChange = (experiences: JobExperience[]) => {
     setSelectedJobExperience(experiences);
     onFilterChange(
       jobType,
@@ -326,9 +317,8 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Search in Title
           </label>
-          <input
+          <Input
             type="text"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
             placeholder="Filter by job title..."
             value={titleFilter}
             onChange={(e) => handleTitleFilterChange(e.target.value)}
@@ -339,8 +329,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Job Type
           </label>
-          <select
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
+          <UiSelect
             value={jobType}
             onChange={(e) => handleJobTypeChange(e.target.value as JobType)}
           >
@@ -348,7 +337,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
             <option value="Hourly Rate">Hourly Rate</option>
             <option value="Unspecified">Unspecified</option>
             <option value="None">None</option>
-          </select>
+          </UiSelect>
         </div>
 
         {/* Fixed Price Range */}
@@ -358,7 +347,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
               Fixed Price Range
             </label>
             <div className="flex items-center space-x-3">
-              <input
+              <Input
                 type="number"
                 min="0"
                 max="5000"
@@ -371,11 +360,11 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
                       : INITIAL_FIXED_PRICE_MAX,
                   )
                 }
-                className="w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
+                className="w-1/2"
                 placeholder="Min Price"
               />
               <span className="text-sm text-gray-700">to</span>
-              <input
+              <Input
                 type="number"
                 min="0"
                 max="5000"
@@ -388,7 +377,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
                     Number(e.target.value),
                   )
                 }
-                className="w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
+                className="w-1/2"
                 placeholder="Max Price"
               />
             </div>
@@ -403,8 +392,7 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
             </label>
             <div className="space-y-2">
               <div className="flex items-center space-x-3">
-                <input
-                  type="range"
+                <RangeInput
                   min="0"
                   max="500"
                   value={hourlyRateRange ? hourlyRateRange[0] : 0}
@@ -416,15 +404,13 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
                         : INITIAL_HOURLY_RATE_MAX,
                     )
                   }
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                 />
                 <span className="w-16 text-sm text-gray-700">
                   ${hourlyRateRange ? hourlyRateRange[0] : 0}
                 </span>
               </div>
               <div className="flex items-center space-x-3">
-                <input
-                  type="range"
+                <RangeInput
                   min="0"
                   max="500"
                   value={
@@ -438,7 +424,6 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
                       Number(e.target.value),
                     )
                   }
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                 />
                 <span className="w-16 text-sm text-gray-700">
                   $
@@ -456,16 +441,12 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Skills
           </label>
-          <Select
-            isMulti
+          <MultiSelect
             options={skillOptions}
-            value={skillOptions.filter((option) =>
-              selectedSkills.includes(option.value),
-            )}
+            value={selectedSkills}
             onChange={handleSkillsChange}
             placeholder="Select skills..."
-            className="react-select-container"
-            classNamePrefix="react-select"
+            searchPlaceholder="Search skills..."
           />
         </div>
 
@@ -474,16 +455,12 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Instruments
           </label>
-          <Select
-            isMulti
+          <MultiSelect
             options={instrumentOptions}
-            value={instrumentOptions.filter((option) =>
-              selectedInstruments.includes(option.value),
-            )}
+            value={selectedInstruments}
             onChange={handleInstrumentsChange}
             placeholder="Select instruments..."
-            className="react-select-container"
-            classNamePrefix="react-select"
+            searchPlaceholder="Search instruments..."
           />
         </div>
 
@@ -492,16 +469,12 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Job Statuses
           </label>
-          <Select
-            isMulti
+          <MultiSelect
             options={statusOptions}
-            value={statusOptions.filter((option) =>
-              selectedStatuses.includes(option.value),
-            )}
+            value={selectedStatuses}
             onChange={handleStatusesChange}
             placeholder="Select statuses..."
-            className="react-select-container"
-            classNamePrefix="react-select"
+            searchPlaceholder="Search statuses..."
           />
         </div>
 
@@ -510,19 +483,15 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Collections
           </label>
-          <Select
-            isMulti
+          <MultiSelect
             options={collectionOptions}
-            value={collectionOptions.filter((option) =>
-              selectedCollections.includes(option.value),
-            )}
+            value={selectedCollections}
             onChange={handleCollectionsChange}
             placeholder={
               collectionOptions.length ? "Select collections..." : "No collections"
             }
-            className="react-select-container"
-            classNamePrefix="react-select"
-            isDisabled={collectionOptions.length === 0}
+            searchPlaceholder="Search collections..."
+            disabled={collectionOptions.length === 0}
           />
         </div>
 
@@ -531,24 +500,19 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Job Experience
           </label>
-          <Select
-            isMulti
+          <MultiSelect
             options={experienceOptions}
-            value={experienceOptions.filter((option) =>
-              selectedJobExperience.includes(option.value),
-            )}
+            value={selectedJobExperience}
             onChange={handleExperienceChange}
             placeholder="Select experience..."
-            className="react-select-container"
-            classNamePrefix="react-select"
+            searchPlaceholder="Search experience..."
           />
         </div>
 
         {/* Bookmarked filter */}
         <div className="flex items-center">
           <label className="flex items-center text-sm font-semibold text-gray-700">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={bookmarked === true}
               onChange={handleBookmarkedChange}
               className="mr-2"

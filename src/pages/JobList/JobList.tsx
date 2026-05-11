@@ -10,9 +10,10 @@ import {
   useFilters,
   useCollections,
 } from "../../features";
-import JobListItem from "./components/JobListItem";
 import { instruments, prepareJobs } from "../../utils";
 import { buildFilterSlug } from "../../features/filters/utils/filterSlug.util";
+import JobListItem from "./components/JobListItem";
+import { Button, Select } from "../../shared/ui";
 
 const mapFiltersToQuery = (filters: FilterState) => {
   const params: Record<string, string | number | boolean | undefined> = {};
@@ -262,8 +263,8 @@ const JobList: React.FC = () => {
           <label className="text-sm font-medium text-gray-700">
             Page size
           </label>
-          <select
-            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
+          <Select
+            className="w-auto"
             value={pageSize}
             onChange={handlePageSizeChange}
             disabled={loading}
@@ -273,25 +274,27 @@ const JobList: React.FC = () => {
                 {size}
               </option>
             ))}
-          </select>
+          </Select>
           <div className="flex items-center gap-2">
-            <button
-              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => goToPage(page - 1)}
               disabled={isFirstPage || loading}
             >
               Previous
-            </button>
+            </Button>
             <span className="text-sm text-gray-700">
               Page {page} / {totalPages}
             </span>
-            <button
-              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => goToPage(page + 1)}
               disabled={isLastPage || loading}
             >
               Next
-            </button>
+            </Button>
           </div>
           <JobExportActions
             jobs={filteredJobsData}

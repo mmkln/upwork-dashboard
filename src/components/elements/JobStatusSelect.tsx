@@ -2,6 +2,14 @@
 
 import React from "react";
 import { JobStatus } from "../../models";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "components/shadcn/ui/select";
+import { cn } from "lib/utils";
 
 interface JobStatusSelectProps {
   status: JobStatus;
@@ -11,27 +19,27 @@ interface JobStatusSelectProps {
 const getStatusColor = (status: JobStatus): string => {
   switch (status) {
     case JobStatus.Draft:
-      return "bg-gray-200 text-gray-700";
+      return "bg-gray-100 text-gray-700";
     case JobStatus.Submitted:
-      return "bg-blue-200 text-blue-800";
+      return "bg-blue-50 text-blue-700";
     case JobStatus.Interview:
-      return "bg-yellow-200 text-yellow-800";
+      return "bg-yellow-50 text-yellow-700";
     case JobStatus.OfferReceived:
-      return "bg-green-200 text-green-800";
+      return "bg-green-50 text-green-700";
     case JobStatus.OfferAccepted:
-      return "bg-indigo-200 text-indigo-800";
+      return "bg-indigo-50 text-indigo-700";
     case JobStatus.InProgress:
-      return "bg-purple-200 text-purple-800";
+      return "bg-purple-50 text-purple-700";
     case JobStatus.Completed:
-      return "bg-teal-200 text-teal-800";
+      return "bg-teal-50 text-teal-700";
     case JobStatus.Closed:
-      return "bg-red-200 text-red-800";
+      return "bg-red-50 text-red-700";
     case JobStatus.Declined:
-      return "bg-pink-200 text-pink-800";
+      return "bg-pink-50 text-pink-700";
     case JobStatus.Withdrawn:
-      return "bg-orange-200 text-orange-800";
+      return "bg-orange-50 text-orange-700";
     default:
-      return "bg-gray-200 text-gray-800";
+      return "bg-gray-100 text-gray-800";
   }
 };
 
@@ -53,28 +61,33 @@ const JobStatusSelect: React.FC<JobStatusSelectProps> = ({
   onStatusChange,
 }) => {
   return (
-    <div className="">
-      {/*<label*/}
-      {/*  htmlFor="job-status"*/}
-      {/*  className="block text-lg font-semibold text-gray-800 mb-2"*/}
-      {/*>*/}
-      {/*  Status*/}
-      {/*</label>*/}
-      <select
-        id="job-status"
+    <div
+      className="min-w-[138px]"
+      onClick={(event) => {
+        event.stopPropagation();
+      }}
+    >
+      <Select
         value={status}
-        onClick={(event) => {
-          event.stopPropagation();
-        }}
-        onChange={(e) => onStatusChange(e.target.value as JobStatus)}
-        className={`block text-xs font-medium px-2 py-1 w-full p-2 rounded ${getStatusColor(status)} border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+        onValueChange={(value) => onStatusChange(value as JobStatus)}
       >
-        {Object.values(JobStatus).map((statusValue) => (
-          <option key={statusValue} value={statusValue}>
-            {statusLabels[statusValue]}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger
+          id="job-status"
+          className={cn(
+            "h-8 rounded-full border-transparent px-3 text-xs font-medium shadow-none focus:ring-1 focus:ring-active-300",
+            getStatusColor(status),
+          )}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="end" className="min-w-[180px] rounded-xl">
+          {Object.values(JobStatus).map((statusValue) => (
+            <SelectItem key={statusValue} value={statusValue}>
+              {statusLabels[statusValue]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import React, { memo } from "react";
+import { chartColorSequence } from "../../shared/theme";
 
 export interface CategoryValuesItem {
   values: number[]; // Масив значень
@@ -36,7 +37,7 @@ export const MultiValueChart: React.FC<MultiValueChartProps> = memo(
     minValue,
     labelSuffix,
     labelPostfix,
-    defaultColors = ["#3f88ff", "#5ac59f", "#f4bb29"], // Стандартні кольори
+    defaultColors = [...chartColorSequence],
   }) => {
     return (
       <div className="w-full max-w-md">

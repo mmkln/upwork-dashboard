@@ -20,12 +20,14 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   return (
     <Link
       to={link}
-      className={`flex items-center gap-1 h-9 min-w-9 p-1.5 w-full rounded-lg transition-colors duration-300 overflow-hidden hover:bg-[#F6F8FF] text-[#575757] ${
-        isActive ? "bg-[#F6F8FF]" : ""
+      className={`flex h-12 min-w-12 w-full items-center gap-2 overflow-hidden rounded-xl px-3 py-3 text-text-secondary transition-colors duration-300 hover:bg-accent hover:text-accent-foreground ${
+        isActive ? "bg-accent text-accent-foreground" : ""
       }`}
     >
-      <div className="flex w-6 h-6 items-center justify-center ">{icon}</div>
-      <span className="text-xs font-medium hidden group-hover:block">
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+        {icon}
+      </div>
+      <span className="hidden truncate text-xs font-medium group-hover:block">
         {label}
       </span>
     </Link>

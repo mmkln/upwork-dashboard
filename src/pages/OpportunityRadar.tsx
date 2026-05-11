@@ -4,9 +4,12 @@ import {
   Badge,
   Button,
   Card,
+  Checkbox,
   EmptyState,
   IconButton,
   Input,
+  Select,
+  Textarea,
 } from "../shared/ui";
 import { PlusIcon } from "../shared/icons";
 import {
@@ -484,8 +487,7 @@ const OpportunityRadar: React.FC = () => {
     <Card className="flex flex-col gap-4">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <label className="flex items-center gap-2 text-xs text-[#575757]">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={filters.verifiedOnly}
             onChange={(event) =>
               handleEditorInput("filters.verifiedOnly", event.target.checked)
@@ -530,8 +532,7 @@ const OpportunityRadar: React.FC = () => {
           <div className="flex flex-wrap gap-3 text-xs text-[#575757]">
             {(["Entry", "Intermediate", "Expert"] as const).map((level) => (
               <label key={level} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={filters.expertiseLevels.includes(level)}
                   onChange={(event) => {
                     const next = event.target.checked
@@ -605,8 +606,7 @@ const OpportunityRadar: React.FC = () => {
           )}
         </div>
         <label className="flex items-center gap-2 text-xs text-[#575757]">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={filters.hideApplied}
             onChange={(event) =>
               handleEditorInput("filters.hideApplied", event.target.checked)
@@ -671,32 +671,32 @@ const OpportunityRadar: React.FC = () => {
           />
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-[640px] w-full text-sm">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="text-xs text-[#8A8A8A] uppercase">
                 <tr>
-                  <th className="text-left py-2">Title</th>
-                  <th className="text-left py-2">Score</th>
-                  <th className="text-left py-2">Age</th>
-                  <th className="text-left py-2">Verified</th>
-                  <th className="text-left py-2">Spent</th>
-                  <th className="text-left py-2">Proposals</th>
-                  <th className="text-left py-2">Country</th>
-                  <th className="text-left py-2">Top tags</th>
+                  <th className="px-6 py-4 text-left">Title</th>
+                  <th className="px-6 py-4 text-left">Score</th>
+                  <th className="px-6 py-4 text-left">Age</th>
+                  <th className="px-6 py-4 text-left">Verified</th>
+                  <th className="px-6 py-4 text-left">Spent</th>
+                  <th className="px-6 py-4 text-left">Proposals</th>
+                  <th className="px-6 py-4 text-left">Country</th>
+                  <th className="px-6 py-4 text-left">Top tags</th>
                 </tr>
               </thead>
               <tbody>
                 {previewMatches.map(({ job, score }) => (
                   <tr key={job.id} className="border-t border-[#EFEFEF]">
-                    <td className="py-2">{job.title}</td>
-                    <td className="py-2">{score}</td>
-                    <td className="py-2">{formatAge(job.created_at)}</td>
-                    <td className="py-2">
+                    <td className="px-6 py-6">{job.title}</td>
+                    <td className="px-6 py-6">{score}</td>
+                    <td className="px-6 py-6">{formatAge(job.created_at)}</td>
+                    <td className="px-6 py-6">
                       {job.is_payment_verified ? "Yes" : "No"}
                     </td>
-                    <td className="py-2">{job.total_spent ?? "—"}</td>
-                    <td className="py-2">{job.proposals ?? "—"}</td>
-                    <td className="py-2">{job.country ?? "—"}</td>
-                    <td className="py-2">
+                    <td className="px-6 py-6">{job.total_spent ?? "—"}</td>
+                    <td className="px-6 py-6">{job.proposals ?? "—"}</td>
+                    <td className="px-6 py-6">{job.country ?? "—"}</td>
+                    <td className="px-6 py-6">
                       {job.normalized_stack.slice(0, 3).join(", ")}
                     </td>
                   </tr>
@@ -715,7 +715,7 @@ const OpportunityRadar: React.FC = () => {
     }
 
     return (
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-8">
         <div>
           <h2 className="text-lg font-semibold text-[#141414]">
             Radar Editor
@@ -725,8 +725,8 @@ const OpportunityRadar: React.FC = () => {
           </p>
         </div>
 
-        <Card className="flex flex-col gap-4">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Card className="flex flex-col gap-6">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
             <div className="flex flex-col gap-2">
               <p className="text-xs text-[#575757]">Name</p>
               <Input
@@ -741,8 +741,7 @@ const OpportunityRadar: React.FC = () => {
             </div>
             <div className="flex flex-col gap-2">
               <p className="text-xs text-[#575757]">Status</p>
-              <select
-                className="rounded-[10px] border border-[#EFF0F0] h-10 px-4 text-sm text-[#141414]"
+              <Select
                 value={editorRadar.status}
                 onChange={(event) =>
                   handleEditorInput("status", event.target.value)
@@ -753,12 +752,11 @@ const OpportunityRadar: React.FC = () => {
                     {status}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div className="flex flex-col gap-2">
               <p className="text-xs text-[#575757]">Schedule</p>
-              <select
-                className="rounded-[10px] border border-[#EFF0F0] h-10 px-4 text-sm text-[#141414]"
+              <Select
                 value={editorRadar.schedule.frequency}
                 onChange={(event) =>
                   handleEditorInput("schedule.frequency", event.target.value)
@@ -769,7 +767,7 @@ const OpportunityRadar: React.FC = () => {
                     {frequency}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div className="flex flex-col gap-2">
               <p className="text-xs text-[#575757]">Hour of day (0-23)</p>
@@ -791,11 +789,10 @@ const OpportunityRadar: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             <div className="flex flex-col gap-2">
               <label className="flex items-center gap-2 text-xs text-[#575757]">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={editorRadar.notifications.email.enabled}
                   onChange={(event) =>
                     handleEditorInput(
@@ -822,8 +819,7 @@ const OpportunityRadar: React.FC = () => {
             </div>
             <div className="flex flex-col gap-2">
               <label className="flex items-center gap-2 text-xs text-[#575757]">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={editorRadar.notifications.plugin.enabled}
                   onChange={(event) =>
                     handleEditorInput(
@@ -901,7 +897,7 @@ const OpportunityRadar: React.FC = () => {
             <Button
               variant="soft"
               size="xs"
-              className="gap-1.5 text-[#575757]"
+              className="gap-2 text-[#575757]"
               onClick={handleCreateRadar}
             >
               <PlusIcon className="h-4 w-4" />
@@ -915,7 +911,7 @@ const OpportunityRadar: React.FC = () => {
       return <EmptyState title="Select a radar to view matches" />;
     }
     return (
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
             <div>
@@ -926,8 +922,7 @@ const OpportunityRadar: React.FC = () => {
                 Matches for the selected radar.
               </p>
             </div>
-            <select
-              className="rounded-[10px] border border-[#EFF0F0] h-10 px-4 text-sm text-[#141414]"
+            <Select
               value={activeRadarId ?? ""}
               onChange={(event) => {
                 setActiveRadarId(event.target.value);
@@ -939,7 +934,7 @@ const OpportunityRadar: React.FC = () => {
                   {radar.name}
                 </option>
               ))}
-            </select>
+            </Select>
             <Badge
               tone={
                 activeRadar.status === "active"
@@ -970,7 +965,7 @@ const OpportunityRadar: React.FC = () => {
             <Button
               variant="soft"
               size="xs"
-              className="gap-1.5 text-[#575757]"
+              className="gap-2 text-[#575757]"
               onClick={handleCreateRadar}
             >
               <PlusIcon className="h-4 w-4" />
@@ -986,8 +981,7 @@ const OpportunityRadar: React.FC = () => {
             onChange={(event) => setMatchesSearch(event.target.value)}
             className="max-w-[220px]"
           />
-          <select
-            className="rounded-[10px] border border-[#EFF0F0] h-10 px-4 text-sm text-[#141414]"
+          <Select
             value={matchesSort}
             onChange={(event) =>
               setMatchesSort(event.target.value as SortKey)
@@ -995,10 +989,9 @@ const OpportunityRadar: React.FC = () => {
           >
             <option value="score_desc">Score desc</option>
             <option value="age_asc">Age asc</option>
-          </select>
+          </Select>
           <label className="flex items-center gap-2 text-xs text-[#575757]">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={matchesHideApplied}
               onChange={(event) => setMatchesHideApplied(event.target.checked)}
             />
@@ -1027,17 +1020,17 @@ const OpportunityRadar: React.FC = () => {
             <table className="w-full text-sm">
               <thead className="text-xs text-[#8A8A8A] uppercase">
                 <tr>
-                  <th className="text-left py-2">Score</th>
-                  <th className="text-left py-2">Age</th>
-                  <th className="text-left py-2">Proposals</th>
-                  <th className="text-left py-2">Verified</th>
-                  <th className="text-left py-2">Spent</th>
-                  <th className="text-left py-2">Hire rate</th>
-                  <th className="text-left py-2">Budget</th>
-                  <th className="text-left py-2">Expertise</th>
-                  <th className="text-left py-2">Country</th>
-                  <th className="text-left py-2">Tags</th>
-                  <th className="text-left py-2">Actions</th>
+                  <th className="px-6 py-4 text-left">Score</th>
+                  <th className="px-6 py-4 text-left">Age</th>
+                  <th className="px-6 py-4 text-left">Proposals</th>
+                  <th className="px-6 py-4 text-left">Verified</th>
+                  <th className="px-6 py-4 text-left">Spent</th>
+                  <th className="px-6 py-4 text-left">Hire rate</th>
+                  <th className="px-6 py-4 text-left">Budget</th>
+                  <th className="px-6 py-4 text-left">Expertise</th>
+                  <th className="px-6 py-4 text-left">Country</th>
+                  <th className="px-6 py-4 text-left">Tags</th>
+                  <th className="px-6 py-4 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -1052,21 +1045,21 @@ const OpportunityRadar: React.FC = () => {
                     : `$${job.budget.min}-${job.budget.max}/h`;
                   return (
                     <tr key={match.jobId} className="border-t border-[#EFEFEF]">
-                      <td className="py-2">{match.score}</td>
-                      <td className="py-2">{formatAge(job.created_at)}</td>
-                      <td className="py-2">{job.proposals ?? "—"}</td>
-                      <td className="py-2">
+                      <td className="px-6 py-6">{match.score}</td>
+                      <td className="px-6 py-6">{formatAge(job.created_at)}</td>
+                      <td className="px-6 py-6">{job.proposals ?? "—"}</td>
+                      <td className="px-6 py-6">
                         {job.is_payment_verified ? "Yes" : "No"}
                       </td>
-                      <td className="py-2">{job.total_spent ?? "—"}</td>
-                      <td className="py-2">{job.hire_rate ?? "—"}</td>
-                      <td className="py-2">{budget}</td>
-                      <td className="py-2">{job.experience ?? "—"}</td>
-                      <td className="py-2">{job.country ?? "—"}</td>
-                      <td className="py-2">
+                      <td className="px-6 py-6">{job.total_spent ?? "—"}</td>
+                      <td className="px-6 py-6">{job.hire_rate ?? "—"}</td>
+                      <td className="px-6 py-6">{budget}</td>
+                      <td className="px-6 py-6">{job.experience ?? "—"}</td>
+                      <td className="px-6 py-6">{job.country ?? "—"}</td>
+                      <td className="px-6 py-6">
                         {job.normalized_stack.slice(0, 3).join(", ")}
                       </td>
-                      <td className="py-2">
+                      <td className="px-6 py-6">
                         <div className="flex flex-wrap gap-2">
                           <Button
                             variant="ghost"
@@ -1122,7 +1115,7 @@ const OpportunityRadar: React.FC = () => {
     ];
 
     return (
-      <div className="fixed right-0 top-0 h-full w-[360px] border-l border-[#EAEBEB] bg-white p-5 shadow-lg">
+      <div className="fixed right-0 top-0 h-full w-[360px] border-l border-[#EAEBEB] bg-white p-8 shadow-lg">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold text-[#141414]">
@@ -1147,7 +1140,7 @@ const OpportunityRadar: React.FC = () => {
           </IconButton>
         </div>
 
-        <div className="flex flex-wrap gap-2 mt-4">
+        <div className="mt-4 flex flex-wrap gap-2">
           {chips.map((chip) => (
             <Badge key={chip} tone="info">
               {chip}
@@ -1160,10 +1153,9 @@ const OpportunityRadar: React.FC = () => {
           ))}
         </div>
 
-        <Card className="mt-5 flex flex-col gap-3">
+        <Card className="mt-6 flex flex-col gap-4">
           <p className="text-xs text-[#8A8A8A]">Applied status</p>
-          <select
-            className="rounded-[10px] border border-[#EFF0F0] h-10 px-4 text-sm text-[#141414]"
+          <Select
             value={application.status}
             onChange={(event) =>
               handleInspectorChange("status", event.target.value)
@@ -1176,11 +1168,10 @@ const OpportunityRadar: React.FC = () => {
                 </option>
               ),
             )}
-          </select>
+          </Select>
           <div className="flex flex-col gap-2">
             <p className="text-xs text-[#575757]">Note</p>
-            <textarea
-              className="rounded-[10px] border border-[#EFF0F0] px-3 py-2 text-sm text-[#141414]"
+            <Textarea
               value={application.note ?? ""}
               onChange={(event) =>
                 handleInspectorChange("note", event.target.value)
@@ -1202,9 +1193,9 @@ const OpportunityRadar: React.FC = () => {
         </Card>
 
         {inspectorMatch.reasons && (
-          <Card className="mt-5">
+          <Card className="mt-6">
             <p className="text-xs text-[#8A8A8A]">Why this score</p>
-            <table className="w-full text-xs mt-2">
+            <table className="mt-2 w-full text-xs">
               <thead className="text-[#8A8A8A] uppercase">
                 <tr>
                   <th className="text-left py-1">Signal</th>
@@ -1241,7 +1232,7 @@ const OpportunityRadar: React.FC = () => {
           aria-hidden="true"
         />
         <div className="absolute right-0 top-0 flex h-full w-[520px] max-w-[90vw] flex-col border-l border-[#EAEBEB] bg-white shadow-lg">
-          <div className="flex items-center justify-between border-b border-[#EFEFEF] px-5 py-4">
+          <div className="flex items-center justify-between border-b border-[#EFEFEF] px-8 py-6">
             <div>
               <h2 className="text-sm font-semibold text-[#141414]">
                 {editorRadar.name || "New Radar"}
@@ -1257,7 +1248,7 @@ const OpportunityRadar: React.FC = () => {
               ×
             </IconButton>
           </div>
-          <div className="flex-1 overflow-y-auto px-5 py-5">
+          <div className="flex-1 overflow-y-auto px-8 py-8">
             {renderEditor()}
           </div>
         </div>
@@ -1272,7 +1263,7 @@ const OpportunityRadar: React.FC = () => {
       {!isEditorOpen && inspectorJobId && renderInspector()}
       {renderEditorDrawer()}
 
-      <div className="fixed bottom-5 right-5 flex flex-col gap-2 z-50">
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
         {toasts.map((toast) => (
           <div
             key={toast.id}

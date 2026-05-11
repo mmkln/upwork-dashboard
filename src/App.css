@@ -10,12 +10,12 @@
 .page-loading-bar {
   background-image: linear-gradient(
     120deg,
-    #3b82f6,
-    #a855f7,
-    #ec4899,
-    #3b82f6
+    hsl(var(--action)),
+    hsl(var(--success)),
+    hsl(var(--destructive)),
+    hsl(var(--action))
   );
   background-size: 200% 100%;
   animation: page-loading-stripes 1.5s linear infinite;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 8px hsl(var(--action) / 0.35);
 }

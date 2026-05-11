@@ -1,0 +1,1849 @@
+# GHL MARKET SIGNALS BOARD — OPERATING DOCUMENTATION
+
+## 1. Purpose
+
+The GHL Market Signals Board exists to turn market reality into action.
+
+It is not a database of random job posts.
+
+It is a decision tool that helps answer:
+
+* What are buyers already paying for?
+* Which problems repeat?
+* Which problems are close to money, leads, sales, time, risk, or operational bottlenecks?
+* Which GHL skills should I learn first?
+* Which proof should I build?
+* Which offer should I test?
+* Which tasks should enter the GHL / Money execution flow?
+
+The board should support this loop:
+
+```text
+Market signal
+→ paid problem
+→ selected opportunity
+→ proof to build
+→ offer
+→ proposal / outreach
+→ paid task
+→ case / template / insight
+→ stronger next cycle
+```
+
+The board exists to prevent random learning, abstract planning, and tool exploration without buyer, pain, proof, offer, or distribution.
+
+---
+
+## 2. Core Principle
+
+The board is successful only if it creates better actions.
+
+A good Market Signal Board should produce:
+
+* better GHL learning priorities;
+* better freelance service ideas;
+* better proof/case decisions;
+* better Upwork proposals;
+* better website/profile positioning;
+* better outreach messages;
+* better delivery templates;
+* better understanding of buyer pain;
+* better chances of getting paid.
+
+If the board becomes a beautiful archive but does not generate action, it is failing.
+
+---
+
+## 3. Main Question
+
+The board should not ask:
+
+```text
+Is this interesting?
+```
+
+It should ask:
+
+```text
+Is there a real buyer with pain, budget, urgency, and a reason to pay now?
+```
+
+A signal is valuable when it reveals:
+
+* who the buyer is;
+* what they are trying to fix;
+* what business outcome is blocked;
+* what they are willing to pay for;
+* what skills are required;
+* what proof would reduce their risk;
+* how this could become an offer.
+
+---
+
+## 4. Recommended Format
+
+Use a table/database format.
+
+Recommended tools:
+
+```text
+Google Sheets
+Airtable
+Notion Database
+Majom Table
+```
+
+Best starting option:
+
+```text
+Google Sheets
+```
+
+Reason:
+
+* easy to create;
+* easy to sort;
+* easy to filter;
+* easy to score;
+* easy to update;
+* easy to link from Majom/Trello.
+
+Majom/Trello should not store the whole board.
+Majom/Trello should only contain execution tasks created from the board.
+
+---
+
+## 5. Board Name
+
+```text
+GHL MARKET SIGNALS BOARD
+```
+
+Optional folder path:
+
+```text
+GHL-MONEY-LOOP / 01_GHL_MARKET_SIGNALS_BOARD
+```
+
+---
+
+## 6. Board Structure
+
+### Required Columns
+
+```text
+Date
+Source
+Link
+Buyer Type
+Niche / Industry
+Problem
+Exact Buyer Language
+Business Pain
+Budget Signal
+Urgency Signal
+Required GHL Skills
+Related Tools
+Repeated Pattern
+Possible Offer
+Proof I Could Build
+Difficulty
+Speed to Cash
+Opportunity Score
+Status
+Linked Task / Card
+Notes
+```
+
+---
+
+## 7. Column Definitions
+
+### Date
+
+When the signal was captured.
+
+Example:
+
+```text
+2026-05-11
+```
+
+---
+
+### Source
+
+Where the signal came from.
+
+Examples:
+
+```text
+Upwork
+LinkedIn Job
+Reddit
+Client Chat
+Agency Website
+Facebook Group
+GoHighLevel Community
+Direct Message
+YouTube Comment
+Competitor Website
+```
+
+---
+
+### Link
+
+URL or reference to the original source.
+
+Purpose:
+
+* return to the job post;
+* check exact wording;
+* use as proposal reference;
+* avoid relying on memory.
+
+---
+
+### Buyer Type
+
+Who is likely paying.
+
+Examples:
+
+```text
+Marketing agency
+Local service business
+Coach / consultant
+Dental clinic
+Real estate agency
+Roofing company
+Med spa
+SaaS company
+E-commerce brand
+Course creator
+Fitness business
+Recruiting agency
+```
+
+---
+
+### Niche / Industry
+
+More specific business category.
+
+Examples:
+
+```text
+Dental
+Roofing
+Real Estate
+Coaching
+Home Services
+Med Spa
+Insurance
+Legal
+Fitness
+Education
+SaaS
+Agency
+```
+
+---
+
+### Problem
+
+The concrete task or issue described by the buyer.
+
+Examples:
+
+```text
+Set up GHL workflow
+Fix broken automation
+Connect form to pipeline
+Build SMS follow-up
+Set up calendar booking
+Clean CRM contacts
+Create missed-call text-back
+Move leads from Facebook Ads to GHL
+Build appointment reminder flow
+Set up email nurture campaign
+```
+
+---
+
+### Exact Buyer Language
+
+Copy the buyer’s wording directly.
+
+This is one of the most important fields.
+
+Examples:
+
+```text
+“We need someone to fix our GoHighLevel workflow.”
+“Leads are not going into the right pipeline.”
+“We need automated SMS follow-up for new leads.”
+“Our calendar booking and reminders are not working properly.”
+“We are losing leads because follow-up is manual.”
+```
+
+Purpose:
+
+* use buyer language in proposals;
+* improve offer wording;
+* understand real pain;
+* avoid fake marketing language.
+
+---
+
+### Business Pain
+
+The real business problem behind the task.
+
+Examples:
+
+```text
+Lost leads
+Slow response time
+Missed appointments
+No follow-up
+Manual work
+No pipeline visibility
+Low show-up rate
+Broken sales process
+Client onboarding chaos
+No reporting
+Team wasting time
+Campaign leads not converting
+```
+
+Question:
+
+```text
+What is blocked if this problem is not solved?
+```
+
+---
+
+### Budget Signal
+
+Evidence that the buyer can or may pay.
+
+Examples:
+
+```text
+Fixed budget: $300
+Hourly: $25–50/hr
+Retainer mentioned
+Agency hiring for client work
+Urgent project
+Existing paid GHL account
+Running ads
+Has sales team
+Has multiple clients
+Has active funnel
+```
+
+If unclear, write:
+
+```text
+Unknown
+```
+
+---
+
+### Urgency Signal
+
+Why the buyer needs it now.
+
+Examples:
+
+```text
+Campaign is live
+Launch deadline
+Workflow is broken
+Leads are being lost
+Client deadline
+Sales team blocked
+Manual process too slow
+Need setup this week
+Need expert ASAP
+Existing automation stopped working
+```
+
+If unclear, write:
+
+```text
+Low / Unknown
+```
+
+---
+
+### Required GHL Skills
+
+The specific skills needed to solve the problem.
+
+Examples:
+
+```text
+Forms
+Funnels
+Workflows
+Pipelines
+Calendars
+Opportunities
+Tags
+Triggers
+Custom fields
+Email automation
+SMS automation
+Webhooks
+Zapier
+Make
+Reporting
+Contact import
+CRM cleanup
+Integrations
+Troubleshooting
+```
+
+---
+
+### Related Tools
+
+Other tools mentioned or likely involved.
+
+Examples:
+
+```text
+Zapier
+Make
+Facebook Ads
+Google Sheets
+Calendly
+Stripe
+WordPress
+Shopify
+Twilio
+Mailgun
+Airtable
+HubSpot
+Pipedrive
+Slack
+Typeform
+Jotform
+```
+
+---
+
+### Repeated Pattern
+
+Does this problem appear repeatedly across signals?
+
+Recommended values:
+
+```text
+Yes
+No
+Maybe
+```
+
+Only mark “Yes” when you have seen the same pattern multiple times.
+
+---
+
+### Possible Offer
+
+A simple service that could be sold based on this signal.
+
+Examples:
+
+```text
+GHL Lead Capture + Follow-Up Setup
+GHL Workflow Fix Audit
+GHL Calendar Booking + Reminder Setup
+Missed-Call Text-Back Setup
+CRM Cleanup + Pipeline Automation
+Facebook Lead Ads → GHL Follow-Up Flow
+GHL Appointment Show-Up Improvement Flow
+GHL New Client Onboarding Automation
+```
+
+The offer should be concrete, not broad.
+
+Bad:
+
+```text
+GHL services
+Automation help
+CRM setup
+```
+
+Good:
+
+```text
+I set up a GHL lead capture, pipeline, booking, and SMS/email follow-up flow for local service businesses.
+```
+
+---
+
+### Proof I Could Build
+
+What proof would make this offer easier to sell?
+
+Examples:
+
+```text
+Demo workflow
+Loom walkthrough
+Before/after workflow map
+Screenshots of setup
+Mini case study
+Checklist
+Audit template
+Test lead flow
+Sample pipeline
+Sample calendar reminder flow
+```
+
+This field connects market research to action.
+
+---
+
+### Difficulty
+
+How hard it would be for you to deliver.
+
+Recommended values:
+
+```text
+1 = very easy
+2 = easy
+3 = medium
+4 = hard
+5 = too hard for now
+```
+
+Difficulty should include:
+
+* technical complexity;
+* unclear requirements;
+* client communication risk;
+* tool access;
+* testing difficulty;
+* responsibility level.
+
+---
+
+### Speed to Cash
+
+How quickly this could turn into money.
+
+Recommended values:
+
+```text
+1 = slow / unclear
+2 = possible but weak
+3 = moderate
+4 = fast
+5 = very fast
+```
+
+High speed to cash usually means:
+
+* buyer already knows the problem;
+* scope is small;
+* outcome is clear;
+* proof can be built quickly;
+* delivery can be done in days, not months;
+* buyer likely has budget.
+
+---
+
+### Opportunity Score
+
+Overall score from 1 to 5.
+
+Use this formula:
+
+```text
+Opportunity Score =
+Buyer + Pain + Budget + Urgency + Repeatability + Proof Potential + Speed to Cash
+```
+
+Simple scoring:
+
+```text
+1 = weak signal
+2 = interesting but unclear
+3 = valid signal
+4 = strong opportunity
+5 = priority opportunity
+```
+
+A score of 4–5 means:
+
+* real buyer;
+* painful problem;
+* budget signal;
+* urgency;
+* repeated pattern;
+* possible offer;
+* proof can be built;
+* realistic path to proposal or paid work.
+
+---
+
+### Status
+
+Use clear status values.
+
+```text
+Raw Signal
+Pattern Found
+Opportunity Candidate
+Selected for Proof
+Proof Built
+Offer Created
+Proposal Sent
+Client Conversation
+Paid Task
+Case Created
+Rejected / Low Value
+Archived
+```
+
+---
+
+### Linked Task / Card
+
+Link to Majom/Trello execution task.
+
+Examples:
+
+```text
+Build demo for GHL lead capture flow
+Write offer for missed-call text-back setup
+Send proposal to 3 similar jobs
+Create Loom proof for workflow fix
+```
+
+The board should create execution tasks.
+
+---
+
+### Notes
+
+Extra observations.
+
+Examples:
+
+```text
+Client seems non-technical.
+Agency may need white-label support.
+Problem is common but price looks low.
+This could become a template.
+Good wording for proposal.
+Needs proof before outreach.
+```
+
+---
+
+## 8. Required Views / Filters
+
+### View 1 — Raw Signals
+
+Purpose:
+
+```text
+See everything collected.
+```
+
+Filter:
+
+```text
+Status = Raw Signal
+```
+
+Use:
+
+* add new job posts;
+* capture rough data quickly;
+* avoid overthinking while collecting.
+
+---
+
+### View 2 — Repeated Patterns
+
+Purpose:
+
+```text
+Find problems that appear again and again.
+```
+
+Filter:
+
+```text
+Repeated Pattern = Yes
+```
+
+Use:
+
+* identify what to learn;
+* identify what to build;
+* identify recurring service packages.
+
+---
+
+### View 3 — Top Opportunities
+
+Purpose:
+
+```text
+Find the best money-facing opportunities.
+```
+
+Filter:
+
+```text
+Opportunity Score >= 4
+```
+
+Use:
+
+* choose what to build proof for;
+* choose what offer to test;
+* choose what proposals to send.
+
+---
+
+### View 4 — Build Proof Next
+
+Purpose:
+
+```text
+Choose the next demo/case to create.
+```
+
+Filter:
+
+```text
+Opportunity Score >= 4
+Proof I Could Build is not empty
+Difficulty <= 3
+```
+
+Use:
+
+* generate proof-building tasks;
+* prevent random GHL learning.
+
+---
+
+### View 5 — Proposal Targets
+
+Purpose:
+
+```text
+Find signals that can be converted into outreach/proposals.
+```
+
+Filter:
+
+```text
+Status = Opportunity Candidate
+OR Status = Offer Created
+OR Status = Proof Built
+```
+
+Use:
+
+* write Upwork proposals;
+* send cold messages;
+* update offer language.
+
+---
+
+### View 6 — Low Value / Archive
+
+Purpose:
+
+```text
+Remove weak signals from focus.
+```
+
+Filter:
+
+```text
+Opportunity Score <= 2
+OR Status = Rejected / Low Value
+OR Status = Archived
+```
+
+Use:
+
+* avoid false opportunities;
+* reduce noise.
+
+---
+
+## 9. What Counts As A Real Market Signal
+
+A signal is valid if it shows at least one of:
+
+* buyer;
+* problem;
+* pain;
+* budget;
+* urgency;
+* required skill;
+* repeated demand;
+* exact buyer language;
+* possible offer;
+* proof opportunity.
+
+Strong signal:
+
+```text
+A marketing agency is hiring someone to fix GHL workflows because leads from Facebook Ads are not entering the correct pipeline, and they need it fixed this week.
+```
+
+Weak signal:
+
+```text
+Someone mentions GHL is useful.
+```
+
+---
+
+## 10. What Not To Add
+
+Do not add:
+
+* random tutorials;
+* generic GHL feature ideas;
+* vague business ideas;
+* abstract trends;
+* content with no buyer;
+* tools without pain;
+* ideas with no budget signal;
+* tasks that are interesting but not connected to money, proof, offer, or distribution.
+
+If it does not help choose what to learn, build, sell, or test, it does not belong in this board.
+
+---
+
+## 11. Collection Sources
+
+Use these sources first:
+
+```text
+Upwork
+LinkedIn Jobs
+Reddit
+GoHighLevel communities
+Facebook groups
+Agency websites
+Competitor offers
+Freelance profiles
+YouTube comments
+Client conversations
+Job descriptions
+Cold outreach replies
+```
+
+Priority order:
+
+```text
+1. Upwork jobs
+2. Real client conversations
+3. LinkedIn/job posts
+4. Agency offers
+5. Communities/forums
+6. Competitor pages
+7. Content/comments
+```
+
+Reason:
+
+Upwork and client conversations are closer to real buying intent.
+
+---
+
+## 12. Search Keywords
+
+Start with these keywords:
+
+```text
+GoHighLevel
+GHL automation
+GHL workflow
+GoHighLevel expert
+GoHighLevel setup
+GHL CRM
+GHL funnel
+GHL calendar
+GHL pipeline
+GHL SMS automation
+GHL email automation
+GHL Zapier
+GHL Make
+HighLevel workflow
+HighLevel automation
+CRM automation
+Sales automation
+Marketing automation
+Appointment booking automation
+Lead follow-up automation
+Missed call text back
+```
+
+---
+
+## 13. Initial Data Collection Task
+
+First target:
+
+```text
+Collect 50 real market signals.
+```
+
+Breakdown:
+
+```text
+20 Upwork jobs with “GoHighLevel”
+10 Upwork jobs with “GHL automation”
+10 jobs/posts with “CRM automation”
+5 agency/competitor offers
+5 LinkedIn/job posts for marketing automation / sales automation / GHL roles
+```
+
+Minimum viable version:
+
+```text
+20 real signals
+```
+
+Do not analyze deeply before reaching 20 signals.
+
+First collect.
+Then sort.
+Then extract patterns.
+
+---
+
+## 14. Collection Rules
+
+When collecting signals:
+
+1. Do not rewrite buyer language too much.
+2. Capture the exact phrase when possible.
+3. Do not judge too early.
+4. Do not turn every signal into a task.
+5. Do not choose an offer from one signal.
+6. Look for repeated pain.
+7. Separate task from business pain.
+8. Separate interesting from payable.
+9. Mark unclear fields as “Unknown”.
+10. Move quickly.
+
+---
+
+## 15. Signal Processing Workflow
+
+### Step 1 — Capture
+
+Add raw signals quickly.
+
+Fill only:
+
+```text
+Date
+Source
+Link
+Buyer Type
+Problem
+Exact Buyer Language
+Budget Signal
+Urgency Signal
+Required Skills
+Status = Raw Signal
+```
+
+Do not overthink.
+
+---
+
+### Step 2 — Clarify
+
+After collecting a batch, fill:
+
+```text
+Business Pain
+Related Tools
+Possible Offer
+Proof I Could Build
+Difficulty
+Speed to Cash
+```
+
+---
+
+### Step 3 — Pattern Detection
+
+Look across rows and mark:
+
+```text
+Repeated Pattern = Yes / Maybe / No
+```
+
+Questions:
+
+```text
+Have I seen this problem before?
+Does the same buyer type ask for it?
+Does the same pain repeat?
+Does the same GHL skill appear?
+Does this look like a service package?
+```
+
+---
+
+### Step 4 — Score
+
+Give Opportunity Score 1–5.
+
+Score high if:
+
+* buyer is clear;
+* pain is expensive;
+* budget is visible;
+* urgency is strong;
+* pattern repeats;
+* delivery is realistic;
+* proof can be built;
+* offer is simple to explain.
+
+---
+
+### Step 5 — Select
+
+Choose one opportunity.
+
+Selection rule:
+
+```text
+Pick one opportunity that is repeated, close to cashflow, realistic to deliver, and easy to prove.
+```
+
+Do not choose 5 opportunities at once.
+
+---
+
+### Step 6 — Convert To Action
+
+Create execution tasks:
+
+```text
+Build proof for selected opportunity
+Write offer
+Write proposal snippet
+Send 3 proposals
+Create delivery checklist
+Update profile if needed
+```
+
+The board is only useful when it produces action.
+
+---
+
+## 16. Opportunity Selection Criteria
+
+Use this checklist before selecting an opportunity:
+
+```text
+Is there a real buyer?
+Is there visible pain?
+Is the problem close to revenue, leads, sales, time saved, or risk reduced?
+Is there a budget signal?
+Is there urgency?
+Does this repeat across multiple signals?
+Can I build proof in 1–3 days?
+Can I explain the offer in one sentence?
+Can I deliver a small version?
+Can this become a template or checklist?
+Can this lead to paid work soon?
+```
+
+Select only if most answers are “yes”.
+
+---
+
+## 17. Good Opportunity Pattern
+
+Strong opportunity:
+
+```text
+Expensive bottleneck
++ solvent buyer
++ clear pain
++ urgency
++ repeated pattern
++ low trust supply
++ clear outcome
++ proof can be built
++ delivery can become template
+```
+
+Example:
+
+```text
+Local service businesses losing leads because GHL forms, pipeline, calendar booking, and SMS follow-up are not connected properly.
+```
+
+Possible offer:
+
+```text
+GHL Lead Capture + Booking + Follow-Up Setup
+```
+
+Proof to build:
+
+```text
+Demo workflow with form → pipeline → calendar → SMS/email follow-up + Loom walkthrough.
+```
+
+---
+
+## 18. Bad Opportunity Pattern
+
+Weak opportunity:
+
+```text
+Interesting tool
++ unclear buyer
++ unclear budget
++ no urgency
++ no repeated demand
++ hard to prove
++ vague outcome
+```
+
+Example:
+
+```text
+Learn advanced GHL features because they seem useful.
+```
+
+Reason it is weak:
+
+```text
+No buyer.
+No pain.
+No offer.
+No proof target.
+No path to money.
+```
+
+---
+
+## 19. How To Turn Signals Into GHL Learning Tasks
+
+Do not create learning tasks like:
+
+```text
+Learn GHL workflows.
+```
+
+Create learning tasks like:
+
+```text
+Learn how to build a GHL workflow that sends SMS/email follow-up after a form submission and moves the lead into a pipeline stage.
+```
+
+Bad:
+
+```text
+Watch GHL course.
+```
+
+Good:
+
+```text
+Watch only the lessons needed to build form → pipeline → follow-up flow for selected proof case.
+```
+
+Every learning task should be linked to:
+
+```text
+Market signal
+Paid problem
+Proof asset
+Possible offer
+```
+
+---
+
+## 20. How To Turn Signals Into Proof Tasks
+
+From this signal:
+
+```text
+Buyer needs automated follow-up for new leads in GHL.
+```
+
+Create proof task:
+
+```text
+Build demo: new lead form submission → pipeline stage → SMS follow-up → email follow-up → internal notification.
+```
+
+Proof output:
+
+```text
+Screenshots
+Loom
+Mini case write-up
+Reusable checklist
+```
+
+Do not build proof without a market signal.
+
+---
+
+## 21. How To Turn Signals Into Offers
+
+From repeated problems, create simple offers.
+
+Signal pattern:
+
+```text
+Leads are not being followed up.
+```
+
+Offer:
+
+```text
+I set up a GHL lead follow-up system that automatically texts, emails, and organizes new leads so fewer inquiries get lost.
+```
+
+Signal pattern:
+
+```text
+Calendars and reminders are broken.
+```
+
+Offer:
+
+```text
+I set up or fix GHL calendar booking and appointment reminder flows to reduce missed appointments and manual follow-up.
+```
+
+Signal pattern:
+
+```text
+CRM is messy.
+```
+
+Offer:
+
+```text
+I clean up and organize your GHL pipeline, tags, stages, and automations so your team can clearly see and manage every lead.
+```
+
+---
+
+## 22. How To Turn Signals Into Proposals
+
+Proposal should use:
+
+```text
+Exact Buyer Language
+Business Pain
+Proof
+Simple Next Step
+```
+
+Proposal structure:
+
+```text
+1. Acknowledge the specific problem.
+2. Show that you understand the business pain.
+3. Mention relevant proof or similar setup.
+4. Ask one clear diagnostic question.
+5. Suggest a simple next step.
+```
+
+Example:
+
+```text
+Hi [Name], I saw you need help fixing your GHL workflow so new leads go into the right pipeline and get proper follow-up.
+
+This usually becomes a real sales problem because leads can be missed or contacted too late. I can help check the current flow, fix the trigger/pipeline logic, and test the full path from form submission to follow-up.
+
+A quick question: are the leads coming from a GHL form, Facebook Lead Ads, or another source?
+
+I can start by reviewing the current workflow and mapping what needs to be fixed.
+```
+
+---
+
+## 23. How To Turn Signals Into Website/Profile Content
+
+Use the board to update public positioning.
+
+From repeated signals, extract:
+
+```text
+common buyer types
+common pains
+common outcomes
+common tools
+common objections
+proof examples
+service packages
+```
+
+Website/profile sections should be based on repeated signals, not imagination.
+
+Possible profile headline:
+
+```text
+GoHighLevel Automation | Lead Capture, Pipelines, Booking & Follow-Up Systems
+```
+
+Possible service bullets:
+
+```text
+GHL workflow setup and troubleshooting
+Lead capture → pipeline → follow-up automation
+Calendar booking and appointment reminders
+CRM cleanup and pipeline organization
+Zapier/Make integrations with GHL
+```
+
+Possible proof section:
+
+```text
+Demo: GHL lead flow from form submission to pipeline, calendar booking, SMS/email follow-up, and internal notification.
+```
+
+---
+
+## 24. How To Use The Board Weekly
+
+Weekly workflow:
+
+```text
+1. Add 10–20 new market signals.
+2. Mark repeated patterns.
+3. Score opportunities.
+4. Select one opportunity.
+5. Create one proof task.
+6. Create or improve one offer.
+7. Send 3–5 proposals/messages.
+8. Capture replies and objections.
+9. Update the board.
+10. Choose next week’s focus.
+```
+
+The board should produce weekly outputs:
+
+```text
+1 selected opportunity
+1 proof asset to build
+1 offer to test
+3–5 proposals/messages
+1 insight for next cycle
+```
+
+---
+
+## 25. Weekly Review Questions
+
+Ask every week:
+
+```text
+What real signals did I capture?
+Which buyer types appeared most often?
+Which problems repeated?
+Which problems were closest to cashflow?
+Which problems had budget signals?
+Which problems had urgency?
+Which required skills appeared repeatedly?
+Which offer became clearer?
+What proof should I build next?
+What did I send to the market?
+What replies or objections did I get?
+What should I stop tracking?
+What should I focus on next week?
+```
+
+---
+
+## 26. Weekly Metrics
+
+Track these numbers:
+
+```text
+Signals captured
+Repeated patterns found
+Top opportunities identified
+Proof assets created
+Offers drafted
+Proposals sent
+Replies received
+Calls booked
+Paid tasks won
+Templates created
+```
+
+Minimum weekly target:
+
+```text
+10 signals captured
+1 repeated pattern identified
+1 proof/offer decision made
+3 proposals/messages sent
+```
+
+Better weekly target:
+
+```text
+20 signals captured
+3 repeated patterns identified
+1 proof asset built
+1 offer tested
+5–10 proposals/messages sent
+```
+
+---
+
+## 27. Board-To-Task Conversion Rules
+
+Create a Trello/Majom task only when a signal becomes action.
+
+Examples:
+
+```text
+Find 20 GHL jobs
+Extract top 5 repeated problems
+Choose first paid GHL opportunity
+Build GHL lead flow demo
+Record Loom proof
+Write mini case study
+Write offer from repeated signal
+Send 3 proposals using this offer
+Update profile headline based on repeated buyer pain
+Create checklist from proof build
+```
+
+Do not create tasks like:
+
+```text
+Think about GHL
+Research automation
+Learn more
+Improve profile
+Build skills
+```
+
+Make every task output-based.
+
+---
+
+## 28. Trello / Majom Integration
+
+Trello/Majom should contain:
+
+```text
+execution tasks
+selected opportunities
+proof-building tasks
+offer-writing tasks
+proposal tasks
+review tasks
+links to board rows
+```
+
+Trello/Majom should not contain:
+
+```text
+all raw signals
+all job posts
+all market notes
+all buyer language
+all scoring
+```
+
+Recommended Majom/Trello card:
+
+```text
+Card Title:
+Build proof for GHL Lead Capture + Follow-Up Setup
+
+Description:
+Selected from Market Signals Board.
+
+Linked rows:
+#12, #18, #24, #31
+
+Output:
+Demo workflow + screenshots + Loom + mini case study.
+
+Tasks:
+- Map workflow
+- Build form
+- Connect form to pipeline
+- Add SMS/email follow-up
+- Add internal notification
+- Test with fake lead
+- Record Loom
+- Write mini case
+- Save to Proof Library
+```
+
+---
+
+## 29. Status Movement
+
+Use this status flow:
+
+```text
+Raw Signal
+→ Pattern Found
+→ Opportunity Candidate
+→ Selected for Proof
+→ Proof Built
+→ Offer Created
+→ Proposal Sent
+→ Client Conversation
+→ Paid Task
+→ Case Created
+```
+
+Alternative endings:
+
+```text
+Rejected / Low Value
+Archived
+```
+
+A signal should not stay forever in “Raw Signal”.
+
+Either process it, use it, or archive it.
+
+---
+
+## 30. Decision Rules
+
+### Rule 1 — Do not learn without market signal
+
+If there is no market signal, do not create a GHL learning task.
+
+---
+
+### Rule 2 — Do not build proof without repeated pain
+
+Proof should be connected to repeated buyer pain.
+
+---
+
+### Rule 3 — Do not create broad offers
+
+Avoid:
+
+```text
+GHL expert
+Automation specialist
+CRM help
+```
+
+Prefer:
+
+```text
+GHL lead capture, booking, and follow-up setup for local service businesses.
+```
+
+---
+
+### Rule 4 — Do not chase every opportunity
+
+One selected opportunity per cycle.
+
+---
+
+### Rule 5 — Prefer close-to-cashflow problems
+
+Prioritize problems connected to:
+
+```text
+leads
+sales
+conversion
+appointments
+follow-up
+pipeline movement
+manual work
+reporting
+risk
+client delivery
+```
+
+---
+
+### Rule 6 — Every selected signal must create an output
+
+Possible outputs:
+
+```text
+proof
+offer
+proposal
+profile update
+delivery checklist
+case study
+template
+client message
+learning task
+```
+
+---
+
+### Rule 7 — Archive weak signals
+
+Archive if:
+
+```text
+no buyer
+no budget
+no urgency
+no repeated pattern
+too complex for now
+not close to cashflow
+cannot build proof
+not relevant to GHL/money focus
+```
+
+---
+
+## 31. First 20 Rows Goal
+
+The first goal is not perfect analysis.
+
+The first goal is:
+
+```text
+Create the board and fill 20 real rows.
+```
+
+After 20 rows, identify:
+
+```text
+Top 5 repeated problems
+Top 3 buyer types
+Top 3 required skills
+Top 3 possible offers
+Top 1 proof asset to build first
+```
+
+Do not tune the system before collecting the first 20 signals.
+
+---
+
+## 32. First Board Setup Tasks
+
+```text
+Create Google Sheet: GHL MARKET SIGNALS BOARD
+Add all required columns
+Add Status dropdown
+Add Repeated Pattern dropdown
+Add Difficulty dropdown
+Add Speed to Cash dropdown
+Add Opportunity Score dropdown
+Create views/filters
+Collect first 20 Upwork GHL signals
+Fill required fields
+Mark repeated patterns
+Score each signal
+Select first proof opportunity
+Create Majom/Trello task from selected opportunity
+```
+
+---
+
+## 33. First Proof Opportunity Recommendation
+
+Start with a simple, common, close-to-cashflow flow:
+
+```text
+GHL lead capture → pipeline → calendar booking → SMS/email follow-up
+```
+
+Why:
+
+* common buyer need;
+* easy to explain;
+* close to leads and sales;
+* proof can be built quickly;
+* useful for local businesses and agencies;
+* can become a repeatable delivery template;
+* good for proposals and profile positioning.
+
+Possible offer:
+
+```text
+I set up a simple GHL lead capture, booking, and follow-up system so new leads are organized, contacted, and moved through the pipeline automatically.
+```
+
+---
+
+## 34. Anti-Fancy Rule
+
+The board should stay simple until it produces results.
+
+Do not add:
+
+* too many columns;
+* complex formulas;
+* dashboards;
+* charts;
+* automation;
+* color systems;
+* over-detailed tags;
+* excessive categories.
+
+Only improve the board when there is a real bottleneck.
+
+Examples:
+
+```text
+If it is hard to choose opportunities → improve scoring.
+If it is hard to find proof tasks → improve Proof I Could Build field.
+If proposals are weak → improve Exact Buyer Language and Business Pain fields.
+If delivery is slow → link selected signals to Delivery Asset Library.
+If too much noise accumulates → improve archive rules.
+```
+
+---
+
+## 35. Tuning Rules
+
+Tune only after usage.
+
+After 2 weeks, review:
+
+```text
+Which columns were useful?
+Which columns were ignored?
+Which fields helped create tasks?
+Which fields helped write proposals?
+Which fields helped select proof?
+Which fields created friction?
+Which statuses were unnecessary?
+```
+
+Remove fields that do not support action.
+
+Add fields only if they improve:
+
+```text
+opportunity selection
+proof creation
+offer clarity
+proposal quality
+speed to cash
+delivery reuse
+```
+
+---
+
+## 36. Definition Of A Working Board
+
+The board is working if it regularly creates:
+
+```text
+clearer GHL learning tasks
+stronger offers
+better proof ideas
+more relevant proposals
+better buyer language
+more realistic service packages
+less random activity
+more market contact
+more paid opportunities
+```
+
+The board is not working if:
+
+```text
+it grows but does not change what you do
+it becomes an archive
+it creates complexity
+it delays outreach
+it becomes a substitute for sales
+it becomes a substitute for building proof
+```
+
+---
+
+## 37. Final Operating Formula
+
+```text
+Market Signals Board
+= market reality captured in a structured way
+→ repeated patterns detected
+→ opportunity selected
+→ proof built
+→ offer written
+→ proposal sent
+→ feedback captured
+→ next cycle improved
+```
+
+The goal is not to maintain the board.
+
+The goal is to use the board to move from:
+
+```text
+random GHL learning
+```
+
+to:
+
+```text
+market-driven proof, offer, outreach, and paid work
+```
+
+---
+
+## 38. Minimum Viable Board
+
+If the full version feels too heavy, use only these columns:
+
+```text
+Date
+Source
+Link
+Buyer Type
+Problem
+Exact Buyer Language
+Business Pain
+Budget Signal
+Urgency Signal
+Required Skills
+Possible Offer
+Proof I Could Build
+Opportunity Score
+Status
+Linked Task
+```
+
+This is enough to start.
+
+---
+
+## 39. One-Sentence Summary
+
+The GHL Market Signals Board is a market radar that converts real buyer demand into the next GHL task, proof asset, offer, proposal, and paid opportunity.

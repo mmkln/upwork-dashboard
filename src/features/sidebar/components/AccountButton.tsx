@@ -1,6 +1,7 @@
 // AccountButton.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../../../shared/ui";
 import { useAuth } from "../../auth/AuthProvider";
 
 const AccountButton: React.FC = () => {
@@ -20,8 +21,9 @@ const AccountButton: React.FC = () => {
   };
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={handleClick}
       className="group mt-auto flex w-full items-center rounded bg-[#002e82] px-2 py-2 text-gray-200 transition-colors duration-300 hover:bg-[#023ca5] overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#001844] focus:ring-blue-500"
       title={user ? `Signed in as ${user.username}` : "Sign in"}
@@ -39,7 +41,7 @@ const AccountButton: React.FC = () => {
           {user ? "Sign out" : "Sign in"}
         </p>
       </div>
-    </button>
+    </Button>
   );
 };
 

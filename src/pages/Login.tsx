@@ -48,8 +48,8 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FCFDFF] px-4">
-      <div className="flex flex-col gap-11 w-full max-w-[468px] p-11 bg-white rounded-[10px] border border-[#EFEFEF]">
+    <div className="flex min-h-screen items-center justify-center bg-[#FCFDFF] px-4">
+      <div className="flex w-full max-w-[468px] flex-col gap-10 rounded-[10px] border border-[#EFEFEF] bg-white p-10">
         <div className="flex justify-center">
           <svg
             width="32"
@@ -67,7 +67,7 @@ const Login: React.FC = () => {
           </svg>
         </div>
 
-        <div className="flex flex-col gap-9">
+        <div className="flex flex-col gap-8">
           <div className="text-center">
             <h1 className="text-2xl font-normal text-[#141414]">
               Sign in to Upboard
@@ -83,8 +83,8 @@ const Login: React.FC = () => {
             </div>
           )}
 
-          <form className="flex flex-col gap-9" onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-3.5">
+          <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="username"

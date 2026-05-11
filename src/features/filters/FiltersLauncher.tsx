@@ -1,10 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import Modal from "react-modal";
+import { JobExperience, JobStatus } from "../../models";
+import {
+  Badge,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../shared/ui";
 import Filters from "./Filters";
 import { FilterState } from "./types";
-import { JobExperience, JobStatus } from "../../models";
-
-Modal.setAppElement?.("#root");
 
 type FiltersLauncherProps = {
   activeFilters: FilterState;
@@ -37,7 +43,8 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
   collectionNameById,
 }) => {
   const [isFiltersModalOpen, setFiltersModalOpen] = useState(false);
-  const [pendingFilters, setPendingFilters] = useState<FilterState>(activeFilters);
+  const [pendingFilters, setPendingFilters] =
+    useState<FilterState>(activeFilters);
   const isDirty = useMemo(
     () => JSON.stringify(pendingFilters) !== JSON.stringify(activeFilters),
     [pendingFilters, activeFilters],
@@ -55,12 +62,18 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
     if (activeFilters.jobType !== "None") {
       list.push(`Type: ${activeFilters.jobType}`);
     }
-    if (activeFilters.jobType === "Fixed Price" && activeFilters.fixedPriceRange) {
+    if (
+      activeFilters.jobType === "Fixed Price" &&
+      activeFilters.fixedPriceRange
+    ) {
       list.push(
         `Fixed $${activeFilters.fixedPriceRange[0]}-${activeFilters.fixedPriceRange[1]}`,
       );
     }
-    if (activeFilters.jobType === "Hourly Rate" && activeFilters.hourlyRateRange) {
+    if (
+      activeFilters.jobType === "Hourly Rate" &&
+      activeFilters.hourlyRateRange
+    ) {
       list.push(
         `Hourly $${activeFilters.hourlyRateRange[0]}-${activeFilters.hourlyRateRange[1]}`,
       );
@@ -93,61 +106,54 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
     return list;
   }, [activeFilters, collectionNameById]);
 
+  const handleClose = () => {
+    setPendingFilters(activeFilters);
+    setFiltersModalOpen(false);
+  };
+
+  const handleApply = () => {
+    onFilterChange(
+      pendingFilters.jobType,
+      pendingFilters.fixedPriceRange,
+      pendingFilters.hourlyRateRange,
+      pendingFilters.selectedSkills,
+      pendingFilters.selectedInstruments,
+      pendingFilters.selectedStatuses,
+      pendingFilters.selectedCollectionIds,
+      pendingFilters.selectedExperience,
+      pendingFilters.titleFilter,
+      pendingFilters.bookmarked,
+    );
+    setFiltersModalOpen(false);
+  };
+
   return (
     <>
       <div className="flex items-center justify-end gap-3 px-6 py-4">
-        <div className="flex flex-wrap gap-2 justify-end max-w-3xl">
+        <div className="flex max-w-3xl flex-wrap justify-end gap-2">
           {badges.length === 0 ? (
             <span className="text-sm text-gray-500">No filters applied</span>
           ) : (
             badges.map((badge) => (
-              <span
-                key={badge}
-                className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
-              >
+              <Badge key={badge} tone="info" className="px-3 py-1 text-blue-700">
                 {badge}
-              </span>
+              </Badge>
             ))
           )}
         </div>
-        <button
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          onClick={() => setFiltersModalOpen(true)}
-        >
+        <Button size="md" onClick={() => setFiltersModalOpen(true)}>
           Filters
-        </button>
+        </Button>
       </div>
 
-      <Modal
-        isOpen={isFiltersModalOpen}
-        onRequestClose={() => setFiltersModalOpen(false)}
-        overlayClassName="fixed inset-0 bg-black bg-opacity-40 z-40 flex items-start justify-center overflow-y-auto"
-        className="relative w-full max-w-5xl p-6 mt-10 mb-10 bg-white rounded-lg shadow-xl outline-none"
-      >
-        <div className="flex items-center justify-between pb-4 border-b">
-          <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
-          <button
-            className="text-gray-500 hover:text-gray-700"
-            onClick={() => setFiltersModalOpen(false)}
-          >
-            ×
-          </button>
-        </div>
-        <div className="py-4">
-          <Filters
-            onFilterChange={(
-              jobType,
-              fixedPriceRange,
-              hourlyRateRange,
-              selectedSkills,
-              selectedInstruments,
-              selectedStatuses,
-              selectedCollectionIds,
-              selectedExperience,
-              titleFilter,
-              bookmarked,
-            ) => {
-              setPendingFilters({
+      <Dialog open={isFiltersModalOpen} onOpenChange={setFiltersModalOpen}>
+        <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto p-8">
+          <DialogHeader className="border-b pb-6">
+            <DialogTitle>Filters</DialogTitle>
+          </DialogHeader>
+          <div className="py-6">
+            <Filters
+              onFilterChange={(
                 jobType,
                 fixedPriceRange,
                 hourlyRateRange,
@@ -158,48 +164,37 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
                 selectedExperience,
                 titleFilter,
                 bookmarked,
-              });
-            }}
-            initialFilters={pendingFilters}
-            availableSkills={availableSkills}
-            availableInstruments={availableInstruments}
-            availableStatuses={availableStatuses}
-            availableCollections={availableCollections}
-          />
-        </div>
-        <div className="flex justify-end gap-3 pt-4 border-t">
-          <button
-            className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50"
-            onClick={() => {
-              setPendingFilters(activeFilters);
-              setFiltersModalOpen(false);
-            }}
-          >
-            Close
-          </button>
-          <button
-            className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
-            disabled={!isDirty}
-            onClick={() => {
-              onFilterChange(
-                pendingFilters.jobType,
-                pendingFilters.fixedPriceRange,
-                pendingFilters.hourlyRateRange,
-                pendingFilters.selectedSkills,
-                pendingFilters.selectedInstruments,
-                pendingFilters.selectedStatuses,
-                pendingFilters.selectedCollectionIds,
-                pendingFilters.selectedExperience,
-                pendingFilters.titleFilter,
-                pendingFilters.bookmarked,
-              );
-              setFiltersModalOpen(false);
-            }}
-          >
-            Apply
-          </button>
-        </div>
-      </Modal>
+              ) => {
+                setPendingFilters({
+                  jobType,
+                  fixedPriceRange,
+                  hourlyRateRange,
+                  selectedSkills,
+                  selectedInstruments,
+                  selectedStatuses,
+                  selectedCollectionIds,
+                  selectedExperience,
+                  titleFilter,
+                  bookmarked,
+                });
+              }}
+              initialFilters={pendingFilters}
+              availableSkills={availableSkills}
+              availableInstruments={availableInstruments}
+              availableStatuses={availableStatuses}
+              availableCollections={availableCollections}
+            />
+          </div>
+          <DialogFooter className="gap-3 border-t pt-6 sm:space-x-0">
+            <Button variant="ghost" size="sm" onClick={handleClose}>
+              Close
+            </Button>
+            <Button size="sm" disabled={!isDirty} onClick={handleApply}>
+              Apply
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

@@ -1,4 +1,5 @@
 import React from "react";
+import { chartColors } from "../../shared/theme";
 import { hexToRgb } from "../../utils";
 
 export interface CategoryValueItem {
@@ -32,42 +33,33 @@ export const ValueByCategoryChart: React.FC<ValueByCategoryChartProps> = ({
   return (
     <div className="w-full max-w-md">
       <ul className="flex flex-col gap-4">
-        {data.map((item) => {
-          const gradientStyle = item.color
-            ? { background: generateGradient(item.color) }
-            : {
-                background:
-                  "linear-gradient(to right, rgba(29, 78, 216, 0.7), rgba(29, 78, 216, 1))",
-              }; // Синій градієнт за замовчуванням
+        {data.map((item) => (
+          <li key={item.label} className="flex flex-col gap-1.5">
+            <div className="bg-gradient-to-r from-gray-500/5 to-gray-500/10 rounded w-full h-3 relative mr-4">
+              <div
+                className="absolute top-0 left-0 h-full rounded"
+                style={{
+                  background: generateGradient(item.color ?? chartColors.primary),
+                  width: `${((item.value - minValue) / (maxValue - minValue)) * 100}%`,
+                }}
+              />
+            </div>
+            <div className="mx-2 flex items-center justify-between text-gray-800 text-sm font-medium">
+              <span className="">
+                {item.label}
+                {item.count && (
+                  <span className="text-gray-500"> ({item.count})</span>
+                )}
+              </span>
 
-          return (
-            <li key={item.label} className="flex flex-col gap-1.5">
-              <div className="bg-gradient-to-r from-gray-500/5 to-gray-500/10 rounded w-full h-3 relative mr-4">
-                <div
-                  className="absolute top-0 left-0 h-full rounded"
-                  style={{
-                    ...gradientStyle,
-                    width: `${((item.value - minValue) / (maxValue - minValue)) * 100}%`,
-                  }}
-                />
-              </div>
-              <div className="mx-2 flex items-center justify-between text-gray-800 text-sm font-medium">
-                <span className="">
-                  {item.label}
-                  {item.count && (
-                    <span className="text-gray-500"> ({item.count})</span>
-                  )}
-                </span>
-
-                <span className="text-gray-500">
-                  {labelSuffix}
-                  {item.value}
-                  {labelPostfix}
-                </span>
-              </div>
-            </li>
-          );
-        })}
+              <span className="text-gray-500">
+                {labelSuffix}
+                {item.value}
+                {labelPostfix}
+              </span>
+            </div>
+          </li>
+        ))}
       </ul>
     </div>
   );

@@ -1,0 +1,1016 @@
+# UNIVERSAL MARKET SIGNALS BOARD — MINIMAL PRODUCT SPEC
+
+## 1. Purpose
+
+Market Signals Board is a filtering, classification, and comparison layer for scraped job data.
+
+It helps users turn a large mixed job database into a clear market map for a chosen research direction.
+
+The feature should answer:
+
+```text
+Which jobs are relevant?
+What are buyers asking for?
+Which requests repeat?
+Which buyer types appear often?
+Which skills/tools are demanded?
+Where are budget and urgency signals?
+Which market patterns look strongest?
+```
+
+---
+
+## 2. Core Output
+
+The feature should produce reusable market knowledge:
+
+```text
+filtered relevant jobs
+classified job signals
+buyer/request/need data
+repeated pattern groups
+skill and tool demand
+budget and urgency signals
+ranked market signals
+```
+
+---
+
+## 3. Core Flow
+
+```text
+Existing scraped jobs
+→ create board
+→ define board goal
+→ define market query
+→ filter relevant jobs
+→ classify filtered jobs
+→ extract comparison fields
+→ group repeated patterns
+→ calculate scores
+→ review market map
+```
+
+---
+
+## 4. Board Creation
+
+User creates a board with:
+
+```text
+Board Name
+Board Goal
+Market Query
+Source Collection
+Include Keywords
+Exclude Keywords
+Optional Filters
+```
+
+---
+
+## 5. Board Goal
+
+Board Goal defines how results should be interpreted.
+
+Allowed examples:
+
+```text
+Freelance opportunity research
+Skill demand research
+Niche comparison
+Service idea validation
+Buyer segment research
+Job market analysis
+Offer research
+```
+
+The same job can have different value depending on the board goal.
+
+---
+
+## 6. Market Query
+
+Market Query defines what the board is researching.
+
+Examples:
+
+```text
+GoHighLevel automation
+2D animation
+Shopify development
+AI automation
+CRM setup
+Sales outreach
+Video editing
+Data dashboards
+Copywriting
+```
+
+The feature must work for any market query, not only one niche.
+
+---
+
+## 7. Filtering Logic
+
+The app filters existing jobs using:
+
+```text
+title
+description
+normalizedTitle
+normalizedDescription
+searchableText
+skills
+```
+
+Primary matching field:
+
+```text
+searchableText
+```
+
+Secondary matching fields:
+
+```text
+title
+description
+skills
+```
+
+---
+
+## 8. Relevance Status
+
+Each job receives:
+
+```text
+Relevant
+Maybe Relevant
+Irrelevant
+```
+
+---
+
+## 9. Relevance Fields
+
+Each job should store:
+
+```text
+relevanceStatus
+relevanceScore
+matchedIncludeKeywords
+matchedExcludeKeywords
+relevanceReason
+```
+
+---
+
+## 10. Relevance Rules
+
+### Relevant
+
+Use when:
+
+```text
+job clearly matches the board query
+job matches multiple include keywords
+job has relevant skills/tools
+job belongs to the target market
+```
+
+### Maybe Relevant
+
+Use when:
+
+```text
+job partially matches the query
+context is unclear
+job belongs to an adjacent market
+```
+
+### Irrelevant
+
+Use when:
+
+```text
+job matches exclude keywords
+job clearly belongs to another category
+job has no meaningful relation to the board query
+```
+
+---
+
+## 11. Universal Signal Fields
+
+Relevant and Maybe Relevant jobs should be enriched with:
+
+```text
+jobId
+boardId
+title
+country
+jobType
+budgetValue
+budgetType
+clientSpend
+clientRating
+paymentVerified
+clientHireRate
+experienceLevel
+skills
+relevanceStatus
+relevanceScore
+requestCategory
+clientType
+niche
+problem
+exactClientLanguage
+buyerNeed
+budgetSignal
+urgencySignal
+requiredSkills
+relatedTools
+difficulty
+speedToValue
+marketSignalScore
+patternGroup
+notes
+```
+
+---
+
+## 12. Field Definitions
+
+### requestCategory
+
+Main type of request.
+
+Examples:
+
+```text
+Workflow Setup
+CRM Cleanup
+2D Animation
+YouTube Video Editing
+Shopify Store Setup
+Landing Page Design
+Sales Outreach
+Data Dashboard
+AI Automation
+```
+
+---
+
+### clientType
+
+Who is likely buying.
+
+Examples:
+
+```text
+Agency
+Small Business
+Creator
+Startup
+E-commerce Brand
+Local Business
+Coach / Consultant
+SaaS Company
+Recruiter
+Unknown
+```
+
+---
+
+### niche
+
+Specific market context.
+
+Examples:
+
+```text
+Dental
+Real Estate
+Fitness
+Education
+YouTube
+E-commerce
+SaaS
+Marketing Agency
+Unknown
+```
+
+---
+
+### problem
+
+Concrete thing the client wants.
+
+Bad:
+
+```text
+Automation
+```
+
+Good:
+
+```text
+Set up SMS follow-up for new leads in CRM.
+```
+
+Bad:
+
+```text
+Animation
+```
+
+Good:
+
+```text
+Create 8-minute 2D history animation in Oversimplified style.
+```
+
+---
+
+### exactClientLanguage
+
+Short original phrase from the job post.
+
+Purpose:
+
+```text
+preserve real buyer language
+avoid fake categories
+support later analysis
+```
+
+---
+
+### buyerNeed
+
+Why the buyer wants this.
+
+Examples:
+
+```text
+Lost leads
+Manual work
+Broken workflow
+Content production need
+Campaign launch
+Client delivery need
+Sales process improvement
+Better reporting
+Audience growth
+Unknown
+```
+
+---
+
+### budgetSignal
+
+Readable budget information.
+
+Use:
+
+```text
+fixedPriceValue
+hourlyRateValues
+average_rate
+job_type
+is_payment_verified
+total_spent
+```
+
+Examples:
+
+```text
+Fixed: $1000
+Hourly: $25–50/hr
+Payment verified
+Client spent: $7600
+Budget unknown
+```
+
+---
+
+### urgencySignal
+
+Extract from job text.
+
+Examples:
+
+```text
+ASAP
+deadline mentioned
+launch soon
+broken system
+active campaign
+urgent fix
+no urgency found
+```
+
+---
+
+### requiredSkills
+
+Normalized skill categories.
+
+Examples:
+
+```text
+CRM
+Zapier
+Make
+After Effects
+2D Animation
+Shopify
+Copywriting
+Sales
+Data Analysis
+Python
+Figma
+Automation
+```
+
+---
+
+### relatedTools
+
+Tools mentioned in job.
+
+Examples:
+
+```text
+GoHighLevel
+Zapier
+Make
+After Effects
+Premiere Pro
+Shopify
+WordPress
+Figma
+Google Sheets
+HubSpot
+Pipedrive
+```
+
+---
+
+### difficulty
+
+```text
+1 = very easy
+2 = easy
+3 = medium
+4 = hard
+5 = too complex
+```
+
+---
+
+### speedToValue
+
+How quickly this job type can create useful value for the board goal.
+
+```text
+1 = slow / unclear
+2 = weak
+3 = moderate
+4 = fast
+5 = very fast
+```
+
+---
+
+### marketSignalScore
+
+Overall signal quality for the current board goal.
+
+```text
+1 = weak
+2 = low
+3 = valid
+4 = strong
+5 = very strong
+```
+
+---
+
+## 13. Scoring Logic
+
+The score should stay simple and explainable.
+
+Inputs:
+
+```text
+relevanceScore
+budgetStrength
+clientStrength
+urgencyStrength
+problemClarity
+skillMatch
+difficulty
+speedToValue
+repeatability
+```
+
+Formula:
+
+```text
+marketSignalScore = average(
+  relevanceScore,
+  budgetStrength,
+  clientStrength,
+  urgencyStrength,
+  problemClarity,
+  skillMatch,
+  speedToValue,
+  repeatability,
+  difficultyAdjusted
+)
+```
+
+The score is interpreted through the Board Goal.
+
+---
+
+## 14. Score Meaning
+
+### Score 5
+
+```text
+clear match
+clear buyer/request
+strong budget/client signal
+strong need
+high repeatability
+strong skill/tool signal
+easy to compare
+high value for board goal
+```
+
+### Score 4
+
+```text
+good match
+clear request
+some budget/client signal
+useful for pattern detection
+```
+
+### Score 3
+
+```text
+valid signal
+some unclear fields
+still useful for comparison
+```
+
+### Score 2
+
+```text
+weak signal
+unclear request
+low usefulness for current board goal
+```
+
+### Score 1
+
+```text
+barely useful
+low relevance
+low comparison value
+```
+
+---
+
+## 15. Pattern Detection
+
+A pattern exists when multiple jobs share similar:
+
+```text
+requestCategory
+problem
+clientType
+buyerNeed
+requiredSkills
+relatedTools
+budget range
+urgency type
+delivery complexity
+```
+
+---
+
+## 16. Pattern Group Fields
+
+```text
+patternId
+patternName
+requestCategory
+clientType
+buyerNeed
+jobCount
+averageBudget
+averageMarketSignalScore
+commonSkills
+commonTools
+exampleJobIds
+patternStrength
+```
+
+---
+
+## 17. Pattern Strength
+
+```text
+Weak
+Medium
+Strong
+```
+
+Rules:
+
+```text
+Strong = 5+ jobs and average score >= 4
+Medium = 3+ jobs and average score >= 3
+Weak = fewer jobs or unclear signal
+```
+
+---
+
+## 18. Board Views
+
+### Relevant Jobs
+
+Shows:
+
+```text
+Relevant
+Maybe Relevant
+```
+
+Sort:
+
+```text
+marketSignalScore desc
+created_at desc
+```
+
+---
+
+### Strong Signals
+
+Filter:
+
+```text
+relevanceStatus = Relevant
+marketSignalScore >= 4
+```
+
+---
+
+### Pattern Groups
+
+Group by:
+
+```text
+requestCategory
+clientType
+buyerNeed
+```
+
+Show:
+
+```text
+jobCount
+averageBudget
+averageMarketSignalScore
+commonSkills
+exampleJobs
+```
+
+---
+
+### Top Categories
+
+Group by:
+
+```text
+requestCategory
+```
+
+Sort by:
+
+```text
+jobCount desc
+averageMarketSignalScore desc
+```
+
+---
+
+### Top Skills
+
+Group by:
+
+```text
+requiredSkills
+```
+
+Sort by:
+
+```text
+frequency desc
+```
+
+---
+
+### Budget Signals
+
+Group by:
+
+```text
+requestCategory
+budgetStrength
+```
+
+Show:
+
+```text
+average fixed price
+hourly range
+client spend
+job count
+```
+
+---
+
+## 19. UI Structure
+
+Minimum page structure:
+
+```text
+Board selector
+Board settings
+Filter bar
+Summary counters
+Jobs table
+Pattern groups
+Job detail panel
+```
+
+---
+
+## 20. Filter Bar
+
+Filters:
+
+```text
+keyword
+relevanceStatus
+requestCategory
+clientType
+niche
+buyerNeed
+budgetStrength
+urgencySignal
+requiredSkills
+relatedTools
+country
+jobType
+experience
+paymentVerified
+difficulty
+speedToValue
+marketSignalScore
+```
+
+---
+
+## 21. Summary Counters
+
+Show:
+
+```text
+Total jobs in source
+Relevant jobs
+Maybe relevant jobs
+Irrelevant jobs
+Strong signals
+Pattern groups
+Average market signal score
+```
+
+---
+
+## 22. Jobs Table
+
+Visible columns:
+
+```text
+Title
+Category
+Client Type
+Problem
+Buyer Need
+Budget
+Urgency
+Skills
+Score
+Relevance
+```
+
+Expandable fields:
+
+```text
+Description
+Exact Client Language
+Related Tools
+Client Data
+Matched Keywords
+Notes
+```
+
+---
+
+## 23. Job Detail Panel
+
+Show:
+
+```text
+Original job data
+Extracted fields
+Matched keywords
+Relevance reason
+Score explanation
+Manual edit fields
+```
+
+---
+
+## 24. Manual Editing
+
+User must be able to edit:
+
+```text
+relevanceStatus
+requestCategory
+clientType
+niche
+problem
+buyerNeed
+budgetSignal
+urgencySignal
+requiredSkills
+relatedTools
+difficulty
+speedToValue
+marketSignalScore
+patternGroup
+notes
+```
+
+Manual correction is part of the product.
+
+---
+
+## 25. Data Quality Rules
+
+### Unknown Is Valid
+
+Use:
+
+```text
+Unknown
+```
+
+Do not invent missing data.
+
+---
+
+### Keep Original Language
+
+Exact client language should stay close to the original job text.
+
+---
+
+### Problem Must Be Specific
+
+Bad:
+
+```text
+Need help
+```
+
+Good:
+
+```text
+Fix broken lead follow-up workflow.
+```
+
+---
+
+### Category Must Be Comparable
+
+Bad:
+
+```text
+Interesting job
+```
+
+Good:
+
+```text
+CRM Automation
+2D Animation
+Shopify Setup
+Video Editing
+Sales Outreach
+```
+
+---
+
+## 26. First Implementation Milestone
+
+Goal:
+
+```text
+Create a universal filtering and comparison layer for existing scraped jobs.
+```
+
+Required features:
+
+```text
+Create Market Signals Board from existing job collection
+Define board goal
+Define market query
+Define include keywords
+Define exclude keywords
+Classify jobs as Relevant / Maybe / Irrelevant
+Extract core comparison fields
+Edit extracted fields manually
+Filter by relevance, category, budget, skills, score
+Group jobs by category
+Group jobs by skills
+Group jobs by client type
+Show repeated pattern groups
+Show job detail panel with original and extracted data
+```
+
+---
+
+## 27. First Data Output
+
+The feature should produce:
+
+```text
+Relevant Jobs
+Maybe Relevant Jobs
+Irrelevant Jobs
+Top Categories
+Top Client Types
+Top Skills
+Top Tools
+Top Buyer Needs
+Top Budget Signals
+Strongest Pattern Groups
+Top Scored Jobs
+```
+
+---
+
+## 28. Done When
+
+```text
+User can create a Market Signals Board for any market query.
+
+User can filter a mixed job database into relevant, maybe relevant, and irrelevant jobs.
+
+User can compare relevant jobs by category, client type, problem, buyer need, budget, urgency, skills, difficulty, speed to value, and score.
+
+User can see repeated patterns without reading every job manually.
+
+User can manually correct wrong classifications.
+
+User can understand which market patterns are strongest in the selected job collection.
+```
+
+---
+
+## 29. Core Success Criterion
+
+```text
+The feature is successful when a user can go from 1000+ mixed scraped jobs to a clear ranked market map for their chosen query.
+```
+
+The output is:
+
+```text
+filtered jobs
+classified signals
+repeated patterns
+comparison data
+ranked market knowledge
+```
