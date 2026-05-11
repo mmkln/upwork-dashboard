@@ -1,8 +1,6 @@
-// src/components/JobListItem.tsx
-
 import React, { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
-import { UpworkJob, JobExperience, JobStatus } from "../../../models";
+import { UpworkJob, JobStatus } from "../../../models";
 import { updateUpworkJob } from "../../../services";
 import { JobStatusSelect } from "../../../components";
 import Card from "../../../components/ui/Card";
@@ -68,12 +66,12 @@ const JobListItem: React.FC<JobListItemProps> = ({
     setJobData(job);
   }, [job]);
 
-  const collectionBadges = (jobData.collections ?? job.collections ?? []).map(
-    (collectionId) => ({
+  const collectionBadges = (jobData.collections ?? job.collections ?? [])
+    .map((collectionId) => ({
       id: collectionId,
       name: collectionNameById[collectionId],
-    }),
-  ).filter((entry): entry is { id: number; name: string } => Boolean(entry.name));
+    }))
+    .filter((entry): entry is { id: number; name: string } => Boolean(entry.name));
 
   const updateCollections = (collectionIds: number[]) => {
     setIsUpdatingCollections(true);
@@ -105,29 +103,61 @@ const JobListItem: React.FC<JobListItemProps> = ({
     if (!selectedCollectionsToAdd.length) return;
     const current = jobData.collections ?? job.collections ?? [];
     const merged = Array.from(new Set([...current, ...selectedCollectionsToAdd]));
-    const updated = merged;
-    updateCollections(updated);
+    updateCollections(merged);
     setSelectedCollectionsToAdd([]);
   };
 
+  const formatPostedTime = (dateString: string) => {
+    const diffMs = Date.now() - new Date(dateString).getTime();
+    const minutes = Math.max(1, Math.round(diffMs / 60000));
+    if (minutes < 60) return `${minutes} minutes ago`;
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return `${hours} hours ago`;
+    const days = Math.round(hours / 24);
+    return `${days} days ago`;
+  };
+
+  const priceInfo = (() => {
+    if (job.hourly_rates && job.hourly_rates.length > 0) {
+      const value = Number(job.hourly_rates[0]);
+      return {
+        price: Number.isNaN(value) ? "-" : `$${value.toFixed(2)}`,
+        type: "/ hr",
+      };
+    }
+    if (job.fixed_price != null) {
+      const value = Number(job.fixed_price);
+      return {
+        price: Number.isNaN(value) ? "-" : `$${value.toFixed(2)}`,
+        type: "(fixed)",
+      };
+    }
+    return { price: "-", type: "" };
+  })();
+
   return (
     <Card shadow={true} isHighlighted={isLastClicked}>
-      <div className="group p-4 cursor-pointer" onClick={() => onClick(job)}>
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-xs text-blue-600">
-            {job.experience === JobExperience.Entry
-              ? "Entry Level"
-              : job.experience === JobExperience.Intermediate
-                ? "Intermediate"
-                : "Expert"}
+      <div className="group flex flex-col gap-4 p-4 cursor-pointer" onClick={() => onClick(job)}>
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[10px] font-normal text-[#575757]">
+            {formatPostedTime(job.created_at)}
           </span>
-          <div className="flex items-center gap-2 h-5">
-            <span className="text-xs text-gray-500">
-              {new Date(job.created_at).toLocaleDateString()}
-            </span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] font-medium text-[#575757]">
+                {priceInfo.price}
+              </span>
+              {priceInfo.type && (
+                <span className="text-[10px] font-normal text-[#8F9295]">
+                  {priceInfo.type}
+                </span>
+              )}
+            </div>
             <button
-              className={`p-1 rounded text-gray-500 hover:bg-gray-100 disabled:text-gray-200 disabled:bg-white ${
-                jobData.is_bookmarked ? 'block' : 'hidden group-hover:block'
+              className={`transition-opacity ${
+                jobData.is_bookmarked
+                  ? "opacity-100"
+                  : "opacity-0 group-hover:opacity-100"
               }`}
               title={jobData.is_bookmarked ? "Remove from bookmarks" : "Bookmark job"}
               onClick={(event) => {
@@ -136,151 +166,150 @@ const JobListItem: React.FC<JobListItemProps> = ({
               }}
             >
               {jobData.is_bookmarked ? (
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg"
+                <svg
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-4 h-4"
+                  fill="#575757"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path fill-rule="evenodd" d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z" clip-rule="evenodd" />
+                  <path d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z" />
                 </svg>
               ) : (
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
                   fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  className="w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                  <path
+                    d="M11.7287 2.21471C12.462 2.30004 13 2.93271 13 3.67137V14L8 11.5L3 14V3.67137C3 2.93271 3.53733 2.30004 4.27133 2.21471C6.74879 1.92713 9.25121 1.92713 11.7287 2.21471Z"
+                    stroke="#575757"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               )}
             </button>
           </div>
         </div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-          {job.title}
-        </h3>
-        <p className="text-sm text-gray-600 mb-2 truncate">{job.description}</p>
-        {job.connects && (
-          <p className="text-sm text-gray-600 mb-4 truncate">
-            Connects: {parseInt(job.connects)}
-          </p>
-        )}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {job.skills.map((skill, index) => (
-            <span
-              key={index}
-              className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-          {collectionBadges.length > 0 ? (
-            collectionBadges.map(({ id, name }) => (
-              <span
-                key={id}
-                className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full border border-blue-100"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {name}
-                <button
-                  className="text-blue-600 hover:text-blue-800"
-                  title="Remove from collection"
-                  onClick={(e) => handleRemoveCollection(id, e)}
-                >
-                  ×
-                </button>
-              </span>
-            ))
-          ) : (
-            <span
-              className="text-xs text-gray-500"
-              onClick={(e) => e.stopPropagation()}
-            >
-              No collections
-            </span>
-          )}
-          {availableCollections.length > 0 && (
-            <div
-              className="flex items-center gap-2 text-xs"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="min-w-[180px]">
-                <Select
-                  isMulti
-                  classNamePrefix="select"
-                  value={availableOptions.filter((option) =>
-                    selectedCollectionsToAdd.includes(option.value),
-                  )}
-                  onChange={(options) =>
-                    setSelectedCollectionsToAdd(
-                      (options || []).map((opt) => opt.value as number),
-                    )
-                  }
-                  options={availableOptions}
-                  placeholder="Add to collections..."
-                  isDisabled={isUpdatingCollections}
-                  styles={{
-                    control: (base) => ({
-                      ...base,
-                      minHeight: "34px",
-                      borderColor: "#d1d5db",
-                      boxShadow: "none",
-                      "&:hover": { borderColor: "#9ca3af" },
-                    }),
-                    valueContainer: (base) => ({
-                      ...base,
-                      padding: "2px 6px",
-                    }),
-                    indicatorsContainer: (base) => ({
-                      ...base,
-                      padding: "2px",
-                    }),
-                    multiValue: (base) => ({
-                      ...base,
-                      backgroundColor: "#e0ebff",
-                      color: "#1d4ed8",
-                    }),
-                    multiValueLabel: (base) => ({
-                      ...base,
-                      color: "#1d4ed8",
-                    }),
-                  }}
-                />
-              </div>
-              <button
-                className="px-2 py-1 bg-blue-600 text-white rounded disabled:opacity-50"
-                disabled={selectedCollectionsToAdd.length === 0 || isUpdatingCollections}
-                onClick={handleAddCollection}
-              >
-                {isUpdatingCollections ? "..." : "Add"}
-              </button>
-            </div>
-          )}
-        </div>
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-800">
-              $
-              {job.hourly_rates && job.hourly_rates.length > 0
-                ? job.hourly_rates[0]
-                : job.fixed_price}
-            </span>
-            <span className="text-xs text-gray-500">
-              {job.hourly_rates && job.hourly_rates.length > 0
-                ? "/ hr"
-                : " (fixed)"}
-            </span>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <h3 className="min-h-[40px] break-words text-[14px] font-medium leading-5 text-primary-900 line-clamp-2">
+              {job.title}
+            </h3>
+            <p className="line-clamp-2 text-[10px] font-normal leading-5 text-[#575757]">
+              {job.description}
+            </p>
           </div>
 
-          <JobStatusSelect
-            status={jobData.status}
-            onStatusChange={handleStatusChange}
-          />
+          <div className="flex flex-wrap gap-2 max-h-[88px] overflow-hidden">
+            {job.skills.map((skill, index) => (
+              <span
+                key={index}
+                className="rounded-[18px] bg-[#F6F8FF] px-[10px] py-1 text-[10px] font-medium leading-4 text-secondary-900"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              {collectionBadges.length > 0 ? (
+                collectionBadges.map(({ id, name }) => (
+                  <span
+                    key={id}
+                    className="inline-flex items-center gap-1 rounded-[18px] border border-[#E6E9F4] bg-[#F6F8FF] px-[10px] py-1 text-[12px] font-medium text-[#2A2627]"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {name}
+                    <button
+                      className="text-[#575757] hover:text-[#141414]"
+                      title="Remove from collection"
+                      onClick={(e) => handleRemoveCollection(id, e)}
+                    >
+                      x
+                    </button>
+                  </span>
+                ))
+              ) : (
+                <span
+                  className="text-[10px] text-[#8F9295]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  No collections
+                </span>
+              )}
+            </div>
+
+            {availableCollections.length > 0 && (
+              <div
+                className="flex flex-wrap items-center gap-2 text-xs"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="min-w-[180px]">
+                  <Select
+                    isMulti
+                    classNamePrefix="select"
+                    value={availableOptions.filter((option) =>
+                      selectedCollectionsToAdd.includes(option.value),
+                    )}
+                    onChange={(options) =>
+                      setSelectedCollectionsToAdd(
+                        (options || []).map((opt) => opt.value as number),
+                      )
+                    }
+                    options={availableOptions}
+                    placeholder="Add to collections..."
+                    isDisabled={isUpdatingCollections}
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        minHeight: "34px",
+                        borderColor: "#d1d5db",
+                        boxShadow: "none",
+                        "&:hover": { borderColor: "#9ca3af" },
+                      }),
+                      valueContainer: (base) => ({
+                        ...base,
+                        padding: "2px 6px",
+                      }),
+                      indicatorsContainer: (base) => ({
+                        ...base,
+                        padding: "2px",
+                      }),
+                      multiValue: (base) => ({
+                        ...base,
+                        backgroundColor: "#e0ebff",
+                        color: "#1d4ed8",
+                      }),
+                      multiValueLabel: (base) => ({
+                        ...base,
+                        color: "#1d4ed8",
+                      }),
+                    }}
+                  />
+                </div>
+                <button
+                  className="px-2 py-1 rounded-[8px] bg-[#1823F0] text-white disabled:opacity-50"
+                  disabled={selectedCollectionsToAdd.length === 0 || isUpdatingCollections}
+                  onClick={handleAddCollection}
+                >
+                  {isUpdatingCollections ? "..." : "Add"}
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end">
+              <JobStatusSelect
+                status={jobData.status}
+                onStatusChange={handleStatusChange}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </Card>

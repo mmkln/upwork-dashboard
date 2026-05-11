@@ -8,9 +8,9 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ children, shadow = false, isHighlighted = false }) => (
   <div
-    className={`border rounded-md transition-shadow duration-200 ${
-      shadow && "hover:shadow-xl"
-    } ${isHighlighted ? "bg-blue-50 border-blue-300" : "bg-white border-gray-200"}`}
+    className={`rounded-[10px] border border-[#EFEFEF] bg-white transition-shadow duration-200 ${
+      shadow ? "hover:shadow-lg" : ""
+    } ${isHighlighted ? "ring-4 ring-tertiary-300" : ""}`}
   >
     {children}
   </div>

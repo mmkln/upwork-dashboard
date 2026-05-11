@@ -41,7 +41,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     <div className={`relative inline-flex ${className}`} ref={rootRef}>
       <button
         type="button"
-        className={`inline-flex items-center gap-2 rounded-[10px] border border-[#EFF0F0] bg-white px-3 py-2 text-xs font-medium text-[#575757] transition-colors duration-200 hover:bg-[#F6F8FF] focus:outline-none focus:ring-2 focus:ring-[#C4C4FD] ${buttonClassName}`}
+        className={`inline-flex items-center gap-2 rounded-[10px] border border-[#EFF0F0] bg-white px-3 py-2 text-xs font-medium text-[#575757] transition-colors duration-200 hover:bg-[#F6F8FF] focus:outline-none focus:ring-2 focus:ring-active-200 ${buttonClassName}`}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         {label}

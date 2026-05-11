@@ -9,7 +9,7 @@ export type IconButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const baseClassName =
-  "inline-flex items-center justify-center rounded-[10px] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#C4C4FD] disabled:cursor-not-allowed disabled:pointer-events-none disabled:bg-[#C4C4FD]";
+  "inline-flex items-center justify-center rounded-[10px] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-active-200 disabled:cursor-not-allowed disabled:pointer-events-none disabled:bg-active-200";
 
 const variantClassName: Record<IconButtonVariant, string> = {
   ghost: "text-[#575757] hover:bg-[#F6F8FF]",

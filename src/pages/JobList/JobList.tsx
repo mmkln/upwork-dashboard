@@ -10,7 +10,7 @@ import {
   useFilters,
   useCollections,
 } from "../../features";
-import { JobListItem } from "./components";
+import JobListItem from "./components/JobListItem";
 import { instruments, prepareJobs } from "../../utils";
 import { buildFilterSlug } from "../../features/filters/utils/filterSlug.util";
 
@@ -299,7 +299,7 @@ const JobList: React.FC = () => {
           />
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
         {filteredJobsData.map((job) => (
           <JobListItem 
             key={job.id} 

@@ -9,10 +9,10 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const baseClassName =
-  "inline-flex items-center justify-center rounded-[10px] font-semibold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:pointer-events-none disabled:bg-[#C4C4FD]";
+  "inline-flex items-center justify-center rounded-[10px] font-semibold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:pointer-events-none disabled:bg-active-200";
 
 const variantClassName: Record<ButtonVariant, string> = {
-  primary: "bg-[#1823F0] text-white hover:bg-[#131CC0] disabled:bg-[#C4C4FD]",
+  primary: "bg-[#1823F0] text-white hover:bg-[#131CC0] disabled:bg-active-200",
   ghost: "bg-transparent text-[#575757] hover:bg-[#F6F8FF]",
   soft: "rounded-[6px] bg-[#EFF0F7] text-[#575757] hover:bg-[#E0E3EF]",
 };

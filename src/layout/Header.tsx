@@ -47,7 +47,7 @@ const Header: React.FC = () => {
       <div className="flex items-center gap-4">
         <button
           type="button"
-          className="flex h-9 w-9 items-center justify-center rounded-full text-[#575757] transition-colors duration-200 hover:bg-[#F5F6FA] focus:outline-none focus:ring-2 focus:ring-[#C4C4FD]"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-[#575757] transition-colors duration-200 hover:bg-[#F5F6FA] focus:outline-none focus:ring-2 focus:ring-active-200"
           aria-label="Notifications"
         >
           <NotificationIcon className="w-[18px] h-[18px]" />
@@ -56,7 +56,7 @@ const Header: React.FC = () => {
         <div className="relative" ref={menuRef}>
           <button
             type="button"
-            className="flex items-center gap-2.5 rounded-xl p-1 pr-2.5 transition-colors duration-200 hover:bg-[#F5F6FA] focus:outline-none focus:ring-2 focus:ring-[#C4C4FD]"
+            className="flex items-center gap-2.5 rounded-xl p-1 pr-2.5 transition-colors duration-200 hover:bg-[#F5F6FA] focus:outline-none focus:ring-2 focus:ring-active-200"
             onClick={() => setIsMenuOpen((prev) => !prev)}
           >
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1823F0] text-sm font-semibold text-white">
