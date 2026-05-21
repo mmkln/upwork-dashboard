@@ -9,12 +9,12 @@ import type {
   MarketSignalsBoardConfig,
 } from "./types";
 
-const matchesSourceCollection = (
+const matchesJobsSnapshot = (
   job: PreparedUpworkJob,
   board: MarketSignalsBoardConfig,
 ) => {
-  if (board.sourceCollectionId == null) return true;
-  return job.collectionsSet.has(board.sourceCollectionId);
+  if (board.jobsSnapshot.length === 0) return false;
+  return board.jobsSnapshot.includes(job.id);
 };
 
 const applyOverride = (
@@ -43,7 +43,7 @@ export const buildMarketSignalJobs = (
   board: MarketSignalsBoardConfig,
   overrides: MarketSignalOverride[],
 ) => {
-  const sourceJobs = jobs.filter((job) => matchesSourceCollection(job, board));
+  const sourceJobs = jobs.filter((job) => matchesJobsSnapshot(job, board));
   const initialSignals = sourceJobs.map((job) => {
     const relevance = classifyRelevance(job, board);
     const fields = extractSignalFields(job, relevance);

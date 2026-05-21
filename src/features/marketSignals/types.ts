@@ -6,10 +6,11 @@ export type PatternStrength = "Weak" | "Medium" | "Strong";
 
 export type MarketSignalsBoardConfig = {
   id: string;
+  owner: number | null;
   name: string;
   goal: string;
   marketQuery: string;
-  sourceCollectionId: number | null;
+  jobsSnapshot: string[];
   includeKeywords: string[];
   excludeKeywords: string[];
   createdAt: string;

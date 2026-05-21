@@ -1,11 +1,5 @@
-import {
-  DEFAULT_MARKET_SIGNAL_BOARD,
-  MARKET_SIGNAL_STORAGE_KEYS,
-} from "./constants";
-import type {
-  MarketSignalOverride,
-  MarketSignalsBoardConfig,
-} from "./types";
+import { MARKET_SIGNAL_STORAGE_KEYS } from "./constants";
+import type { MarketSignalOverride } from "./types";
 
 const isBrowser = () => typeof window !== "undefined";
 
@@ -29,31 +23,6 @@ const writeJson = <T,>(key: string, value: T) => {
   }
 };
 
-export const loadMarketSignalBoards = (): MarketSignalsBoardConfig[] => {
-  const boards = readJson<MarketSignalsBoardConfig[]>(
-    MARKET_SIGNAL_STORAGE_KEYS.boards,
-    [],
-  );
-  return boards.length ? boards : [DEFAULT_MARKET_SIGNAL_BOARD];
-};
-
-export const saveMarketSignalBoards = (boards: MarketSignalsBoardConfig[]) => {
-  writeJson(MARKET_SIGNAL_STORAGE_KEYS.boards, boards);
-};
-
-export const loadActiveMarketSignalBoardId = () => {
-  if (!isBrowser()) return DEFAULT_MARKET_SIGNAL_BOARD.id;
-  return (
-    window.localStorage.getItem(MARKET_SIGNAL_STORAGE_KEYS.activeBoardId) ??
-    DEFAULT_MARKET_SIGNAL_BOARD.id
-  );
-};
-
-export const saveActiveMarketSignalBoardId = (boardId: string) => {
-  if (!isBrowser()) return;
-  window.localStorage.setItem(MARKET_SIGNAL_STORAGE_KEYS.activeBoardId, boardId);
-};
-
 export const loadMarketSignalOverrides = (): MarketSignalOverride[] =>
   readJson<MarketSignalOverride[]>(MARKET_SIGNAL_STORAGE_KEYS.overrides, []);
 
@@ -73,4 +42,3 @@ export const upsertMarketSignalOverride = (
   );
   return [...nextOverrides, override];
 };
-

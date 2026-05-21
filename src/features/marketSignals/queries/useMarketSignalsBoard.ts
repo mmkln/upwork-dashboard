@@ -2,22 +2,22 @@ import { useEffect, useMemo, useState } from "react";
 import { useCollections } from "../../filters/CollectionsProvider";
 import { useJobsSnapshot } from "../../jobs";
 import {
-  DEFAULT_MARKET_SIGNAL_BOARD,
-  DEFAULT_MARKET_SIGNAL_FILTERS,
-} from "../constants";
+  createMarketResearch,
+  fetchMarketResearchList,
+  updateMarketResearch,
+  type MarketResearch,
+} from "../../marketResearch";
+import { DEFAULT_MARKET_SIGNAL_FILTERS } from "../constants";
 import { filterSignalJobs } from "../filters";
 import { buildPatternGroups } from "../patterns";
+import { parseKeywordInput } from "../relevance";
 import {
   buildMarketSignalJobs,
   getSignalSummary,
   getUniqueSignalValues,
 } from "../selectors";
 import {
-  loadActiveMarketSignalBoardId,
-  loadMarketSignalBoards,
   loadMarketSignalOverrides,
-  saveActiveMarketSignalBoardId,
-  saveMarketSignalBoards,
   saveMarketSignalOverrides,
   upsertMarketSignalOverride,
 } from "../storage";
@@ -37,22 +37,20 @@ export type MarketSignalsFocusMode =
 
 const PAGE_SIZE = 2000;
 
-const createBoardId = () => `market-signals-${Date.now()}`;
-
-const createNewBoard = (
-  index: number,
-  baseBoard: MarketSignalsBoardConfig = DEFAULT_MARKET_SIGNAL_BOARD,
-): MarketSignalsBoardConfig => {
-  const now = new Date().toISOString();
-
-  return {
-    ...baseBoard,
-    id: createBoardId(),
-    name: baseBoard.marketQuery || `Market Signals Board ${index}`,
-    createdAt: now,
-    updatedAt: now,
-  };
-};
+const mapMarketResearchToBoard = (
+  research: MarketResearch,
+): MarketSignalsBoardConfig => ({
+  id: research.id,
+  owner: research.owner,
+  name: research.title,
+  goal: research.description,
+  marketQuery: research.title,
+  jobsSnapshot: research.jobs_snapshot,
+  includeKeywords: parseKeywordInput(research.title.replace(/\s+/g, ",")),
+  excludeKeywords: [],
+  createdAt: research.created_at,
+  updatedAt: research.updated_at,
+});
 
 const sortSignalJobs = (jobs: MarketSignalJob[]) =>
   [...jobs].sort((a, b) => {
@@ -94,26 +92,20 @@ const getFocusJobs = (
   return jobs;
 };
 
-const getSourceCollectionName = (
-  board: MarketSignalsBoardConfig | undefined,
-  collections: Array<{ id: number; name: string }>,
-) => {
-  if (!board || board.sourceCollectionId == null) return "All collections";
-  return (
-    collections.find((collection) => collection.id === board.sourceCollectionId)
-      ?.name ?? "Selected collection"
-  );
+const getSnapshotLabel = (board: MarketSignalsBoardConfig | null) => {
+  if (!board) return "No research selected";
+  return `${board.jobsSnapshot.length.toLocaleString()} saved jobs`;
 };
 
 export const useMarketSignalsBoard = () => {
   const { collections } = useCollections();
   const jobsSnapshot = useJobsSnapshot({ pageSize: PAGE_SIZE });
-  const [boards, setBoards] = useState<MarketSignalsBoardConfig[]>(() =>
-    loadMarketSignalBoards(),
-  );
-  const [activeBoardId, setActiveBoardId] = useState(() =>
-    loadActiveMarketSignalBoardId(),
-  );
+  const [marketResearchRecords, setMarketResearchRecords] = useState<
+    MarketResearch[]
+  >([]);
+  const [activeBoardId, setActiveBoardId] = useState<string | null>(null);
+  const [researchError, setResearchError] = useState("");
+  const [isResearchLoading, setIsResearchLoading] = useState(true);
   const [overrides, setOverrides] = useState<MarketSignalOverride[]>(() =>
     loadMarketSignalOverrides(),
   );
@@ -127,15 +119,49 @@ export const useMarketSignalsBoard = () => {
     useState<MarketSignalsFocusMode>("priority");
   const [quickSearch, setQuickSearch] = useState("");
 
+  useEffect(() => {
+    let isMounted = true;
+    setIsResearchLoading(true);
+    fetchMarketResearchList()
+      .then((records) => {
+        if (!isMounted) return;
+        setMarketResearchRecords(records);
+        setResearchError("");
+        setActiveBoardId((currentId) =>
+          currentId && records.some((record) => record.id === currentId)
+            ? currentId
+            : records[0]?.id ?? null,
+        );
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setResearchError("Unable to load saved market research right now.");
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsResearchLoading(false);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const boards = useMemo(
+    () => marketResearchRecords.map(mapMarketResearchToBoard),
+    [marketResearchRecords],
+  );
+
   const activeBoard = useMemo(() => {
-    return boards.find((board) => board.id === activeBoardId) ?? boards[0];
+    return (
+      boards.find((board) => board.id === activeBoardId) ?? boards[0] ?? null
+    );
   }, [activeBoardId, boards]);
 
   useEffect(() => {
     if (!activeBoard) return;
     if (activeBoard.id !== activeBoardId) {
       setActiveBoardId(activeBoard.id);
-      saveActiveMarketSignalBoardId(activeBoard.id);
     }
   }, [activeBoard, activeBoardId]);
 
@@ -211,25 +237,35 @@ export const useMarketSignalsBoard = () => {
 
   const handleSelectBoard = (boardId: string) => {
     setActiveBoardId(boardId);
-    saveActiveMarketSignalBoardId(boardId);
     setSelectedJobId(null);
   };
 
-  const handleChangeBoard = (nextBoard: MarketSignalsBoardConfig) => {
-    const nextBoards = boards.map((board) =>
-      board.id === nextBoard.id ? nextBoard : board,
+  const handleChangeBoard = async (nextBoard: MarketSignalsBoardConfig) => {
+    const updatedResearch = await updateMarketResearch(nextBoard.id, {
+      title: nextBoard.marketQuery || nextBoard.name,
+      description: nextBoard.goal,
+      jobs_snapshot: nextBoard.jobsSnapshot,
+    });
+    setMarketResearchRecords((records) =>
+      records.map((record) =>
+        record.id === updatedResearch.id ? updatedResearch : record,
+      ),
     );
-    setBoards(nextBoards);
-    saveMarketSignalBoards(nextBoards);
   };
 
-  const handleCreateBoard = () => {
-    const nextBoard = createNewBoard(boards.length + 1, activeBoard);
-    const nextBoards = [...boards, nextBoard];
-    setBoards(nextBoards);
-    saveMarketSignalBoards(nextBoards);
-    setActiveBoardId(nextBoard.id);
-    saveActiveMarketSignalBoardId(nextBoard.id);
+  const handleCreateBoard = async () => {
+    const index = marketResearchRecords.length + 1;
+    const title = activeBoard?.marketQuery || `Market research ${index}`;
+    const createdResearch = await createMarketResearch({
+      title,
+      description: activeBoard?.goal || "",
+      jobs_snapshot:
+        activeBoard && activeBoard.jobsSnapshot.length > 0
+          ? activeBoard.jobsSnapshot
+          : jobsSnapshot.jobs.map((job) => job.id),
+    });
+    setMarketResearchRecords((records) => [...records, createdResearch]);
+    setActiveBoardId(createdResearch.id);
     setSelectedJobId(null);
   };
 
@@ -245,14 +281,14 @@ export const useMarketSignalsBoard = () => {
     collections,
     jobs: jobsSnapshot.jobs,
     jobsSnapshot,
-    error: jobsSnapshot.error
+    error: researchError || (jobsSnapshot.error
       ? "Unable to load market signals right now."
-      : "",
+      : ""),
     filters,
     filterOptions,
     focusCounts,
     focusMode,
-    isLoading: jobsSnapshot.isLoading,
+    isLoading: isResearchLoading || jobsSnapshot.isLoading,
     isSetupOpen,
     patternGroups,
     quickSearch,
@@ -260,7 +296,7 @@ export const useMarketSignalsBoard = () => {
     selectedJobId,
     showAdvancedFilters,
     signalJobs,
-    sourceCollectionName: getSourceCollectionName(activeBoard, collections),
+    sourceCollectionName: getSnapshotLabel(activeBoard),
     summary,
     filteredSignalJobs,
     handleChangeBoard,

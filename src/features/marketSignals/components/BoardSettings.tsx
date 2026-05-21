@@ -13,8 +13,8 @@ import {
   OverlayHeader,
   ScrollArea,
   Select,
+  Textarea,
 } from "../../../shared/ui";
-import { parseKeywordInput } from "../relevance";
 import { buildMarketSignalJobs, getSignalSummary } from "../selectors";
 import type { MarketSignalsBoardConfig } from "../types";
 
@@ -26,8 +26,8 @@ type BoardSettingsProps = {
   jobs: PreparedUpworkJob[];
   onOpenChange: (open: boolean) => void;
   onSelectBoard: (boardId: string) => void;
-  onCreateBoard: () => void;
-  onChangeBoard: (board: MarketSignalsBoardConfig) => void;
+  onCreateBoard: () => void | Promise<void>;
+  onChangeBoard: (board: MarketSignalsBoardConfig) => void | Promise<void>;
 };
 
 type PreviewState = {
@@ -35,54 +35,29 @@ type PreviewState = {
   likelyMatches: number;
   strongSignals: number;
   excludedByTerms: number;
-  quality: "Add terms" | "Too narrow" | "Balanced" | "Too broad";
+  quality: "No jobs" | "Too narrow" | "Balanced" | "Too broad";
 };
 
-const suggestedTermGroups: Array<{ match: string[]; terms: string[] }> = [
-  {
-    match: ["gohighlevel", "go high level", "ghl"],
-    terms: ["ghl", "crm", "pipeline", "workflow", "lead follow-up"],
-  },
-  {
-    match: ["shopify", "ecommerce", "e-commerce"],
-    terms: ["ecommerce", "product page", "checkout", "theme", "store setup"],
-  },
-  {
-    match: ["ai automation", "openai", "chatgpt"],
-    terms: ["openai", "zapier", "make", "workflow", "automation"],
-  },
-  {
-    match: ["dashboard", "data", "reporting"],
-    terms: ["analytics", "reporting", "looker", "google sheets", "dashboard"],
-  },
-];
-
-const normalizeTerms = (terms: string[]) =>
-  Array.from(
-    new Set(
-      terms
-        .map((term) => term.trim().toLowerCase())
-        .filter(Boolean),
-    ),
-  );
+const SNAPSHOT_CURRENT_VALUE = "snapshot";
+const SNAPSHOT_ALL_VALUE = "all";
 
 const getBoardLabel = (board: MarketSignalsBoardConfig) =>
   board.marketQuery || board.name || "Untitled research";
 
-const getSuggestedTerms = (board: MarketSignalsBoardConfig) => {
-  const query = board.marketQuery.toLowerCase();
-  const queryTerms = parseKeywordInput(query.replace(/\s+/g, ","));
-  const mappedTerms = suggestedTermGroups.flatMap((group) =>
-    group.match.some((term) => query.includes(term)) ? group.terms : [],
-  );
-  const existingTerms = new Set([
-    ...board.includeKeywords,
-    ...board.excludeKeywords,
-  ]);
-
-  return normalizeTerms([...queryTerms, ...mappedTerms]).filter(
-    (term) => !existingTerms.has(term),
-  );
+const getJobIdsForSnapshotSource = (
+  value: string,
+  jobs: PreparedUpworkJob[],
+): string[] => {
+  if (value === SNAPSHOT_ALL_VALUE) {
+    return jobs.map((job) => job.id);
+  }
+  const collectionId = Number(value);
+  if (Number.isNaN(collectionId)) {
+    return [];
+  }
+  return jobs
+    .filter((job) => job.collectionsSet.has(collectionId))
+    .map((job) => job.id);
 };
 
 const buildPreview = (
@@ -96,14 +71,14 @@ const buildPreview = (
     (job) => job.matchedExcludeKeywords.length > 0,
   ).length;
   const matchRatio = summary.totalJobs ? likelyMatches / summary.totalJobs : 0;
-  const hasTerms = board.includeKeywords.length > 0;
-  const quality = !hasTerms
-    ? "Add terms"
-    : likelyMatches < 10
-      ? "Too narrow"
-      : matchRatio > 0.5 || likelyMatches > 300
-        ? "Too broad"
-        : "Balanced";
+  const quality =
+    summary.totalJobs === 0
+      ? "No jobs"
+      : likelyMatches < 10
+        ? "Too narrow"
+        : matchRatio > 0.5 || likelyMatches > 300
+          ? "Too broad"
+          : "Balanced";
 
   return {
     sourceJobs: summary.totalJobs,
@@ -126,22 +101,17 @@ const BoardSettings: React.FC<BoardSettingsProps> = ({
   onChangeBoard,
 }) => {
   const [draftBoard, setDraftBoard] = useState(activeBoard);
+  const [snapshotSource, setSnapshotSource] = useState(SNAPSHOT_CURRENT_VALUE);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     if (open) {
       setDraftBoard(activeBoard);
+      setSnapshotSource(SNAPSHOT_CURRENT_VALUE);
+      setSaveError("");
     }
   }, [activeBoard, open]);
-
-  const selectedCollectionValue = useMemo(
-    () => String(draftBoard.sourceCollectionId ?? "all"),
-    [draftBoard.sourceCollectionId],
-  );
-
-  const suggestedTerms = useMemo(
-    () => getSuggestedTerms(draftBoard),
-    [draftBoard],
-  );
 
   const preview = useMemo(
     () => buildPreview(jobs, draftBoard),
@@ -156,21 +126,42 @@ const BoardSettings: React.FC<BoardSettingsProps> = ({
     }));
   };
 
-  const setIncludeKeywords = (keywords: string[]) => {
-    patchDraft({ includeKeywords: normalizeTerms(keywords) });
-  };
-
-  const setExcludeKeywords = (keywords: string[]) => {
-    patchDraft({ excludeKeywords: normalizeTerms(keywords) });
-  };
-
-  const handleApply = () => {
-    onChangeBoard({
-      ...draftBoard,
-      name: draftBoard.marketQuery || draftBoard.name,
-      updatedAt: new Date().toISOString(),
+  const handleSnapshotSourceChange = (value: string) => {
+    setSnapshotSource(value);
+    if (value === SNAPSHOT_CURRENT_VALUE) return;
+    patchDraft({
+      jobsSnapshot: getJobIdsForSnapshotSource(value, jobs),
     });
-    onOpenChange(false);
+  };
+
+  const handleApply = async () => {
+    setIsSaving(true);
+    setSaveError("");
+    try {
+      await onChangeBoard({
+        ...draftBoard,
+        name: draftBoard.marketQuery || draftBoard.name,
+        updatedAt: new Date().toISOString(),
+      });
+      onOpenChange(false);
+    } catch {
+      setSaveError("Unable to save market research.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCreate = async () => {
+    setIsSaving(true);
+    setSaveError("");
+    try {
+      await onCreateBoard();
+      setSnapshotSource(SNAPSHOT_CURRENT_VALUE);
+    } catch {
+      setSaveError("Unable to create market research.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -186,7 +177,7 @@ const BoardSettings: React.FC<BoardSettingsProps> = ({
             Refine research
           </DialogTitle>
           <DialogDescription className="text-body text-text-secondary">
-            Tune what counts as a market signal before applying changes.
+            Save a named job snapshot for market signal analysis.
           </DialogDescription>
         </OverlayHeader>
 
@@ -194,12 +185,10 @@ const BoardSettings: React.FC<BoardSettingsProps> = ({
           <OverlayBody className="grid grid-cols-1 gap-card lg:grid-cols-settings">
             <div className="flex flex-col gap-card">
               <label className="flex flex-col gap-item">
-                <span className="text-label text-text-muted">
-                  What are you researching?
-                </span>
+                <span className="text-label text-text-muted">Title</span>
                 <Input
                   value={draftBoard.marketQuery}
-                  placeholder="GoHighLevel automation for local businesses"
+                  placeholder="GHL automation research"
                   onChange={(event) =>
                     patchDraft({
                       marketQuery: event.target.value,
@@ -210,19 +199,32 @@ const BoardSettings: React.FC<BoardSettingsProps> = ({
               </label>
 
               <label className="flex flex-col gap-item">
-                <span className="text-label text-text-muted">Source</span>
-                <Select
-                  value={selectedCollectionValue}
+                <span className="text-label text-text-muted">Description</span>
+                <Textarea
+                  value={draftBoard.goal}
+                  placeholder="Research selected GHL jobs"
                   onChange={(event) =>
                     patchDraft({
-                      sourceCollectionId:
-                        event.target.value === "all"
-                          ? null
-                          : Number(event.target.value),
+                      goal: event.target.value,
                     })
                   }
+                />
+              </label>
+
+              <label className="flex flex-col gap-item">
+                <span className="text-label text-text-muted">
+                  Snapshot source
+                </span>
+                <Select
+                  value={snapshotSource}
+                  onChange={(event) =>
+                    handleSnapshotSourceChange(event.target.value)
+                  }
                 >
-                  <option value="all">All collections</option>
+                  <option value={SNAPSHOT_CURRENT_VALUE}>
+                    Current saved snapshot
+                  </option>
+                  <option value={SNAPSHOT_ALL_VALUE}>All loaded jobs</option>
                   {collections.map((collection) => (
                     <option key={collection.id} value={collection.id}>
                       {collection.name}
@@ -231,35 +233,22 @@ const BoardSettings: React.FC<BoardSettingsProps> = ({
                 </Select>
               </label>
 
-              <KeywordEditor
-                label="Must match"
-                keywords={draftBoard.includeKeywords}
-                placeholder="Add term"
-                tone="success"
-                onChange={setIncludeKeywords}
-              />
-
-              <SuggestedTerms
-                terms={suggestedTerms}
-                onAdd={(term) =>
-                  setIncludeKeywords([...draftBoard.includeKeywords, term])
-                }
-              />
-
-              <KeywordEditor
-                label="Exclude"
-                keywords={draftBoard.excludeKeywords}
-                placeholder="Add term"
-                tone="warning"
-                onChange={setExcludeKeywords}
-              />
+              <div className="flex flex-col gap-item">
+                <span className="text-label text-text-muted">
+                  Jobs snapshot
+                </span>
+                <p className="text-body text-text-secondary">
+                  {draftBoard.jobsSnapshot.length.toLocaleString()} job IDs will
+                  be saved with this research.
+                </p>
+              </div>
             </div>
 
             <div className="flex flex-col gap-component">
               <div className="rounded-control bg-block-subtle p-component">
                 <p className="text-ui text-text-primary">Preview</p>
                 <div className="mt-component flex flex-col gap-control">
-                  <PreviewRow label="Jobs in source" value={preview.sourceJobs} />
+                  <PreviewRow label="Jobs in snapshot" value={preview.sourceJobs} />
                   <PreviewRow
                     label="Likely matches"
                     value={preview.likelyMatches}
@@ -300,121 +289,37 @@ const BoardSettings: React.FC<BoardSettingsProps> = ({
                 </label>
                 <Button
                   className="mt-control w-full"
+                  disabled={isSaving}
                   size="sm"
                   variant="soft"
-                  onClick={onCreateBoard}
+                  onClick={handleCreate}
                 >
                   New research
                 </Button>
               </div>
+
+              {saveError ? (
+                <p className="text-body text-destructive">{saveError}</p>
+              ) : null}
             </div>
           </OverlayBody>
         </ScrollArea>
 
         <OverlayFooter className="flex flex-col-reverse gap-item sm:flex-row sm:justify-end">
-          <Button size="sm" variant="ghost" onClick={handleCancel}>
+          <Button
+            disabled={isSaving}
+            size="sm"
+            variant="ghost"
+            onClick={handleCancel}
+          >
             Cancel
           </Button>
-          <Button size="sm" onClick={handleApply}>
-            Apply research
+          <Button disabled={isSaving} size="sm" onClick={handleApply}>
+            {isSaving ? "Saving" : "Apply research"}
           </Button>
         </OverlayFooter>
       </DialogContent>
     </Dialog>
-  );
-};
-
-type KeywordEditorProps = {
-  label: string;
-  keywords: string[];
-  placeholder: string;
-  tone: "success" | "warning";
-  onChange: (keywords: string[]) => void;
-};
-
-const KeywordEditor: React.FC<KeywordEditorProps> = ({
-  label,
-  keywords,
-  placeholder,
-  tone,
-  onChange,
-}) => {
-  const [draft, setDraft] = useState("");
-
-  const addDraftTerms = () => {
-    const nextTerms = parseKeywordInput(draft);
-    if (!nextTerms.length) return;
-    onChange([...keywords, ...nextTerms]);
-    setDraft("");
-  };
-
-  const removeTerm = (term: string) => {
-    onChange(keywords.filter((keyword) => keyword !== term));
-  };
-
-  return (
-    <div className="flex flex-col gap-item">
-      <span className="text-label text-text-muted">{label}</span>
-      <div className="flex gap-item">
-        <Input
-          value={draft}
-          placeholder={placeholder}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              addDraftTerms();
-            }
-          }}
-        />
-        <Button size="sm" variant="soft" onClick={addDraftTerms}>
-          Add
-        </Button>
-      </div>
-      <div className="flex min-h-control-small flex-wrap gap-item">
-        {keywords.length ? (
-          keywords.map((keyword) => (
-            <button
-              key={keyword}
-              type="button"
-              className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring"
-              onClick={() => removeTerm(keyword)}
-            >
-              <Badge tone={tone}>{keyword} x</Badge>
-            </button>
-          ))
-        ) : (
-          <span className="text-body text-text-muted">No terms</span>
-        )}
-      </div>
-    </div>
-  );
-};
-
-type SuggestedTermsProps = {
-  terms: string[];
-  onAdd: (term: string) => void;
-};
-
-const SuggestedTerms: React.FC<SuggestedTermsProps> = ({ terms, onAdd }) => {
-  if (!terms.length) return null;
-
-  return (
-    <div className="flex flex-col gap-item">
-      <span className="text-label text-text-muted">Suggested</span>
-      <div className="flex flex-wrap gap-item">
-        {terms.slice(0, 8).map((term) => (
-          <button
-            key={term}
-            type="button"
-            className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring"
-            onClick={() => onAdd(term)}
-          >
-            <Badge tone="info">{term} +</Badge>
-          </button>
-        ))}
-      </div>
-    </div>
   );
 };
 

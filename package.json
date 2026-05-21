@@ -1,7 +1,7 @@
 {
   "name": "upwork-dashboard",
   "homepage": "https://mmklb.github.io/upwork-dashboard",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "workspaces": [
     "packages/*"

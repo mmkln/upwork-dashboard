@@ -25,9 +25,8 @@ export const getApiAuthToken = (): string | null => {
   }
 };
 
-// Створюємо інстанс axios із базовим URL
-const apiClient = axios.create({
-  baseURL: environment.apiUrl, // Заміни на свій базовий URL
+export const apiClient = axios.create({
+  baseURL: environment.apiUrl,
   headers: {
     "Content-Type": "application/json",
   },

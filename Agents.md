@@ -23,6 +23,7 @@
 - Every revealed filter, sort, or settings control must have an explicit visible label unless the control's value and surrounding group already make the meaning unmistakable.
 - In list/table workflows, keep side detail panes as read-only inspectors with focused actions; move long edit/correction forms into a Sheet/Dialog so scanning and editing do not compete in the same persistent layout.
 - Keep API mutation payloads separate from prepared/view-model objects; whitelist transport fields so derived UI data, caches, and non-serializable structures never leak back to the backend.
+- When replacing local persisted UI state with a backend contract, remove unsupported local-only fields from persisted workflows instead of encoding them into unrelated API fields.
 
 ## Design
 

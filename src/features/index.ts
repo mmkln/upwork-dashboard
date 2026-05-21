@@ -25,3 +25,4 @@ export {
   serializeJobsForExport,
   stripPreparedJobMeta,
 } from "./jobs";
+export * from "./marketResearch";

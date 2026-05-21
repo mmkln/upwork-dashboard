@@ -6,17 +6,16 @@ import type {
 const now = new Date().toISOString();
 
 export const MARKET_SIGNAL_STORAGE_KEYS = {
-  boards: "marketSignals.boards.v1",
-  activeBoardId: "marketSignals.activeBoardId.v1",
   overrides: "marketSignals.overrides.v1",
 };
 
 export const DEFAULT_MARKET_SIGNAL_BOARD: MarketSignalsBoardConfig = {
   id: "default-market-signals-board",
+  owner: null,
   name: "Market Signals Board",
   goal: "Freelance opportunity research",
   marketQuery: "GoHighLevel automation",
-  sourceCollectionId: null,
+  jobsSnapshot: [],
   includeKeywords: [
     "gohighlevel",
     "go high level",
@@ -41,4 +40,3 @@ export const DEFAULT_MARKET_SIGNAL_FILTERS: MarketSignalFilters = {
 };
 
 export const UNKNOWN_VALUE = "Unknown";
-
