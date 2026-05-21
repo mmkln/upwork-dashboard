@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge as ShadcnBadge } from "components/shadcn/ui/badge";
+import { Badge as SharedBadge } from "../../shared/ui";
 import { cn } from "lib/utils";
 
 interface BadgeProps {
@@ -10,25 +10,25 @@ interface BadgeProps {
 
 const Badge: React.FC<BadgeProps> = ({ label, value, maxRate }) => {
   const rateDiff = value / maxRate;
-  const backgroundColor = `rgba(59, 130, 246, ${rateDiff})`;
+  const backgroundColor = `hsl(var(--action) / ${rateDiff})`;
   const color =
-    rateDiff > 0.7 ? "rgba(255,255,255, 0.95)" : "rgba(45,59,101,0.8)";
+    rateDiff > 0.7 ? "hsl(var(--action-foreground))" : "hsl(var(--action))";
   const displayLabel =
     label.length > 12 ? label.slice(0, 8).trim() + ".." : label;
 
   return (
-    <ShadcnBadge
-      variant="secondary"
+    <SharedBadge
+      tone="info"
       className={cn(
-        "group/skill relative rounded-lg border-transparent px-2 py-1 text-xs font-medium shadow-none",
+        "group/skill relative rounded-full border-transparent px-control py-0 text-label leading-none shadow-none",
       )}
       style={{ backgroundColor, color }}
     >
       {displayLabel}
-      <div className="hidden group-hover/skill:flex absolute bottom-7 rounded-xl border border-border bg-popover px-2 py-1 text-popover-foreground">
+      <div className="absolute bottom-7 hidden rounded-control border border-island-border bg-material-liquid px-item py-micro text-text-primary shadow-premium backdrop-blur-2xl group-hover/skill:flex">
         {label} <br /> ({value})
       </div>
-    </ShadcnBadge>
+    </SharedBadge>
   );
 };
 

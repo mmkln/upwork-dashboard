@@ -1,5 +1,6 @@
 import { JobExperience, JobStatus } from "../../models";
-import { JobType } from "./Filters";
+
+export type JobType = "Fixed Price" | "Hourly Rate" | "Unspecified" | "None";
 
 export type FilterState = {
   jobType: JobType;

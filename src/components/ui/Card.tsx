@@ -1,5 +1,5 @@
 import React from "react";
-import { Card as ShadcnCard } from "components/shadcn/ui/card";
+import { Card as SharedCard } from "../../shared/ui";
 import { cn } from "lib/utils";
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -15,17 +15,17 @@ const Card: React.FC<CardProps> = ({
   className,
   ...props
 }) => (
-  <ShadcnCard
+  <SharedCard
     className={cn(
-      "rounded-[10px] border-border bg-card text-card-foreground shadow-none transition-shadow duration-200",
-      shadow && "hover:shadow-lg",
-      isHighlighted && "ring-4 ring-tertiary-300",
+      "transition-shadow duration-motion-fast ease-motion-standard",
+      shadow && "hover:shadow-block",
+      isHighlighted && "ring-4 ring-action/20",
       className,
     )}
     {...props}
   >
     {children}
-  </ShadcnCard>
+  </SharedCard>
 );
 
 export default Card;

@@ -76,7 +76,7 @@ const JobRatesByCountryMinMax: React.FC<MinMaxRateByCountryProps> = ({
   const limitedData = limit ? sortedData.slice(0, limit) : data;
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow w-full">
+    <div className="w-full rounded-block bg-block p-block shadow-none">
       <h2 className="text-lg font-semibold mb-8">
         Job Rate by Country (min & max)
       </h2>

@@ -9,13 +9,41 @@
     <meta name="apple-mobile-web-app-title" content="Upboard" />
     <link rel="manifest" href="%PUBLIC_URL%/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#F5F5F7" />
+    <script>
+      (function () {
+        try {
+          var theme = window.localStorage.getItem("upboard-theme") || "system";
+          if (theme !== "light" && theme !== "dark" && theme !== "system") {
+            theme = "system";
+          }
+          var prefersDark =
+            typeof window.matchMedia === "function" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var resolvedTheme =
+            theme === "dark" || (theme === "system" && prefersDark)
+              ? "dark"
+              : "light";
+
+          document.documentElement.classList.toggle(
+            "dark",
+            resolvedTheme === "dark"
+          );
+          document.documentElement.style.colorScheme = resolvedTheme;
+
+          var themeColor = document.querySelector('meta[name="theme-color"]');
+          if (themeColor) {
+            themeColor.setAttribute(
+              "content",
+              resolvedTheme === "dark" ? "#1D1D1F" : "#F5F5F7"
+            );
+          }
+        } catch (error) {
+          document.documentElement.style.colorScheme = "light";
+        }
+      })();
+    </script>
     <meta
       name="description"
       content="Web site created using create-react-app"

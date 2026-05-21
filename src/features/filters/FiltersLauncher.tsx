@@ -1,16 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
 import { JobExperience, JobStatus } from "../../models";
 import {
   Badge,
   Button,
   Dialog,
   DialogContent,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
+  OverlayBody,
+  OverlayFooter,
+  OverlayHeader,
+  ScrollArea,
 } from "../../shared/ui";
 import Filters from "./Filters";
-import { FilterState } from "./types";
+import { DEFAULT_FILTERS, FilterState } from "./types";
 
 type FiltersLauncherProps = {
   activeFilters: FilterState;
@@ -31,6 +34,13 @@ type FiltersLauncherProps = {
   availableStatuses: JobStatus[];
   availableCollections: { id: number; name: string }[];
   collectionNameById: Record<number, string>;
+  badgePlacement?: "before-button" | "after-button";
+  buttonLabel?: string;
+  buttonVariant?: "primary" | "ghost" | "soft";
+  emptyLabel?: React.ReactNode;
+  showButtonIcon?: boolean;
+  showCollectionsFilter?: boolean;
+  className?: string;
 };
 
 const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
@@ -41,6 +51,13 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
   availableStatuses,
   availableCollections,
   collectionNameById,
+  badgePlacement = "after-button",
+  buttonLabel = "Filters",
+  buttonVariant = "primary",
+  emptyLabel = "No filters applied",
+  showButtonIcon = false,
+  showCollectionsFilter = true,
+  className = "",
 }) => {
   const [isFiltersModalOpen, setFiltersModalOpen] = useState(false);
   const [pendingFilters, setPendingFilters] =
@@ -105,6 +122,8 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
 
     return list;
   }, [activeFilters, collectionNameById]);
+  const visibleBadges = badges.slice(0, 3);
+  const hiddenBadgeCount = Math.max(0, badges.length - visibleBadges.length);
 
   const handleClose = () => {
     setPendingFilters(activeFilters);
@@ -127,45 +146,85 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
     setFiltersModalOpen(false);
   };
 
+  const handleClear = () => {
+    onFilterChange(
+      DEFAULT_FILTERS.jobType,
+      DEFAULT_FILTERS.fixedPriceRange,
+      DEFAULT_FILTERS.hourlyRateRange,
+      DEFAULT_FILTERS.selectedSkills,
+      DEFAULT_FILTERS.selectedInstruments,
+      DEFAULT_FILTERS.selectedStatuses,
+      DEFAULT_FILTERS.selectedCollectionIds,
+      DEFAULT_FILTERS.selectedExperience,
+      DEFAULT_FILTERS.titleFilter,
+      DEFAULT_FILTERS.bookmarked,
+    );
+    setPendingFilters(DEFAULT_FILTERS);
+    setFiltersModalOpen(false);
+  };
+
+  const filterButton = (
+    <Button
+      size="sm"
+      variant={buttonVariant}
+      className="gap-item"
+      onClick={() => setFiltersModalOpen(true)}
+    >
+      {showButtonIcon ? <SlidersHorizontal className="h-4 w-4" /> : null}
+      <span>
+        {buttonLabel}
+        {badges.length ? ` (${badges.length})` : ""}
+      </span>
+    </Button>
+  );
+
+  const badgeList = (
+    <div className="flex min-w-0 flex-wrap items-center gap-item">
+      {badges.length === 0 ? (
+        emptyLabel ? (
+          <span className="text-body text-text-muted">{emptyLabel}</span>
+        ) : null
+      ) : (
+        visibleBadges.map((badge) => (
+          <Badge
+            key={badge}
+            tone="info"
+            className="max-w-search-compact text-action"
+          >
+            <span className="truncate">{badge}</span>
+          </Badge>
+        ))
+      )}
+      {hiddenBadgeCount > 0 && (
+        <Badge tone="neutral">+{hiddenBadgeCount}</Badge>
+      )}
+    </div>
+  );
+
   return (
     <>
-      <div className="flex items-center justify-end gap-3 px-6 py-4">
-        <div className="flex max-w-3xl flex-wrap justify-end gap-2">
-          {badges.length === 0 ? (
-            <span className="text-sm text-gray-500">No filters applied</span>
-          ) : (
-            badges.map((badge) => (
-              <Badge key={badge} tone="info" className="px-3 py-1 text-blue-700">
-                {badge}
-              </Badge>
-            ))
-          )}
-        </div>
-        <Button size="md" onClick={() => setFiltersModalOpen(true)}>
-          Filters
-        </Button>
+      <div
+        className={`flex min-w-0 flex-wrap items-center gap-control ${className}`}
+      >
+        {badgePlacement === "before-button" ? badgeList : null}
+        {filterButton}
+        {badgePlacement === "after-button" ? badgeList : null}
+        {badges.length > 0 && (
+          <Button variant="ghost" size="sm" onClick={handleClear}>
+            Clear
+          </Button>
+        )}
       </div>
 
       <Dialog open={isFiltersModalOpen} onOpenChange={setFiltersModalOpen}>
-        <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto p-8">
-          <DialogHeader className="border-b pb-6">
+        <DialogContent className="max-h-overlay max-w-modal-xl gap-0 overflow-hidden p-0">
+          <OverlayHeader className="text-center sm:text-left">
             <DialogTitle>Filters</DialogTitle>
-          </DialogHeader>
-          <div className="py-6">
-            <Filters
-              onFilterChange={(
-                jobType,
-                fixedPriceRange,
-                hourlyRateRange,
-                selectedSkills,
-                selectedInstruments,
-                selectedStatuses,
-                selectedCollectionIds,
-                selectedExperience,
-                titleFilter,
-                bookmarked,
-              ) => {
-                setPendingFilters({
+          </OverlayHeader>
+          <ScrollArea className="max-h-overlay-body">
+            <OverlayBody>
+              <Filters
+                onFilterChange={(
                   jobType,
                   fixedPriceRange,
                   hourlyRateRange,
@@ -176,23 +235,37 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
                   selectedExperience,
                   titleFilter,
                   bookmarked,
-                });
-              }}
-              initialFilters={pendingFilters}
-              availableSkills={availableSkills}
-              availableInstruments={availableInstruments}
-              availableStatuses={availableStatuses}
-              availableCollections={availableCollections}
-            />
-          </div>
-          <DialogFooter className="gap-3 border-t pt-6 sm:space-x-0">
+                ) => {
+                  setPendingFilters({
+                    jobType,
+                    fixedPriceRange,
+                    hourlyRateRange,
+                    selectedSkills,
+                    selectedInstruments,
+                    selectedStatuses,
+                    selectedCollectionIds,
+                    selectedExperience,
+                    titleFilter,
+                    bookmarked,
+                  });
+                }}
+                initialFilters={pendingFilters}
+                availableSkills={availableSkills}
+                availableInstruments={availableInstruments}
+                availableStatuses={availableStatuses}
+                availableCollections={availableCollections}
+                showCollectionsFilter={showCollectionsFilter}
+              />
+            </OverlayBody>
+          </ScrollArea>
+          <OverlayFooter className="flex flex-col-reverse gap-control sm:flex-row sm:justify-end sm:space-x-0">
             <Button variant="ghost" size="sm" onClick={handleClose}>
               Close
             </Button>
             <Button size="sm" disabled={!isDirty} onClick={handleApply}>
               Apply
             </Button>
-          </DialogFooter>
+          </OverlayFooter>
         </DialogContent>
       </Dialog>
     </>

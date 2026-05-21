@@ -8,23 +8,23 @@ import {
 } from "react-icons/fa"; // Іконки
 
 import { JobStatus, UpworkJob } from "../../models";
-import Card from "../ui/Card";
+import { Card } from "../../shared/ui";
 
 interface JobStatsProps {
   jobs: UpworkJob[];
 }
 
 const statusIcons: { [key in JobStatus]: JSX.Element } = {
-  draft: <FaEdit className="text-gray-500" />,
-  submitted: <FaBriefcase className="text-blue-500" />,
-  interview: <FaClock className="text-yellow-500" />,
-  offerReceived: <FaBriefcase className="text-green-500" />,
-  offerAccepted: <FaCheckCircle className="text-green-500" />,
-  inProgress: <FaClock className="text-blue-500" />,
-  completed: <FaCheckCircle className="text-green-600" />,
-  closed: <FaTimesCircle className="text-red-500" />,
-  declined: <FaTimesCircle className="text-red-600" />,
-  withdrawn: <FaTimesCircle className="text-gray-400" />,
+  draft: <FaEdit className="text-text-muted" />,
+  submitted: <FaBriefcase className="text-action" />,
+  interview: <FaClock className="text-warning" />,
+  offerReceived: <FaBriefcase className="text-success" />,
+  offerAccepted: <FaCheckCircle className="text-success" />,
+  inProgress: <FaClock className="text-action" />,
+  completed: <FaCheckCircle className="text-success" />,
+  closed: <FaTimesCircle className="text-destructive" />,
+  declined: <FaTimesCircle className="text-destructive" />,
+  withdrawn: <FaTimesCircle className="text-text-muted" />,
 };
 
 const JobStats: React.FC<JobStatsProps> = ({ jobs }) => {
@@ -75,42 +75,42 @@ const JobStats: React.FC<JobStatsProps> = ({ jobs }) => {
   );
 
   return (
-    <Card>
-      <div className="p-6">
-        <h3 className="text-xl font-medium mb-4">Job Statuses</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+    <Card className="p-card">
+      <div className="space-y-card">
+        <h3 className="text-heading text-text-primary">Job Statuses</h3>
+        <div className="grid grid-cols-2 gap-component sm:grid-cols-3 lg:grid-cols-4">
           {Object.keys(statusCounts).map((status) => (
             <div
               key={status}
-              className="flex items-center bg-gray-100 p-4 rounded-lg shadow-md"
+              className="flex items-center gap-control rounded-control bg-block-subtle p-component"
             >
               {statusIcons[status as JobStatus]} {/* Іконки статусів */}
-              <div className="ml-4">
-                <p className="text-lg font-medium capitalize">
+              <div>
+                <p className="text-ui capitalize text-text-primary">
                   {status}: {statusCounts[status as JobStatus]}
                 </p>
               </div>
             </div>
           ))}
         </div>
-        <div className="mt-6">
-          <h2 className="text-xl font-medium mb-4">Overall Job Statistics</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h3 className="text-lg font-medium">Total Jobs</h3>
-              <p className="text-2xl">{totalJobs}</p>
+        <div className="space-y-component">
+          <h2 className="text-heading text-text-primary">Overall Job Statistics</h2>
+          <div className="grid grid-cols-2 gap-component">
+            <div className="rounded-control bg-block-subtle p-component">
+              <h3 className="text-label text-text-muted">Total Jobs</h3>
+              <p className="mt-item text-data text-text-primary">{totalJobs}</p>
             </div>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h3 className="text-lg font-medium">Average Rate</h3>
-              <p className="text-2xl">${averageRate}</p>
+            <div className="rounded-control bg-block-subtle p-component">
+              <h3 className="text-label text-text-muted">Average Rate</h3>
+              <p className="mt-item text-data text-text-primary">${averageRate}</p>
             </div>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h3 className="text-lg font-medium">Unique Countries</h3>
-              <p className="text-2xl">{uniqueCountries.length}</p>
+            <div className="rounded-control bg-block-subtle p-component">
+              <h3 className="text-label text-text-muted">Unique Countries</h3>
+              <p className="mt-item text-data text-text-primary">{uniqueCountries.length}</p>
             </div>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h3 className="text-lg font-medium">Unique Skills</h3>
-              <p className="text-2xl">{uniqueSkills.length}</p>
+            <div className="rounded-control bg-block-subtle p-component">
+              <h3 className="text-label text-text-muted">Unique Skills</h3>
+              <p className="mt-item text-data text-text-primary">{uniqueSkills.length}</p>
             </div>
           </div>
         </div>

@@ -2,7 +2,8 @@ import React from "react";
 import { JobExperience, UpworkJob } from "../../models";
 import { ValueByCategoryChart, CategoryValueItem } from "../charts";
 import { findAvg } from "../../utils";
-import { Card } from "../ui";
+import { chartColors } from "../../shared/theme";
+import { Card } from "../../shared/ui";
 
 interface AverageRateByExperienceProps {
   jobs: UpworkJob[];
@@ -37,9 +38,9 @@ const AverageRateByExperience: React.FC<AverageRateByExperienceProps> = ({
   );
 
   const experienceColorKeys: { [key: string]: string } = {
-    [JobExperience.Entry]: "#3f88ff",
-    [JobExperience.Intermediate]: "#5ac59f", // Синій для Intermediate
-    [JobExperience.Expert]: "#f4bb29",
+    [JobExperience.Entry]: chartColors.primary,
+    [JobExperience.Intermediate]: chartColors.green,
+    [JobExperience.Expert]: chartColors.amber,
   };
 
   // Перетворюємо об'єкт у масив для використання в BarChart
@@ -65,8 +66,8 @@ const AverageRateByExperience: React.FC<AverageRateByExperienceProps> = ({
 
   return (
     <Card>
-      <div className="p-6 w-full max-w-sm">
-        <h2 className="text-lg font-semibold mb-8">
+      <div className="w-full max-w-sm p-card">
+        <h2 className="mb-card text-heading text-text-primary">
           Rate by Experience (avg.)
         </h2>
         <ValueByCategoryChart

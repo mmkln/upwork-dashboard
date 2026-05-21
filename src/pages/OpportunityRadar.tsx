@@ -5,10 +5,22 @@ import {
   Button,
   Card,
   Checkbox,
+  ContentToolbar,
   EmptyState,
-  IconButton,
+  FormField,
   Input,
+  NumberField,
+  OverlayBody,
+  OverlayFooter,
+  OverlayHeader,
+  PageHeader,
+  PageShell,
+  ScrollArea,
   Select,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
   Textarea,
 } from "../shared/ui";
 import { PlusIcon } from "../shared/icons";
@@ -44,6 +56,17 @@ import {
 
 type EditorTabKey = "filters" | "weights" | "preview";
 type SortKey = "score_desc" | "age_asc";
+
+const EDITOR_TABS: Array<{ value: EditorTabKey; label: string }> = [
+  { value: "filters", label: "Filters" },
+  { value: "weights", label: "Weights" },
+  { value: "preview", label: "Preview" },
+];
+
+const FieldError: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <p className="text-body text-destructive">{children}</p>
+);
+
 const OpportunityRadar: React.FC = () => {
   const [radars, setRadars] = useState<Radar[]>(loadRadars());
   const [applications, setApplications] = useState<Application[]>(
@@ -415,9 +438,19 @@ const OpportunityRadar: React.FC = () => {
       return;
     }
 
+    if (path === "schedule.hourOfDay" && typeof value === "number") {
+      updateEditorField(path, Number.isNaN(value) ? null : value);
+      return;
+    }
+
     if (path.startsWith("weights.") && typeof value === "string") {
       const numberValue = Number(value);
       updateEditorField(path, Number.isNaN(numberValue) ? 0 : numberValue);
+      return;
+    }
+
+    if (path.startsWith("weights.") && typeof value === "number") {
+      updateEditorField(path, Number.isNaN(value) ? 0 : value);
       return;
     }
 
@@ -484,9 +517,9 @@ const OpportunityRadar: React.FC = () => {
   };
 
   const renderFilterTab = (filters: RadarFilters) => (
-    <Card className="flex flex-col gap-4">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <label className="flex items-center gap-2 text-xs text-[#575757]">
+    <Card className="flex flex-col gap-component">
+      <div className="grid gap-component md:grid-cols-2">
+        <label className="flex min-h-target items-center gap-item rounded-control px-component py-control text-ui text-text-secondary transition-colors duration-motion-fast ease-motion-standard hover:bg-fill-tertiary">
           <Checkbox
             checked={filters.verifiedOnly}
             onChange={(event) =>
@@ -495,117 +528,7 @@ const OpportunityRadar: React.FC = () => {
           />
           Verified only
         </label>
-        <Input
-          type="number"
-          placeholder="Min spent"
-          value={filters.minSpent ?? ""}
-          onChange={(event) =>
-            handleEditorInput("filters.minSpent", event.target.value)
-          }
-        />
-        <Input
-          type="number"
-          placeholder="Min hire rate"
-          value={filters.minHireRate ?? ""}
-          onChange={(event) =>
-            handleEditorInput("filters.minHireRate", event.target.value)
-          }
-        />
-        <Input
-          type="number"
-          placeholder="Max proposals"
-          value={filters.maxProposals ?? ""}
-          onChange={(event) =>
-            handleEditorInput("filters.maxProposals", event.target.value)
-          }
-        />
-        <Input
-          type="number"
-          placeholder="Max age (hours)"
-          value={filters.maxAgeHours ?? ""}
-          onChange={(event) =>
-            handleEditorInput("filters.maxAgeHours", event.target.value)
-          }
-        />
-        <div className="flex flex-col gap-2">
-          <p className="text-xs text-[#575757]">Expertise levels</p>
-          <div className="flex flex-wrap gap-3 text-xs text-[#575757]">
-            {(["Entry", "Intermediate", "Expert"] as const).map((level) => (
-              <label key={level} className="flex items-center gap-2">
-                <Checkbox
-                  checked={filters.expertiseLevels.includes(level)}
-                  onChange={(event) => {
-                    const next = event.target.checked
-                      ? [...filters.expertiseLevels, level]
-                      : filters.expertiseLevels.filter(
-                          (item) => item !== level,
-                        );
-                    handleEditorInput("filters.expertiseLevels", next);
-                  }}
-                />
-                {level}
-              </label>
-            ))}
-          </div>
-        </div>
-        <Input
-          placeholder="Countries include (comma separated)"
-          value={filters.countriesInclude.join(", ")}
-          onChange={(event) =>
-            handleEditorInput("filters.countriesInclude", event.target.value)
-          }
-        />
-        <Input
-          placeholder="Countries exclude (comma separated)"
-          value={filters.countriesExclude.join(", ")}
-          onChange={(event) =>
-            handleEditorInput("filters.countriesExclude", event.target.value)
-          }
-        />
-        <Input
-          placeholder="Include tags (comma separated)"
-          value={filters.includeTags.join(", ")}
-          onChange={(event) =>
-            handleEditorInput("filters.includeTags", event.target.value)
-          }
-        />
-        <Input
-          placeholder="Exclude tags (comma separated)"
-          value={filters.excludeTags.join(", ")}
-          onChange={(event) =>
-            handleEditorInput("filters.excludeTags", event.target.value)
-          }
-        />
-        <Input
-          type="number"
-          placeholder="Min fixed budget"
-          value={filters.minBudget ?? ""}
-          onChange={(event) =>
-            handleEditorInput("filters.minBudget", event.target.value)
-          }
-        />
-        <Input
-          type="number"
-          placeholder="Hourly min"
-          value={filters.hourlyMin ?? ""}
-          onChange={(event) =>
-            handleEditorInput("filters.hourlyMin", event.target.value)
-          }
-        />
-        <div className="flex flex-col gap-2">
-          <Input
-            type="number"
-            placeholder="Hourly max"
-            value={filters.hourlyMax ?? ""}
-            onChange={(event) =>
-              handleEditorInput("filters.hourlyMax", event.target.value)
-            }
-          />
-          {editorErrors.hourly && (
-            <p className="text-xs text-red-600">{editorErrors.hourly}</p>
-          )}
-        </div>
-        <label className="flex items-center gap-2 text-xs text-[#575757]">
+        <label className="flex min-h-target items-center gap-item rounded-control px-component py-control text-ui text-text-secondary transition-colors duration-motion-fast ease-motion-standard hover:bg-fill-tertiary">
           <Checkbox
             checked={filters.hideApplied}
             onChange={(event) =>
@@ -614,6 +537,109 @@ const OpportunityRadar: React.FC = () => {
           />
           Hide applied
         </label>
+        <NumberField
+          label="Min spent"
+          value={filters.minSpent ?? ""}
+          onValueChange={(value) => handleEditorInput("filters.minSpent", value)}
+        />
+        <NumberField
+          label="Min hire rate"
+          value={filters.minHireRate ?? ""}
+          onValueChange={(value) =>
+            handleEditorInput("filters.minHireRate", value)
+          }
+        />
+        <NumberField
+          label="Max proposals"
+          value={filters.maxProposals ?? ""}
+          onValueChange={(value) =>
+            handleEditorInput("filters.maxProposals", value)
+          }
+        />
+        <NumberField
+          label="Max age (hours)"
+          value={filters.maxAgeHours ?? ""}
+          onValueChange={(value) =>
+            handleEditorInput("filters.maxAgeHours", value)
+          }
+        />
+      </div>
+
+      <div className="flex flex-col gap-item">
+        <p className="text-label text-text-muted">Expertise levels</p>
+        <div className="flex flex-wrap gap-control text-ui text-text-secondary">
+          {(["Entry", "Intermediate", "Expert"] as const).map((level) => (
+            <label key={level} className="flex items-center gap-item">
+              <Checkbox
+                checked={filters.expertiseLevels.includes(level)}
+                onChange={(event) => {
+                  const next = event.target.checked
+                    ? [...filters.expertiseLevels, level]
+                    : filters.expertiseLevels.filter((item) => item !== level);
+                  handleEditorInput("filters.expertiseLevels", next);
+                }}
+              />
+              {level}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-component md:grid-cols-2">
+        <FormField
+          label="Countries include"
+          placeholder="United States, Canada"
+          value={filters.countriesInclude.join(", ")}
+          onValueChange={(value) =>
+            handleEditorInput("filters.countriesInclude", value)
+          }
+        />
+        <FormField
+          label="Countries exclude"
+          placeholder="Country names"
+          value={filters.countriesExclude.join(", ")}
+          onValueChange={(value) =>
+            handleEditorInput("filters.countriesExclude", value)
+          }
+        />
+        <FormField
+          label="Include tags"
+          placeholder="react, dashboard"
+          value={filters.includeTags.join(", ")}
+          onValueChange={(value) =>
+            handleEditorInput("filters.includeTags", value)
+          }
+        />
+        <FormField
+          label="Exclude tags"
+          placeholder="wordpress, scraping"
+          value={filters.excludeTags.join(", ")}
+          onValueChange={(value) =>
+            handleEditorInput("filters.excludeTags", value)
+          }
+        />
+        <NumberField
+          label="Min fixed budget"
+          value={filters.minBudget ?? ""}
+          onValueChange={(value) => handleEditorInput("filters.minBudget", value)}
+        />
+        <NumberField
+          label="Hourly min"
+          value={filters.hourlyMin ?? ""}
+          onValueChange={(value) => handleEditorInput("filters.hourlyMin", value)}
+        />
+        <div className="flex flex-col gap-item">
+          <NumberField
+            label="Hourly max"
+            value={filters.hourlyMax ?? ""}
+            onValueChange={(value) =>
+              handleEditorInput("filters.hourlyMax", value)
+            }
+          />
+          {editorErrors.hourly && (
+            <FieldError>{editorErrors.hourly}</FieldError>
+          )}
+        </div>
       </div>
     </Card>
   );
@@ -621,9 +647,9 @@ const OpportunityRadar: React.FC = () => {
   const renderWeightsTab = (weights: RadarWeights) => {
     const sum = Object.values(weights).reduce((acc, value) => acc + value, 0);
     return (
-      <Card className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-[#8A8A8A]">
+      <Card className="flex flex-col gap-component">
+        <div className="flex flex-wrap items-center justify-between gap-control">
+          <p className="text-body text-text-secondary">
             Sum weights: {sum.toFixed(2)} (normalized in scoring)
           </p>
           <Button
@@ -634,16 +660,15 @@ const OpportunityRadar: React.FC = () => {
             Reset to default
           </Button>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-component md:grid-cols-2">
           {Object.entries(weights).map(([key, value]) => (
-            <Input
+            <NumberField
               key={key}
-              type="number"
+              label={key}
               step="0.01"
-              placeholder={key}
               value={value}
-              onChange={(event) =>
-                handleEditorInput(`weights.${key}`, event.target.value)
+              onValueChange={(nextValue) =>
+                handleEditorInput(`weights.${key}`, nextValue)
               }
             />
           ))}
@@ -671,32 +696,32 @@ const OpportunityRadar: React.FC = () => {
           />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-sm">
-              <thead className="text-xs text-[#8A8A8A] uppercase">
+            <table className="w-full min-w-table-sm text-body">
+              <thead className="text-label text-text-muted">
                 <tr>
-                  <th className="px-6 py-4 text-left">Title</th>
-                  <th className="px-6 py-4 text-left">Score</th>
-                  <th className="px-6 py-4 text-left">Age</th>
-                  <th className="px-6 py-4 text-left">Verified</th>
-                  <th className="px-6 py-4 text-left">Spent</th>
-                  <th className="px-6 py-4 text-left">Proposals</th>
-                  <th className="px-6 py-4 text-left">Country</th>
-                  <th className="px-6 py-4 text-left">Top tags</th>
+                  <th className="px-card py-component text-left">Title</th>
+                  <th className="px-card py-component text-left">Score</th>
+                  <th className="px-card py-component text-left">Age</th>
+                  <th className="px-card py-component text-left">Verified</th>
+                  <th className="px-card py-component text-left">Spent</th>
+                  <th className="px-card py-component text-left">Proposals</th>
+                  <th className="px-card py-component text-left">Country</th>
+                  <th className="px-card py-component text-left">Top tags</th>
                 </tr>
               </thead>
               <tbody>
                 {previewMatches.map(({ job, score }) => (
-                  <tr key={job.id} className="border-t border-[#EFEFEF]">
-                    <td className="px-6 py-6">{job.title}</td>
-                    <td className="px-6 py-6">{score}</td>
-                    <td className="px-6 py-6">{formatAge(job.created_at)}</td>
-                    <td className="px-6 py-6">
+                  <tr key={job.id} className="border-t border-border">
+                    <td className="px-card py-card">{job.title}</td>
+                    <td className="px-card py-card">{score}</td>
+                    <td className="px-card py-card">{formatAge(job.created_at)}</td>
+                    <td className="px-card py-card">
                       {job.is_payment_verified ? "Yes" : "No"}
                     </td>
-                    <td className="px-6 py-6">{job.total_spent ?? "—"}</td>
-                    <td className="px-6 py-6">{job.proposals ?? "—"}</td>
-                    <td className="px-6 py-6">{job.country ?? "—"}</td>
-                    <td className="px-6 py-6">
+                    <td className="px-card py-card">{job.total_spent ?? "—"}</td>
+                    <td className="px-card py-card">{job.proposals ?? "—"}</td>
+                    <td className="px-card py-card">{job.country ?? "—"}</td>
+                    <td className="px-card py-card">
                       {job.normalized_stack.slice(0, 3).join(", ")}
                     </td>
                   </tr>
@@ -715,32 +740,19 @@ const OpportunityRadar: React.FC = () => {
     }
 
     return (
-      <div className="flex flex-col gap-8">
-        <div>
-          <h2 className="text-lg font-semibold text-[#141414]">
-            Radar Editor
-          </h2>
-          <p className="mt-1 text-sm text-[#6B7280]">
-            Editing: {editorRadar.name}
-          </p>
-        </div>
-
-        <Card className="flex flex-col gap-6">
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            <div className="flex flex-col gap-2">
-              <p className="text-xs text-[#575757]">Name</p>
-              <Input
+      <div className="flex flex-col gap-card">
+        <Card className="flex flex-col gap-component">
+          <div className="grid gap-component md:grid-cols-2">
+            <div className="flex flex-col gap-item">
+              <FormField
+                label="Name"
                 value={editorRadar.name}
-                onChange={(event) =>
-                  handleEditorInput("name", event.target.value)
-                }
+                onValueChange={(value) => handleEditorInput("name", value)}
               />
-              {editorErrors.name && (
-                <p className="text-xs text-red-600">{editorErrors.name}</p>
-              )}
+              {editorErrors.name && <FieldError>{editorErrors.name}</FieldError>}
             </div>
-            <div className="flex flex-col gap-2">
-              <p className="text-xs text-[#575757]">Status</p>
+            <label className="flex flex-col gap-item">
+              <span className="text-label text-text-muted">Status</span>
               <Select
                 value={editorRadar.status}
                 onChange={(event) =>
@@ -753,9 +765,9 @@ const OpportunityRadar: React.FC = () => {
                   </option>
                 ))}
               </Select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="text-xs text-[#575757]">Schedule</p>
+            </label>
+            <label className="flex flex-col gap-item">
+              <span className="text-label text-text-muted">Schedule</span>
               <Select
                 value={editorRadar.schedule.frequency}
                 onChange={(event) =>
@@ -768,30 +780,26 @@ const OpportunityRadar: React.FC = () => {
                   </option>
                 ))}
               </Select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="text-xs text-[#575757]">Hour of day (0-23)</p>
-              <Input
-                type="number"
+            </label>
+            <div className="flex flex-col gap-item">
+              <NumberField
+                label="Hour of day (0-23)"
+                min={0}
+                max={23}
                 value={editorRadar.schedule.hourOfDay ?? ""}
-                onChange={(event) =>
-                  handleEditorInput(
-                    "schedule.hourOfDay",
-                    event.target.value,
-                  )
+                onValueChange={(value) =>
+                  handleEditorInput("schedule.hourOfDay", value)
                 }
               />
               {editorErrors.hourOfDay && (
-                <p className="text-xs text-red-600">
-                  {editorErrors.hourOfDay}
-                </p>
+                <FieldError>{editorErrors.hourOfDay}</FieldError>
               )}
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-2 text-xs text-[#575757]">
+          <div className="grid gap-component md:grid-cols-2">
+            <div className="flex flex-col gap-item">
+              <label className="flex items-center gap-item text-ui text-text-secondary">
                 <Checkbox
                   checked={editorRadar.notifications.email.enabled}
                   onChange={(event) =>
@@ -813,12 +821,10 @@ const OpportunityRadar: React.FC = () => {
                   )
                 }
               />
-              {editorErrors.email && (
-                <p className="text-xs text-red-600">{editorErrors.email}</p>
-              )}
+              {editorErrors.email && <FieldError>{editorErrors.email}</FieldError>}
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-2 text-xs text-[#575757]">
+            <div className="flex flex-col gap-item">
+              <label className="flex items-center gap-item text-ui text-text-secondary">
                 <Checkbox
                   checked={editorRadar.notifications.plugin.enabled}
                   onChange={(event) =>
@@ -841,7 +847,7 @@ const OpportunityRadar: React.FC = () => {
                 }
               />
               {editorErrors.plugin && (
-                <p className="text-xs text-red-600">{editorErrors.plugin}</p>
+                <FieldError>{editorErrors.plugin}</FieldError>
               )}
             </div>
           </div>
@@ -853,16 +859,15 @@ const OpportunityRadar: React.FC = () => {
           </div>
         </Card>
 
-        <div className="flex flex-wrap gap-2">
-          {(["filters", "weights", "preview"] as const).map((tab) => (
+        <div className="flex flex-wrap gap-item">
+          {EDITOR_TABS.map((tab) => (
             <Button
-              key={tab}
-              variant="ghost"
+              key={tab.value}
+              variant={editorTab === tab.value ? "soft" : "ghost"}
               size="sm"
-              className={editorTab === tab ? "bg-[#F6F8FF]" : ""}
-              onClick={() => setEditorTab(tab)}
+              onClick={() => setEditorTab(tab.value)}
             >
-              {tab}
+              {tab.label}
             </Button>
           ))}
         </div>
@@ -870,19 +875,6 @@ const OpportunityRadar: React.FC = () => {
         {editorTab === "filters" && renderFilterTab(editorRadar.filters)}
         {editorTab === "weights" && renderWeightsTab(editorRadar.weights)}
         {editorTab === "preview" && renderPreviewTab(editorRadar)}
-
-        <div className="flex items-center gap-3">
-          <Button onClick={handleSaveRadar}>Save</Button>
-          <Button variant="ghost" onClick={closeEditor}>
-            Cancel
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => handleExportRadar(editorRadar)}
-          >
-            Export JSON
-          </Button>
-        </div>
       </div>
     );
   };
@@ -897,7 +889,7 @@ const OpportunityRadar: React.FC = () => {
             <Button
               variant="soft"
               size="xs"
-              className="gap-2 text-[#575757]"
+              className="gap-item text-text-secondary"
               onClick={handleCreateRadar}
             >
               <PlusIcon className="h-4 w-4" />
@@ -911,75 +903,72 @@ const OpportunityRadar: React.FC = () => {
       return <EmptyState title="Select a radar to view matches" />;
     }
     return (
-      <div className="flex flex-col gap-8">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <div>
-              <h1 className="text-xl font-semibold text-[#141414]">
-                Opportunity Radar
-              </h1>
-              <p className="mt-1 text-sm text-[#6B7280]">
-                Matches for the selected radar.
-              </p>
+      <PageShell className="gap-section">
+        <PageHeader
+          title="Opportunity Radar"
+          eyebrow={
+            <div className="flex flex-wrap items-center gap-control">
+              <Select
+                value={activeRadarId ?? ""}
+                onChange={(event) => {
+                  setActiveRadarId(event.target.value);
+                  setInspectorJobId(null);
+                }}
+              >
+                {radars.map((radar) => (
+                  <option key={radar.id} value={radar.id}>
+                    {radar.name}
+                  </option>
+                ))}
+              </Select>
+              <Badge
+                tone={
+                  activeRadar.status === "active"
+                    ? "success"
+                    : activeRadar.status === "paused"
+                    ? "warning"
+                    : "neutral"
+                }
+              >
+                {activeRadar.status}
+              </Badge>
             </div>
-            <Select
-              value={activeRadarId ?? ""}
-              onChange={(event) => {
-                setActiveRadarId(event.target.value);
-                setInspectorJobId(null);
-              }}
-            >
-              {radars.map((radar) => (
-                <option key={radar.id} value={radar.id}>
-                  {radar.name}
-                </option>
-              ))}
-            </Select>
-            <Badge
-              tone={
-                activeRadar.status === "active"
-                  ? "success"
-                  : activeRadar.status === "paused"
-                  ? "warning"
-                  : "neutral"
-              }
-            >
-              {activeRadar.status}
-            </Badge>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleToggleStatus(activeRadar)}
-            >
-              {activeRadar.status === "active" ? "Pause" : "Activate"}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleEditRadar(activeRadar)}
-            >
-              Edit radar
-            </Button>
-            <Button
-              variant="soft"
-              size="xs"
-              className="gap-2 text-[#575757]"
-              onClick={handleCreateRadar}
-            >
-              <PlusIcon className="h-4 w-4" />
-              New radar
-            </Button>
-          </div>
-        </div>
+          }
+          actions={
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleToggleStatus(activeRadar)}
+              >
+                {activeRadar.status === "active" ? "Pause" : "Activate"}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleEditRadar(activeRadar)}
+              >
+                Edit radar
+              </Button>
+              <Button
+                variant="soft"
+                size="xs"
+                className="gap-item text-text-secondary"
+                onClick={handleCreateRadar}
+              >
+                <PlusIcon className="h-4 w-4" />
+                New radar
+              </Button>
+            </>
+          }
+        />
 
-        <div className="flex flex-wrap items-center gap-3">
+        <ContentToolbar className="flex-row flex-wrap items-center">
           <Input
             placeholder="Search title..."
             value={matchesSearch}
             onChange={(event) => setMatchesSearch(event.target.value)}
-            className="max-w-[220px]"
+            className="max-w-search-compact"
           />
           <Select
             value={matchesSort}
@@ -990,14 +979,14 @@ const OpportunityRadar: React.FC = () => {
             <option value="score_desc">Score desc</option>
             <option value="age_asc">Age asc</option>
           </Select>
-          <label className="flex items-center gap-2 text-xs text-[#575757]">
+          <label className="flex items-center gap-item text-ui text-text-secondary">
             <Checkbox
               checked={matchesHideApplied}
               onChange={(event) => setMatchesHideApplied(event.target.checked)}
             />
             Hide applied
           </label>
-          <div className="flex items-center gap-2 text-xs text-[#575757]">
+          <div className="flex items-center gap-item text-ui text-text-secondary">
             <span>Min score</span>
             <Input
               type="number"
@@ -1005,10 +994,10 @@ const OpportunityRadar: React.FC = () => {
               onChange={(event) =>
                 setMatchesMinScore(Number(event.target.value))
               }
-              className="w-[80px]"
+              className="w-number-field"
             />
           </div>
-        </div>
+        </ContentToolbar>
 
         {filteredMatches.length === 0 ? (
           <EmptyState
@@ -1017,20 +1006,20 @@ const OpportunityRadar: React.FC = () => {
           />
         ) : (
           <Card className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-xs text-[#8A8A8A] uppercase">
+            <table className="w-full min-w-table-lg text-body">
+              <thead className="text-label text-text-muted">
                 <tr>
-                  <th className="px-6 py-4 text-left">Score</th>
-                  <th className="px-6 py-4 text-left">Age</th>
-                  <th className="px-6 py-4 text-left">Proposals</th>
-                  <th className="px-6 py-4 text-left">Verified</th>
-                  <th className="px-6 py-4 text-left">Spent</th>
-                  <th className="px-6 py-4 text-left">Hire rate</th>
-                  <th className="px-6 py-4 text-left">Budget</th>
-                  <th className="px-6 py-4 text-left">Expertise</th>
-                  <th className="px-6 py-4 text-left">Country</th>
-                  <th className="px-6 py-4 text-left">Tags</th>
-                  <th className="px-6 py-4 text-left">Actions</th>
+                  <th className="px-component py-control text-left">Score</th>
+                  <th className="px-component py-control text-left">Age</th>
+                  <th className="px-component py-control text-left">Proposals</th>
+                  <th className="px-component py-control text-left">Verified</th>
+                  <th className="px-component py-control text-left">Spent</th>
+                  <th className="px-component py-control text-left">Hire rate</th>
+                  <th className="px-component py-control text-left">Budget</th>
+                  <th className="px-component py-control text-left">Expertise</th>
+                  <th className="px-component py-control text-left">Country</th>
+                  <th className="px-component py-control text-left">Tags</th>
+                  <th className="px-component py-control text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -1044,23 +1033,23 @@ const OpportunityRadar: React.FC = () => {
                     ? `$${job.budget.amount} fixed`
                     : `$${job.budget.min}-${job.budget.max}/h`;
                   return (
-                    <tr key={match.jobId} className="border-t border-[#EFEFEF]">
-                      <td className="px-6 py-6">{match.score}</td>
-                      <td className="px-6 py-6">{formatAge(job.created_at)}</td>
-                      <td className="px-6 py-6">{job.proposals ?? "—"}</td>
-                      <td className="px-6 py-6">
+                    <tr key={match.jobId} className="border-t border-separator">
+                      <td className="px-component py-card">{match.score}</td>
+                      <td className="px-component py-card">{formatAge(job.created_at)}</td>
+                      <td className="px-component py-card">{job.proposals ?? "—"}</td>
+                      <td className="px-component py-card">
                         {job.is_payment_verified ? "Yes" : "No"}
                       </td>
-                      <td className="px-6 py-6">{job.total_spent ?? "—"}</td>
-                      <td className="px-6 py-6">{job.hire_rate ?? "—"}</td>
-                      <td className="px-6 py-6">{budget}</td>
-                      <td className="px-6 py-6">{job.experience ?? "—"}</td>
-                      <td className="px-6 py-6">{job.country ?? "—"}</td>
-                      <td className="px-6 py-6">
+                      <td className="px-component py-card">{job.total_spent ?? "—"}</td>
+                      <td className="px-component py-card">{job.hire_rate ?? "—"}</td>
+                      <td className="px-component py-card">{budget}</td>
+                      <td className="px-component py-card">{job.experience ?? "—"}</td>
+                      <td className="px-component py-card">{job.country ?? "—"}</td>
+                      <td className="px-component py-card">
                         {job.normalized_stack.slice(0, 3).join(", ")}
                       </td>
-                      <td className="px-6 py-6">
-                        <div className="flex flex-wrap gap-2">
+                      <td className="px-component py-card">
+                        <div className="flex flex-wrap gap-item">
                           <Button
                             variant="ghost"
                             size="sm"
@@ -1091,7 +1080,7 @@ const OpportunityRadar: React.FC = () => {
             </table>
           </Card>
         )}
-      </div>
+      </PageShell>
     );
   };
 
@@ -1115,109 +1104,123 @@ const OpportunityRadar: React.FC = () => {
     ];
 
     return (
-      <div className="fixed right-0 top-0 h-full w-[360px] border-l border-[#EAEBEB] bg-white p-8 shadow-lg">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-sm font-semibold text-[#141414]">
+      <Sheet
+        open={Boolean(inspectorJobId)}
+        onOpenChange={(open) => {
+          if (!open) setInspectorJobId(null);
+        }}
+      >
+        <SheetContent className="flex w-full max-w-viewport-safe flex-col gap-0 overflow-hidden p-0 sm:max-w-sheet-sm">
+          <OverlayHeader className="pr-spacious text-left">
+            <SheetTitle className="line-clamp-3 text-ui text-text-primary">
               {inspectorJob.title}
-            </h2>
-            <a
-              href={inspectorJob.url}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs text-[#1823F0]"
-            >
-              Open job
-            </a>
-          </div>
-          <IconButton
-            variant="outline"
-            size="sm"
-            onClick={() => setInspectorJobId(null)}
-            aria-label="Close inspector"
-          >
-            ×
-          </IconButton>
-        </div>
+            </SheetTitle>
+            <SheetDescription asChild>
+              <a
+                href={inspectorJob.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-label text-link hover:text-link-hover"
+              >
+                Open job
+              </a>
+            </SheetDescription>
+          </OverlayHeader>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {chips.map((chip) => (
-            <Badge key={chip} tone="info">
-              {chip}
-            </Badge>
-          ))}
-          {inspectorJob.normalized_stack.map((tag) => (
-            <Badge key={tag} tone="neutral">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-
-        <Card className="mt-6 flex flex-col gap-4">
-          <p className="text-xs text-[#8A8A8A]">Applied status</p>
-          <Select
-            value={application.status}
-            onChange={(event) =>
-              handleInspectorChange("status", event.target.value)
-            }
-          >
-            {["none", "applied", "shortlisted", "interview", "hired", "declined"].map(
-              (status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ),
-            )}
-          </Select>
-          <div className="flex flex-col gap-2">
-            <p className="text-xs text-[#575757]">Note</p>
-            <Textarea
-              value={application.note ?? ""}
-              onChange={(event) =>
-                handleInspectorChange("note", event.target.value)
-              }
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-xs text-[#575757]">Proposal link</p>
-            <Input
-              value={application.proposalLink ?? ""}
-              onChange={(event) =>
-                handleInspectorChange("proposalLink", event.target.value)
-              }
-            />
-            {inspectorUrlError && (
-              <p className="text-xs text-red-600">{inspectorUrlError}</p>
-            )}
-          </div>
-        </Card>
-
-        {inspectorMatch.reasons && (
-          <Card className="mt-6">
-            <p className="text-xs text-[#8A8A8A]">Why this score</p>
-            <table className="mt-2 w-full text-xs">
-              <thead className="text-[#8A8A8A] uppercase">
-                <tr>
-                  <th className="text-left py-1">Signal</th>
-                  <th className="text-left py-1">Weight</th>
-                  <th className="text-left py-1">Signal</th>
-                  <th className="text-left py-1">Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                {inspectorMatch.reasons.map((reason) => (
-                  <tr key={reason.key} className="border-t border-[#EFEFEF]">
-                    <td className="py-1">{reason.key}</td>
-                    <td className="py-1">{reason.weight.toFixed(2)}</td>
-                    <td className="py-1">{reason.signal.toFixed(2)}</td>
-                    <td className="py-1">{reason.points}</td>
-                  </tr>
+          <ScrollArea className="min-h-0 flex-1">
+            <OverlayBody className="space-y-card">
+              <div className="flex flex-wrap gap-item">
+                {chips.map((chip) => (
+                  <Badge key={chip} tone="info">
+                    {chip}
+                  </Badge>
                 ))}
-              </tbody>
-            </table>
-          </Card>
-        )}
-      </div>
+                {inspectorJob.normalized_stack.map((tag) => (
+                  <Badge key={tag} tone="neutral">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+
+              <section className="space-y-control">
+                <p className="text-label text-text-muted">Applied status</p>
+                <Select
+                  value={application.status}
+                  onChange={(event) =>
+                    handleInspectorChange("status", event.target.value)
+                  }
+                >
+                  {[
+                    "none",
+                    "applied",
+                    "shortlisted",
+                    "interview",
+                    "hired",
+                    "declined",
+                  ].map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </Select>
+                <div className="flex flex-col gap-item">
+                  <p className="text-label text-text-muted">Note</p>
+                  <Textarea
+                    value={application.note ?? ""}
+                    onChange={(event) =>
+                      handleInspectorChange("note", event.target.value)
+                    }
+                  />
+                </div>
+                <div className="flex flex-col gap-item">
+                  <p className="text-label text-text-muted">Proposal link</p>
+                  <Input
+                    value={application.proposalLink ?? ""}
+                    onChange={(event) =>
+                      handleInspectorChange("proposalLink", event.target.value)
+                    }
+                  />
+                  {inspectorUrlError && (
+                    <p className="text-body text-destructive">
+                      {inspectorUrlError}
+                    </p>
+                  )}
+                </div>
+              </section>
+
+              {inspectorMatch.reasons && (
+                <section className="space-y-control">
+                  <p className="text-label text-text-muted">Why this score</p>
+                  <table className="w-full text-data text-text-secondary">
+                    <thead className="text-label text-text-muted">
+                      <tr>
+                        <th className="py-micro text-left">Signal</th>
+                        <th className="py-micro text-left">Weight</th>
+                        <th className="py-micro text-left">Signal</th>
+                        <th className="py-micro text-left">Points</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inspectorMatch.reasons.map((reason) => (
+                        <tr key={reason.key} className="border-t border-separator">
+                          <td className="py-micro">{reason.key}</td>
+                          <td className="py-micro">
+                            {reason.weight.toFixed(2)}
+                          </td>
+                          <td className="py-micro">
+                            {reason.signal.toFixed(2)}
+                          </td>
+                          <td className="py-micro">{reason.points}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </section>
+              )}
+            </OverlayBody>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
     );
   };
 
@@ -1225,34 +1228,44 @@ const OpportunityRadar: React.FC = () => {
     if (!isEditorOpen || !editorRadar) return null;
 
     return (
-      <div className="fixed inset-0 z-40">
-        <div
-          className="absolute inset-0 bg-black/20"
-          onClick={closeEditor}
-          aria-hidden="true"
-        />
-        <div className="absolute right-0 top-0 flex h-full w-[520px] max-w-[90vw] flex-col border-l border-[#EAEBEB] bg-white shadow-lg">
-          <div className="flex items-center justify-between border-b border-[#EFEFEF] px-8 py-6">
-            <div>
-              <h2 className="text-sm font-semibold text-[#141414]">
-                {editorRadar.name || "New Radar"}
-              </h2>
-              <p className="text-xs text-[#8A8A8A]">Radar Editor</p>
-            </div>
-            <IconButton
-              variant="outline"
-              size="sm"
-              onClick={closeEditor}
-              aria-label="Close editor"
+      <Sheet
+        open={isEditorOpen}
+        onOpenChange={(open) => {
+          if (!open) closeEditor();
+        }}
+      >
+        <SheetContent className="flex w-full max-w-viewport-safe flex-col gap-0 overflow-hidden p-0 sm:max-w-sheet-md">
+          <OverlayHeader className="pr-spacious text-left">
+            <SheetTitle className="text-heading text-text-primary">
+              {editorRadar.name || "New Radar"}
+            </SheetTitle>
+            <SheetDescription className="text-body text-text-secondary">
+              Radar Editor
+            </SheetDescription>
+          </OverlayHeader>
+
+          <ScrollArea className="min-h-0 flex-1">
+            <OverlayBody>
+              {renderEditor()}
+            </OverlayBody>
+          </ScrollArea>
+
+          <OverlayFooter className="flex flex-col-reverse gap-control sm:flex-row sm:justify-between sm:space-x-0">
+            <Button
+              variant="ghost"
+              onClick={() => handleExportRadar(editorRadar)}
             >
-              ×
-            </IconButton>
-          </div>
-          <div className="flex-1 overflow-y-auto px-8 py-8">
-            {renderEditor()}
-          </div>
-        </div>
-      </div>
+              Export JSON
+            </Button>
+            <div className="flex items-center gap-control">
+              <Button variant="ghost" onClick={closeEditor}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveRadar}>Save</Button>
+            </div>
+          </OverlayFooter>
+        </SheetContent>
+      </Sheet>
     );
   };
 
@@ -1263,11 +1276,11 @@ const OpportunityRadar: React.FC = () => {
       {!isEditorOpen && inspectorJobId && renderInspector()}
       {renderEditorDrawer()}
 
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
+      <div className="fixed bottom-card right-card z-50 flex flex-col gap-item">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className="rounded-[10px] bg-[#141414] text-white px-3 py-2 text-xs shadow-lg"
+            className="rounded-control border border-island-border bg-material-vibrant px-component py-control text-body text-text-primary shadow-premium backdrop-blur-2xl"
           >
             {toast.message}
           </div>

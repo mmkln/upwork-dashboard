@@ -10,8 +10,8 @@ export type BadgeProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 const toneClassName: Record<BadgeTone, string> = {
-  neutral: "bg-muted text-text-secondary",
-  info: "bg-accent text-accent-foreground",
+  neutral: "bg-block-subtle text-text-secondary",
+  info: "bg-action-muted text-action",
   success: "bg-success-muted text-success-foreground",
   warning: "bg-warning-muted text-warning",
 };
@@ -25,7 +25,7 @@ const Badge: React.FC<BadgeProps> = ({
   <ShadcnBadge
     variant="secondary"
     className={cn(
-      "rounded-full border-transparent px-2 py-0.5 text-[11px] font-medium shadow-none hover:bg-current/0",
+      "min-h-control-mini justify-center rounded-full border-transparent px-control py-0 text-label leading-none shadow-none hover:bg-current/0",
       toneClassName[tone],
       className,
     )}

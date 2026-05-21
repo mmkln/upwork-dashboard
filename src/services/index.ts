@@ -4,6 +4,7 @@ export {
   updateUpworkJob,
   createUpworkJob,
   fetchJobCollections,
+  createJobCollection,
   setApiAuthToken,
   login,
   getApiAuthToken,

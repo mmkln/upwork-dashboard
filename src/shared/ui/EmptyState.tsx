@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "lib/utils";
 
 type EmptyStateProps = {
   title: string;
@@ -14,13 +15,16 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   className = "",
 }) => (
   <div
-    className={`flex flex-col items-start gap-2 rounded-[10px] border border-dashed border-border-subtle bg-surface-subtle p-4 ${className}`}
-  >
-    <p className="text-sm font-medium text-text-primary">{title}</p>
-    {description && (
-      <p className="text-xs text-text-muted">{description}</p>
+    className={cn(
+      "flex flex-col items-start gap-item rounded-block bg-block-subtle p-component",
+      className,
     )}
-    {action && <div className="pt-1">{action}</div>}
+  >
+    <p className="text-ui text-text-primary">{title}</p>
+    {description && (
+      <p className="text-body text-text-muted">{description}</p>
+    )}
+    {action && <div className="pt-micro">{action}</div>}
   </div>
 );
 

@@ -9,7 +9,7 @@ const RangeInput = React.forwardRef<HTMLInputElement, RangeInputProps>(
       ref={ref}
       type="range"
       className={cn(
-        "h-2 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary disabled:cursor-not-allowed disabled:opacity-50",
+        "min-h-control-small w-full cursor-pointer appearance-none rounded-full bg-control accent-action hover:bg-control-hover disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
       {...props}

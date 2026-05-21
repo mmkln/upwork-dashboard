@@ -5,26 +5,26 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-item whitespace-nowrap rounded-full text-ui transition-colors duration-motion-fast ease-motion-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+          "bg-primary text-primary-foreground shadow-none hover:bg-primary-hover",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground shadow-none hover:bg-destructive/90",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "border border-control-border bg-control shadow-none hover:bg-control-hover hover:text-text-primary",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-control text-text-secondary shadow-none hover:bg-control-hover hover:text-text-primary",
+        ghost: "hover:bg-control-hover hover:text-text-primary",
+        link: "text-link underline-offset-4 hover:text-link-hover hover:underline",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        default: "h-target px-component",
+        sm: "h-control-small px-control text-label",
+        lg: "h-control-large px-card",
+        icon: "h-target w-target",
       },
     },
     defaultVariants: {

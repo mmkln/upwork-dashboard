@@ -9,65 +9,62 @@ interface ProgressBarSegment {
 interface ProgressBarProps {
   segments: ProgressBarSegment[];
   total: number;
-  size?: "lg" | "md" | "sm"; // Новий параметр для розміру
+  size?: "lg" | "md" | "sm";
 }
+
+const getSizeStyles = (size: NonNullable<ProgressBarProps["size"]>) => {
+  switch (size) {
+    case "lg":
+      return {
+        barHeight: "h-6",
+        dotSize: "h-5 w-5",
+        textSize: "text-ui",
+      };
+    case "sm":
+      return {
+        barHeight: "h-2",
+        dotSize: "h-2 w-2",
+        textSize: "text-label",
+      };
+    case "md":
+    default:
+      return {
+        barHeight: "h-3",
+        dotSize: "h-3 w-3",
+        textSize: "text-ui",
+      };
+  }
+};
 
 export const ProgressBar: React.FC<ProgressBarProps> = React.memo(
   ({ segments, total, size = "md" }) => {
-    // Визначаємо стилі залежно від розміру
-    const getSizeStyles = (size: "lg" | "md" | "sm") => {
-      switch (size) {
-        case "lg":
-          return {
-            barHeight: "h-6", // Висота бару для великого розміру
-            dotSize: "w-5 h-5", // Розмір точок для легенди
-            textSize: "text-base", // Розмір тексту
-          };
-        case "sm":
-          return {
-            barHeight: "h-2", // Висота бару для маленького розміру
-            dotSize: "w-2 h-2", // Розмір точок для легенди
-            textSize: "text-xs", // Розмір тексту
-          };
-        case "md":
-        default:
-          return {
-            barHeight: "h-3", // Висота бару для середнього розміру
-            dotSize: "w-3 h-3", // Розмір точок для легенди
-            textSize: "text-sm", // Розмір тексту
-          };
-      }
-    };
-
     const styles = getSizeStyles(size);
 
     return (
-      <div className="flex flex-col w-full gap-4">
+      <div className="flex w-full flex-col gap-component">
         <div
-          className={`relative w-full rounded bg-gray-300 flex overflow-hidden ${styles.barHeight}`}
+          className={`relative flex w-full overflow-hidden rounded bg-muted ${styles.barHeight}`}
         >
           {segments.map((segment, index) => (
             <div
               key={index}
-              className="h-full flex items-center justify-center"
+              className="flex h-full items-center justify-center"
               style={{
                 width: `${(segment.value / total) * 100}%`,
                 backgroundColor: segment.color,
               }}
-            >
-              {/* Лейбл всередині кожного сегмента */}
-            </div>
+            />
           ))}
         </div>
-        <div className={`flex justify-between font-medium ${styles.textSize}`}>
+        <div className={`flex justify-between text-text-secondary ${styles.textSize}`}>
           {segments.map((segment, index) => (
-            <div key={index} className="flex items-center gap-1">
+            <div key={index} className="flex items-center gap-micro">
               <div
                 className={`${styles.dotSize} rounded-full`}
                 style={{
                   backgroundColor: segment.color,
                 }}
-              ></div>
+              />
               <span>{segment.label}</span>
             </div>
           ))}
@@ -76,5 +73,3 @@ export const ProgressBar: React.FC<ProgressBarProps> = React.memo(
     );
   },
 );
-
-// export default React.memo(ProgressBar);

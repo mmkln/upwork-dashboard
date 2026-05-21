@@ -1,42 +1,24 @@
-import React, { useEffect, useMemo, useState } from "react";
-import update from "immutability-helper";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend"; // Бекенд для drag-and-drop
-import { fetchAllUpworkJobs, fetchUpworkJobs } from "../services";
-import { JobExperience, JobStatus, PreparedUpworkJob } from "../models";
+import React, { useEffect, useMemo } from "react";
+import { JobExperience, JobStatus } from "../models";
 import {
   AverageRateByCountry,
   AverageRateByExperience,
   JobStats,
-  TopSkillsChart,
-  ExperiencePieChart,
-  CountryJobsChart,
-  AverageRateByCountryChart,
   JobsByBinnedRangeChart,
   JobsByRateDistributionChart,
   JobsByAverageRateChart,
   JobsByFixedPriceChart,
-  HourlyRateChart,
   ClientRatingVsAverageRateChart,
   ClientSpendingByIndustryChart,
   JobsOverTimeChart,
   SkillsAverageRateChart,
   SkillsStackedBarChart,
   SkillsBubbleChart,
-  SkillsPieChart,
-  SkillsTreeMapChart,
   JobsByExperienceLevel,
-  TopSkills,
-  AvgMinMaxJobRatesByCountry,
-  JobRatesByCountryMinMax,
-  JobRatesByCountryAvg,
-  JobRatesByCountryAvg2,
-  JobRatesByCountryMed,
   JobCalendar,
   JobsByCountry,
   KeywordFrequency,
   SkillBadges,
-  Tile,
   PaymentTypeChart,
   InstrumentBadges,
   TopInstrumentsByAverageRate,
@@ -44,83 +26,82 @@ import {
   JobExportActions,
 } from "../components";
 import {
-  filterJobs,
   JobType,
   FiltersLauncher,
   useFilters,
   useCollections,
+  useDashboardAnalytics,
+  useJobFacets,
+  JobsSnapshotProgress,
 } from "../features";
-import type { CategoryValueItem } from "../components/charts";
-import { instruments, prepareJobs } from "../utils";
+import { instruments } from "../utils";
 import { buildFilterSlug } from "../features/filters/utils/filterSlug.util";
+import { Card, PageHeader, PageShell } from "../shared/ui";
 
-const MIN_TOOL_OCCURRENCES_PERCENTAGE = 0.02;
-const MIN_TOOL_OCCURRENCES_ABSOLUTE = 2;
 const DASHBOARD_PAGE_SIZE = 2000;
 
-const mapFiltersToQuery = (filters: ReturnType<typeof useFilters>["filters"]) => {
-  const params: Record<string, string | number | boolean | undefined> = {};
-
-  if (filters.titleFilter.trim()) {
-    params.search = filters.titleFilter.trim();
-  }
-
-  switch (filters.jobType) {
-    case "Fixed Price":
-      params.job_type = "fixed";
-      if (filters.fixedPriceRange) {
-        params.fixed_price_min = filters.fixedPriceRange[0];
-        params.fixed_price_max = filters.fixedPriceRange[1];
-      }
-      break;
-    case "Hourly Rate":
-      params.job_type = "hourly";
-      if (filters.hourlyRateRange) {
-        params.hourly_rate_min = filters.hourlyRateRange[0];
-        params.hourly_rate_max = filters.hourlyRateRange[1];
-      }
-      break;
-    case "Unspecified":
-      params.job_type = "unspecified";
-      break;
-    default:
-      break;
-  }
-
-  if (filters.selectedSkills.length) {
-    params.skills = filters.selectedSkills.join(",");
-  }
-  if (filters.selectedInstruments.length) {
-    params.instruments = filters.selectedInstruments.join(",");
-  }
-  if (filters.selectedStatuses.length) {
-    params.statuses = filters.selectedStatuses.join(",");
-  }
-  if (filters.selectedCollectionIds.length) {
-    params.collections = filters.selectedCollectionIds.join(",");
-  }
-  if (filters.selectedExperience.length) {
-    params.experience = filters.selectedExperience.join(",");
-  }
-  if (filters.bookmarked) {
-    params.bookmarked = true;
-  }
-
-  return params;
+type DashboardSectionProps = {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
 };
 
+const DashboardSection: React.FC<DashboardSectionProps> = ({
+  title,
+  description,
+  children,
+}) => (
+  <section className="space-y-component">
+    <div className="space-y-micro">
+      <h2 className="text-heading text-text-primary">{title}</h2>
+      {description && (
+        <p className="text-body text-text-secondary">{description}</p>
+      )}
+    </div>
+    {children}
+  </section>
+);
+
+type DashboardMetricProps = {
+  label: string;
+  value: string;
+  detail?: string;
+};
+
+const DashboardMetric: React.FC<DashboardMetricProps> = ({
+  label,
+  value,
+  detail,
+}) => (
+  <Card className="p-card">
+    <p className="text-label text-text-muted">{label}</p>
+    <p className="mt-item text-data text-text-primary">{value}</p>
+    {detail && <p className="mt-micro text-body text-text-secondary">{detail}</p>}
+  </Card>
+);
+
 const Dashboard: React.FC = () => {
-  const [jobsData, setJobsData] = useState<PreparedUpworkJob[]>([]);
-  const [filteredJobsData, setFilteredJobsData] =
-    useState<PreparedUpworkJob[]>([]);
   const { filters: activeFilters, setFilters } = useFilters();
   const { collections, refreshCollections } = useCollections();
-  const [filterSlug, setFilterSlug] = useState<string>("all");
+  const {
+    sourceJobs,
+    filteredJobs,
+    instrumentAverageRates,
+    averageHourlyRate,
+    bookmarkedCount,
+    countryCount,
+    loadedCount,
+    totalCount,
+    isHydrating,
+    isReady,
+    error,
+  } = useDashboardAnalytics({
+    filters: activeFilters,
+    pageSize: DASHBOARD_PAGE_SIZE,
+  });
+  const { facets } = useJobFacets({ pageSize: DASHBOARD_PAGE_SIZE });
 
-  const availableStatuses = useMemo(
-    () => Object.values(JobStatus),
-    [],
-  );
+  const availableStatuses = useMemo(() => Object.values(JobStatus), []);
 
   const availableInstruments = useMemo(
     () =>
@@ -138,158 +119,13 @@ const Dashboard: React.FC = () => {
   }, [collections]);
 
   useEffect(() => {
-    let cancelled = false;
-    const loadJobs = async () => {
-      try {
-        const allJobs: PreparedUpworkJob[] = [];
-        let page = 1;
-        const queryParams = {
-          page,
-          page_size: DASHBOARD_PAGE_SIZE,
-          ...mapFiltersToQuery(activeFilters),
-        };
-        while (true) {
-          const pageResult = await fetchUpworkJobs({
-            ...queryParams,
-            page,
-          });
-          if (cancelled) return;
-          allJobs.push(...prepareJobs(pageResult.results));
-          if (!pageResult.next) break;
-          page += 1;
-        }
-        if (cancelled) return;
-        setJobsData(allJobs);
-        setFilteredJobsData(
-          filterJobs(
-            allJobs,
-            activeFilters.jobType,
-            activeFilters.fixedPriceRange,
-            activeFilters.hourlyRateRange,
-            activeFilters.selectedSkills,
-            activeFilters.selectedInstruments,
-            activeFilters.selectedStatuses,
-            activeFilters.selectedCollectionIds,
-            activeFilters.selectedExperience,
-            activeFilters.titleFilter,
-            activeFilters.bookmarked,
-          ),
-        );
-        refreshCollections();
-      } catch (error) {
-        if (!cancelled) {
-          console.error("Error fetching jobs:", error);
-        }
-      }
-    };
-    loadJobs();
-    return () => {
-      cancelled = true;
-    };
-  }, [activeFilters, refreshCollections]);
+    refreshCollections();
+  }, [refreshCollections]);
 
-  useEffect(() => {
-    setFilteredJobsData(
-      filterJobs(
-        jobsData,
-        activeFilters.jobType,
-        activeFilters.fixedPriceRange,
-        activeFilters.hourlyRateRange,
-        activeFilters.selectedSkills,
-        activeFilters.selectedInstruments,
-        activeFilters.selectedStatuses,
-        activeFilters.selectedCollectionIds,
-        activeFilters.selectedExperience,
-        activeFilters.titleFilter,
-        activeFilters.bookmarked,
-      ),
-    );
-    setFilterSlug(buildFilterSlug(activeFilters, collectionNameById));
-  }, [activeFilters, jobsData, collectionNameById]);
-
-  const [tiles, setTiles] = useState([
-    { id: "1", component: <AverageRateByCountry jobs={jobsData} /> },
-    { id: "2", component: <AverageRateByExperience jobs={jobsData} /> },
-  ]);
-
-  const moveTile = (dragIndex: number, hoverIndex: number) => {
-    const draggedTile = tiles[dragIndex];
-    setTiles(
-      update(tiles, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, draggedTile],
-        ],
-      }),
-    );
-  };
-
-  const availableSkills = useMemo(
-    () =>
-      Array.from(
-        new Set(jobsData.flatMap((job) => job.skills)),
-      ),
-    [jobsData],
+  const filterSlug = useMemo(
+    () => buildFilterSlug(activeFilters, collectionNameById),
+    [activeFilters, collectionNameById],
   );
-
-  const instrumentAverageRates = useMemo<CategoryValueItem[]>(() => {
-    if (!filteredJobsData.length) {
-      return [];
-    }
-
-    const minOccurrences = Math.max(
-      MIN_TOOL_OCCURRENCES_ABSOLUTE,
-      Math.floor(filteredJobsData.length * MIN_TOOL_OCCURRENCES_PERCENTAGE),
-    );
-
-    const accumulator: Record<
-      string,
-      {
-        totalRate: number;
-        withRateCount: number;
-        totalCount: number;
-      }
-    > = {};
-
-    filteredJobsData.forEach((job) => {
-      if (job.matchedInstruments.size === 0) {
-        return;
-      }
-
-      job.matchedInstruments.forEach((instrument) => {
-        if (!accumulator[instrument]) {
-          accumulator[instrument] = {
-            totalRate: 0,
-            withRateCount: 0,
-            totalCount: 0,
-          };
-        }
-
-        const bucket = accumulator[instrument];
-        bucket.totalCount += 1;
-
-        if (job.hourlyRateAverage != null) {
-          bucket.totalRate += job.hourlyRateAverage;
-          bucket.withRateCount += 1;
-        }
-      });
-    });
-
-    return Object.entries(accumulator)
-      .filter(
-        ([, { totalCount, withRateCount }]) =>
-          totalCount >= minOccurrences && withRateCount > 0,
-      )
-      .map(([label, { totalRate, withRateCount, totalCount }]) => ({
-        label,
-        value:
-          withRateCount > 0
-            ? Number((totalRate / withRateCount).toFixed(2))
-            : 0,
-        count: totalCount,
-      }))
-      .sort((a, b) => b.value - a.value);
-  }, [filteredJobsData]);
 
   const today = new Date();
 
@@ -318,148 +154,157 @@ const Dashboard: React.FC = () => {
       bookmarked,
     };
     setFilters(nextFilters);
-    const jobs = filterJobs(
-      jobsData,
-      nextFilters.jobType,
-      nextFilters.fixedPriceRange,
-      nextFilters.hourlyRateRange,
-      nextFilters.selectedSkills,
-      nextFilters.selectedInstruments,
-      nextFilters.selectedStatuses,
-      nextFilters.selectedCollectionIds,
-      nextFilters.selectedExperience,
-      nextFilters.titleFilter,
-      nextFilters.bookmarked,
-    );
-    setFilteredJobsData(jobs);
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <PageShell>
+      <PageHeader
+        title="Dashboard"
+        actions={
+          <JobExportActions
+            jobs={filteredJobs}
+            filterDescriptor={filterSlug}
+            filenamePrefix="dashboard-jobs"
+          />
+        }
+      />
+
       <FiltersLauncher
         activeFilters={activeFilters}
         onFilterChange={onFilterChanged}
-        availableSkills={availableSkills}
+        availableSkills={facets.skills}
         availableInstruments={availableInstruments}
         availableStatuses={availableStatuses}
         availableCollections={collections}
         collectionNameById={collectionNameById}
       />
-      <div className="flex justify-end pb-4">
-        <JobExportActions
-          jobs={filteredJobsData}
-          filterDescriptor={filterSlug}
-          filenamePrefix="dashboard-jobs"
+
+      <JobsSnapshotProgress
+        loadedCount={loadedCount}
+        totalCount={totalCount}
+        isHydrating={isHydrating}
+        isReady={isReady}
+        error={error}
+        label="Loading dashboard data"
+      />
+
+      <div className="grid gap-component md:grid-cols-2 xl:grid-cols-4">
+        <DashboardMetric
+          label="Filtered Jobs"
+          value={filteredJobs.length.toLocaleString()}
+          detail={`${sourceJobs.length.toLocaleString()} loaded total`}
+        />
+        <DashboardMetric
+          label="Average Hourly Rate"
+          value={
+            averageHourlyRate == null
+              ? "-"
+              : `$${averageHourlyRate.toFixed(0)}`
+          }
+          detail="Across jobs with hourly ranges"
+        />
+        <DashboardMetric
+          label="Countries"
+          value={countryCount.toLocaleString()}
+          detail="Represented in filtered jobs"
+        />
+        <DashboardMetric
+          label="Bookmarked"
+          value={bookmarkedCount.toLocaleString()}
+          detail="Saved opportunities"
         />
       </div>
-      <div className="mx-auto flex flex-col gap-4">
-        <div className="flex gap-4">
-          <div className=" max-w-3xl">
-            <JobStats jobs={filteredJobsData} />
+
+      <DashboardSection
+        title="Overview"
+        description="High-level job status and posting activity."
+      >
+        <div className="grid gap-component xl:grid-cols-overview">
+          <div className="min-w-0">
+            <JobStats jobs={filteredJobs} />
           </div>
-          <div className="">
-            <JobCalendar jobs={filteredJobsData} month={today} />
+          <div className="min-w-0">
+            <JobCalendar jobs={filteredJobs} month={today} />
           </div>
         </div>
-        <div className="flex gap-4 flex-wrap">
-          <div className="max-w-96 min-w-80">
-            <KeywordFrequency jobs={filteredJobsData} limit={50} />
+      </DashboardSection>
+
+      <DashboardSection
+        title="Demand Signals"
+        description="Keywords, tools, and skills that appear most often."
+      >
+        <div className="grid gap-component md:grid-cols-2 xl:grid-cols-4">
+          <div className="min-w-0">
+            <KeywordFrequency jobs={filteredJobs} limit={50} />
           </div>
-          <div className="max-w-96 min-w-80">
+          <div className="min-w-0">
             <KeywordFrequency
-              jobs={filteredJobsData}
+              jobs={filteredJobs}
               limit={50}
               getText={(job) => job.title}
               headingFormatter={(count) => `Top ${count} Job Title Keywords`}
               copyName="Job Title Keywords"
             />
           </div>
-          <div className="max-w-96 min-w-80">
-            <InstrumentBadges jobs={filteredJobsData} limit={50} />
+          <div className="min-w-0">
+            <InstrumentBadges jobs={filteredJobs} limit={50} />
           </div>
-          <div className="max-w-96 min-w-80">
-            <SkillBadges jobs={filteredJobsData} limit={50} />
+          <div className="min-w-0">
+            <SkillBadges jobs={filteredJobs} limit={50} />
           </div>
         </div>
-        <div className="flex gap-4">
-          <div className="max-w-md min-w-80">
-            <AverageRateByCountry jobs={filteredJobsData} />
+      </DashboardSection>
+
+      <DashboardSection
+        title="Rates And Segments"
+        description="Rate distribution by country, experience, payment type, tools, and industries."
+      >
+        <div className="grid gap-component lg:grid-cols-2 xl:grid-cols-3">
+          <div className="min-w-0">
+            <AverageRateByCountry jobs={filteredJobs} />
           </div>
-          <div className="max-w-md min-w-80">
-            <JobsByCountry jobs={filteredJobsData} />
+          <div className="min-w-0">
+            <JobsByCountry jobs={filteredJobs} />
           </div>
-          <div className="flex flex-col gap-4 max-w-xs">
-            <AverageRateByExperience jobs={filteredJobsData} />
-            <JobsByExperienceLevel jobs={filteredJobsData} />
+          <div className="min-w-0">
+            <AverageRateByExperience jobs={filteredJobs} />
           </div>
-          {/*<div className="max-w-md min-w-80">*/}
-          {/*  <TopSkills jobs={jobsData} limit={7} />*/}
-          {/*</div>*/}
-        </div>
-        <div className="flex gap-4">
-          <div className="max-w-96 min-w-80">
-            <PaymentTypeChart jobs={filteredJobsData} />
+          <div className="min-w-0">
+            <JobsByExperienceLevel jobs={filteredJobs} />
           </div>
-          <div className="max-w-md min-w-80">
+          <div className="min-w-0">
+            <PaymentTypeChart jobs={filteredJobs} />
+          </div>
+          <div className="min-w-0">
             <TopInstrumentsByAverageRate
               data={instrumentAverageRates}
               limit={15}
             />
           </div>
-          <div className="max-w-md min-w-80">
-            <JobsByIndustryChart jobs={filteredJobsData} limit={20} />
+          <div className="min-w-0 xl:col-span-3">
+            <JobsByIndustryChart jobs={filteredJobs} limit={20} />
           </div>
         </div>
-        // TODO: fix or remove these charts
-        {/*<div className="flex gap-4">*/}
-        {/*  <div className="max-w-md min-w-80">*/}
-        {/*    <AvgMinMaxJobRatesByCountry jobs={filteredJobsData} />*/}
-        {/*  </div>*/}
-        {/*  <div className="max-w-md min-w-80">*/}
-        {/*    <JobRatesByCountryMinMax jobs={filteredJobsData} />*/}
-        {/*  </div>*/}
-        {/*  /!*<div className="max-w-md min-w-80">*!/*/}
-        {/*  /!*  <JobRatesByCountryAvg jobs={jobsData} />*!/*/}
-        {/*  /!*</div>*!/*/}
-        {/*  <div className="max-w-md min-w-80">*/}
-        {/*    <JobRatesByCountryAvg2 jobs={filteredJobsData} />*/}
-        {/*  </div>*/}
-        {/*  <div className="max-w-md min-w-80">*/}
-        {/*    <JobRatesByCountryMed jobs={filteredJobsData} />*/}
-        {/*  </div>*/}
-        {/*</div>*/}
+      </DashboardSection>
 
-        {/*<div>*/}
-        {/*  {tiles.map((tile, index) => (*/}
-        {/*    <Tile key={tile.id} id={tile.id} index={index} moveTile={moveTile}>*/}
-        {/*      {tile.component}*/}
-        {/*    </Tile>*/}
-        {/*  ))}*/}
-        {/*</div>*/}
-
-        {/*<TopSkillsChart jobs={jobsData} />*/}
-        {/*<ExperiencePieChart jobs={jobsData} />*/}
-        {/*<CountryJobsChart jobs={jobsData} />*/}
-        {/*<AverageRateByCountryChart jobs={jobsData} />*/}
-        <JobsByBinnedRangeChart jobs={filteredJobsData} rangeStep={15} />
-        <JobsByRateDistributionChart jobs={filteredJobsData} valueStep={1} />
-        <JobsByAverageRateChart jobs={filteredJobsData} />
-        <JobsByFixedPriceChart jobs={filteredJobsData} />
-        {/*<HourlyRateChart jobs={jobsData} />*/}
-        <ClientRatingVsAverageRateChart jobs={filteredJobsData} />
-        <ClientSpendingByIndustryChart jobs={filteredJobsData} />
-        <JobsOverTimeChart jobs={filteredJobsData} />
-        {/* TODO: fix calculation in SkillsAverageRateChart*/}
-        <SkillsAverageRateChart jobs={filteredJobsData} />
-        {/* TODO: implement chart Skills by total spent*/}
-        {/* TODO: implement chart Instruments by Average Rate*/}
-        <SkillsStackedBarChart jobs={filteredJobsData} />
-        <SkillsBubbleChart jobs={filteredJobsData} />
-        {/*<SkillsPieChart jobs={jobsData} />*/}
-        {/*<SkillsTreeMapChart jobs={jobsData} />*/}
-        {/* Додаткові графіки можна додавати тут */}
-      </div>
-    </DndProvider>
+      <DashboardSection
+        title="Trend Charts"
+        description="Detailed historical and distribution charts for deeper analysis."
+      >
+        <div className="grid gap-component xl:grid-cols-2">
+          <JobsByBinnedRangeChart jobs={filteredJobs} rangeStep={15} />
+          <JobsByRateDistributionChart jobs={filteredJobs} valueStep={1} />
+          <JobsByAverageRateChart jobs={filteredJobs} />
+          <JobsByFixedPriceChart jobs={filteredJobs} />
+          <ClientRatingVsAverageRateChart jobs={filteredJobs} />
+          <ClientSpendingByIndustryChart jobs={filteredJobs} />
+          <JobsOverTimeChart jobs={filteredJobs} />
+          <SkillsAverageRateChart jobs={filteredJobs} />
+          <SkillsStackedBarChart jobs={filteredJobs} />
+          <SkillsBubbleChart jobs={filteredJobs} />
+        </div>
+      </DashboardSection>
+    </PageShell>
   );
 };
 

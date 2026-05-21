@@ -5,3 +5,4 @@ export * from "./relevance";
 export * from "./selectors";
 export * from "./storage";
 export * from "./types";
+export * from "./queries/useMarketSignalsBoard";

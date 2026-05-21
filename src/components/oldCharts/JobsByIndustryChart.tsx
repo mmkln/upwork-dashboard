@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { UpworkJob } from "../../models";
 import { CategoryValueItem, ValueByCategoryChart } from "../charts";
-import Card from "../ui/Card";
+import { Card } from "../../shared/ui";
 
 interface JobsByIndustryChartProps {
   jobs: UpworkJob[];
@@ -51,11 +51,10 @@ const JobsByIndustryChart: React.FC<JobsByIndustryChartProps> = ({
     : 10;
 
   return (
-    <Card>
-      <div className="p-6">
-        <h2 className="text-lg font-semibold mb-6">Jobs by Client Industry</h2>
+    <Card className="p-card">
+        <h2 className="text-heading text-text-primary">Jobs by Client Industry</h2>
         {data.length ? (
-          <div className="overflow-y-auto h-[21.5rem]">
+          <div className="mt-card h-[21.5rem] overflow-y-auto">
             <ValueByCategoryChart
               data={data}
               maxValue={maxValue}
@@ -63,9 +62,10 @@ const JobsByIndustryChart: React.FC<JobsByIndustryChartProps> = ({
             />
           </div>
         ) : (
-          <p className="text-sm text-gray-500">No industry data to display.</p>
+          <p className="mt-card text-body text-text-muted">
+            No industry data to display.
+          </p>
         )}
-      </div>
     </Card>
   );
 };

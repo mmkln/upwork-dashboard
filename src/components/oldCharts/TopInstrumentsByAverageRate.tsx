@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { CategoryValueItem, ValueByCategoryChart } from "../charts";
-import Card from "../ui/Card";
+import { Card } from "../../shared/ui";
 
 interface TopInstrumentsByAverageRateProps {
   data: CategoryValueItem[];
@@ -35,16 +35,17 @@ const TopInstrumentsByAverageRate: React.FC<
     : 10;
 
   return (
-    <Card>
-      <div className="p-6">
-        <h2 className="text-lg font-semibold mb-2">
+    <Card className="p-card">
+      <div className="space-y-item">
+        <h2 className="text-heading text-text-primary">
           Top Instruments by Avg Hourly Rate
         </h2>
-        <p className="text-xs text-gray-500 mb-4">
+        <p className="text-body text-text-secondary">
           Average uses jobs with hourly rates; count reflects all matches.
         </p>
+      </div>
         {chartData.length ? (
-          <div className="overflow-y-auto h-[21.5rem]">
+          <div className="mt-card h-[21.5rem] overflow-y-auto">
             <ValueByCategoryChart
               data={chartData}
               maxValue={maxValue}
@@ -53,11 +54,10 @@ const TopInstrumentsByAverageRate: React.FC<
             />
           </div>
         ) : (
-          <p className="text-sm text-gray-500">
+          <p className="mt-card text-body text-text-muted">
             No instruments found with the specified criteria.
           </p>
         )}
-      </div>
     </Card>
   );
 };

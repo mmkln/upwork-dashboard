@@ -9,6 +9,7 @@ import {
 } from "recharts";
 import { UpworkJob } from "../../models";
 import { chartColors } from "../../shared/theme";
+import { Card } from "../../shared/ui";
 
 interface PaymentTypeChartProps {
   jobs: UpworkJob[];
@@ -102,8 +103,8 @@ class PaymentTypeChart extends PureComponent<PaymentTypeChartProps> {
     const paymentData = this.getPaymentData();
 
     return (
-      <div className="bg-white p-8 rounded-3xl shadow w-full">
-        <h2 className="text-lg font-semibold">Payment Types</h2>
+      <Card className="w-full p-card">
+        <h2 className="text-heading text-text-primary">Payment Types</h2>
         <ResponsiveContainer width="100%" height={400}>
           <PieChart>
             <Pie
@@ -132,7 +133,7 @@ class PaymentTypeChart extends PureComponent<PaymentTypeChartProps> {
             <Legend />
           </PieChart>
         </ResponsiveContainer>
-      </div>
+      </Card>
     );
   }
 }

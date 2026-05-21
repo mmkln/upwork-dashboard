@@ -8,7 +8,7 @@ const RequireAuth: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#fafafc] text-gray-600">
+      <div className="flex min-h-svh items-center justify-center bg-background text-body text-text-secondary">
         Loading...
       </div>
     );

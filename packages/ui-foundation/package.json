@@ -1,0 +1,65 @@
+{
+  "name": "@upboard/ui-foundation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "styles/base.css",
+    "styles/tailwind-v4.css"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "styles",
+    "tailwind.preset.cjs",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./ui": {
+      "types": "./dist/ui/index.d.ts",
+      "default": "./dist/ui/index.js"
+    },
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "default": "./dist/theme/index.js"
+    },
+    "./lib/cn": {
+      "types": "./dist/lib/cn.d.ts",
+      "default": "./dist/lib/cn.js"
+    },
+    "./styles/base.css": "./styles/base.css",
+    "./styles/tokens.css": "./styles/base.css",
+    "./styles/tailwind-v4.css": "./styles/tailwind-v4.css",
+    "./tailwind-preset": "./tailwind.preset.cjs"
+  },
+  "peerDependencies": {
+    "@radix-ui/react-dialog": "^1.1.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.0",
+    "@radix-ui/react-popover": "^1.1.0",
+    "@radix-ui/react-scroll-area": "^1.2.0",
+    "@radix-ui/react-select": "^2.2.0",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.2.0",
+    "@radix-ui/react-toggle": "^1.1.0",
+    "@radix-ui/react-toggle-group": "^1.1.0",
+    "@radix-ui/react-tooltip": "^1.2.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "cmdk": "^1.1.0",
+    "lucide-react": "^0.468.0 || ^1.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "tailwind-merge": "^3.0.0",
+    "tailwindcss": "^3.4.0 || ^4.0.0",
+    "tailwindcss-animate": "^1.0.0"
+  }
+}

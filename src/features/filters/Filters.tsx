@@ -1,16 +1,19 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { JobStatus, JobExperience } from "../../models";
 import {
   Checkbox,
-  Input,
+  FormField,
   MultiSelect,
+  NumberField,
+  RadixSelect as Select,
+  RadixSelectContent as SelectContent,
+  RadixSelectItem as SelectItem,
+  RadixSelectTrigger as SelectTrigger,
+  RadixSelectValue as SelectValue,
   RangeInput,
-  Select as UiSelect,
 } from "../../shared/ui";
-import { camelToCapitalizedWords, debounce } from "../../utils";
-import { FilterState } from "./types";
-
-export type JobType = "Fixed Price" | "Hourly Rate" | "Unspecified" | "None";
+import { camelToCapitalizedWords } from "../../utils";
+import { FilterState, JobType } from "./types";
 
 interface FilterComponentProps {
   onFilterChange: (
@@ -30,10 +33,42 @@ interface FilterComponentProps {
   availableStatuses: JobStatus[];
   availableCollections: { id: number; name: string }[];
   initialFilters?: FilterState;
+  showCollectionsFilter?: boolean;
 }
 
 const INITIAL_HOURLY_RATE_MAX = 500;
 const INITIAL_FIXED_PRICE_MAX = 5000;
+
+const JOB_TYPE_OPTIONS: JobType[] = [
+  "None",
+  "Fixed Price",
+  "Hourly Rate",
+  "Unspecified",
+];
+
+type FieldProps = {
+  label: React.ReactNode;
+  children: React.ReactNode;
+};
+
+const Field: React.FC<FieldProps> = ({ label, children }) => (
+  <label className="flex flex-col gap-item">
+    <span className="text-label text-text-muted">{label}</span>
+    {children}
+  </label>
+);
+
+type FilterSectionProps = {
+  title: string;
+  children: React.ReactNode;
+};
+
+const FilterSection: React.FC<FilterSectionProps> = ({ title, children }) => (
+  <section className="space-y-component">
+    <h3 className="text-heading text-text-primary">{title}</h3>
+    {children}
+  </section>
+);
 
 export const FilterComponent: React.FC<FilterComponentProps> = ({
   onFilterChange,
@@ -42,29 +77,48 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   availableStatuses,
   availableCollections,
   initialFilters,
+  showCollectionsFilter = true,
 }) => {
-  const [jobType, setJobType] = useState<JobType>(initialFilters?.jobType ?? "None");
+  const [jobType, setJobType] = useState<JobType>(
+    initialFilters?.jobType ?? "None",
+  );
   const [fixedPriceRange, setFixedPriceRange] = useState<
     [number, number] | null
   >(initialFilters?.fixedPriceRange ?? [0, INITIAL_FIXED_PRICE_MAX]);
   const [hourlyRateRange, setHourlyRateRange] = useState<
     [number, number] | null
   >(initialFilters?.hourlyRateRange ?? [0, INITIAL_HOURLY_RATE_MAX]);
-  const [selectedSkills, setSelectedSkills] = useState<string[]>(initialFilters?.selectedSkills ?? []);
-  const [selectedInstruments, setSelectedInstruments] = useState<string[]>(initialFilters?.selectedInstruments ?? []);
-  const [selectedStatuses, setSelectedStatuses] = useState<JobStatus[]>(initialFilters?.selectedStatuses ?? []);
-  const [selectedCollections, setSelectedCollections] = useState<number[]>(initialFilters?.selectedCollectionIds ?? []);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(
+    initialFilters?.selectedSkills ?? [],
+  );
+  const [selectedInstruments, setSelectedInstruments] = useState<string[]>(
+    initialFilters?.selectedInstruments ?? [],
+  );
+  const [selectedStatuses, setSelectedStatuses] = useState<JobStatus[]>(
+    initialFilters?.selectedStatuses ?? [],
+  );
+  const [selectedCollections, setSelectedCollections] = useState<number[]>(
+    initialFilters?.selectedCollectionIds ?? [],
+  );
   const [selectedJobExperience, setSelectedJobExperience] = useState<
     JobExperience[]
   >(initialFilters?.selectedExperience ?? []);
-  const [titleFilter, setTitleFilter] = useState<string>(initialFilters?.titleFilter ?? "");
-  const [bookmarked, setBookmarked] = useState<boolean>(initialFilters?.bookmarked ?? false);
+  const [titleFilter, setTitleFilter] = useState<string>(
+    initialFilters?.titleFilter ?? "",
+  );
+  const [bookmarked, setBookmarked] = useState<boolean>(
+    initialFilters?.bookmarked ?? false,
+  );
 
   useEffect(() => {
     if (!initialFilters) return;
     setJobType(initialFilters.jobType);
-    setFixedPriceRange(initialFilters.fixedPriceRange ?? [0, INITIAL_FIXED_PRICE_MAX]);
-    setHourlyRateRange(initialFilters.hourlyRateRange ?? [0, INITIAL_HOURLY_RATE_MAX]);
+    setFixedPriceRange(
+      initialFilters.fixedPriceRange ?? [0, INITIAL_FIXED_PRICE_MAX],
+    );
+    setHourlyRateRange(
+      initialFilters.hourlyRateRange ?? [0, INITIAL_HOURLY_RATE_MAX],
+    );
     setSelectedSkills(initialFilters.selectedSkills ?? []);
     setSelectedInstruments(initialFilters.selectedInstruments ?? []);
     setSelectedStatuses(initialFilters.selectedStatuses ?? []);
@@ -99,428 +153,283 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     label: exp,
   }));
 
+  const emitFilterChange = (nextFilters: Partial<FilterState>) => {
+    const merged: FilterState = {
+      jobType,
+      fixedPriceRange,
+      hourlyRateRange,
+      selectedSkills,
+      selectedInstruments,
+      selectedStatuses,
+      selectedCollectionIds: selectedCollections,
+      selectedExperience: selectedJobExperience,
+      titleFilter,
+      bookmarked,
+      ...nextFilters,
+    };
+
+    onFilterChange(
+      merged.jobType,
+      merged.fixedPriceRange,
+      merged.hourlyRateRange,
+      merged.selectedSkills,
+      merged.selectedInstruments,
+      merged.selectedStatuses,
+      merged.selectedCollectionIds,
+      merged.selectedExperience,
+      merged.titleFilter,
+      merged.bookmarked,
+    );
+  };
+
   useEffect(() => {
     setSelectedCollections((prev) => {
       const validIds = prev.filter((id) =>
         availableCollections.some((collection) => collection.id === id),
       );
+
       if (validIds.length !== prev.length) {
-        onFilterChange(
-          jobType,
-          fixedPriceRange,
-          hourlyRateRange,
-          selectedSkills,
-          selectedInstruments,
-          selectedStatuses,
-          validIds,
-          selectedJobExperience,
-          titleFilter,
-          bookmarked,
-        );
+        emitFilterChange({ selectedCollectionIds: validIds });
       }
+
       return validIds;
     });
-  }, [availableCollections, bookmarked, fixedPriceRange, hourlyRateRange, jobType, onFilterChange, selectedInstruments, selectedJobExperience, selectedSkills, selectedStatuses, titleFilter]);
-
-  // Debounced filter change handler
-  const debouncedFilterChange = useCallback(
-    debounce((value: string) => {
-      onFilterChange(
-        jobType,
-        fixedPriceRange,
-        hourlyRateRange,
-        selectedSkills,
-        selectedInstruments,
-        selectedStatuses,
-        selectedCollections,
-        selectedJobExperience,
-        value,
-        bookmarked,
-      );
-    }, 300),
-    [
-      jobType,
-      fixedPriceRange,
-      hourlyRateRange,
-      selectedSkills,
-      selectedInstruments,
-      selectedStatuses,
-      selectedCollections,
-      selectedJobExperience,
-      bookmarked,
-    ],
-  );
+  }, [availableCollections]);
 
   const handleTitleFilterChange = (value: string) => {
     setTitleFilter(value);
-    debouncedFilterChange(value);
+    emitFilterChange({ titleFilter: value });
   };
 
   const handleJobTypeChange = (value: JobType) => {
     setJobType(value);
-    onFilterChange(
-      value,
-      fixedPriceRange,
-      hourlyRateRange,
-      selectedSkills,
-      selectedInstruments,
-      selectedStatuses,
-      selectedCollections,
-      selectedJobExperience,
-      titleFilter,
-      bookmarked,
-    );
+    emitFilterChange({ jobType: value });
   };
 
   const handleFixedPriceChange = (min: number, max: number) => {
-    // Validate inputs: ensure non-negative and min <= max
     const validatedMin = Math.max(0, min);
     const validatedMax = Math.max(validatedMin, max);
     const range: [number, number] = [validatedMin, validatedMax];
+
     setFixedPriceRange(range);
-    onFilterChange(
-      jobType,
-      range,
-      hourlyRateRange,
-      selectedSkills,
-      selectedInstruments,
-      selectedStatuses,
-      selectedCollections,
-      selectedJobExperience,
-      titleFilter,
-      bookmarked,
-    );
+    emitFilterChange({ fixedPriceRange: range });
   };
 
   const handleHourlyRateChange = (min: number, max: number) => {
-    // Add validation similar to fixed price
     const validatedMin = Math.max(0, min);
     const validatedMax = Math.max(validatedMin, max);
     const range: [number, number] = [validatedMin, validatedMax];
+
     setHourlyRateRange(range);
-    onFilterChange(
-      jobType,
-      fixedPriceRange,
-      range,
-      selectedSkills,
-      selectedInstruments,
-      selectedStatuses,
-      selectedCollections,
-      selectedJobExperience,
-      titleFilter,
-      bookmarked,
-    );
+    emitFilterChange({ hourlyRateRange: range });
   };
 
   const handleSkillsChange = (skills: string[]) => {
     setSelectedSkills(skills);
-    onFilterChange(
-      jobType,
-      fixedPriceRange,
-      hourlyRateRange,
-      skills,
-      selectedInstruments,
-      selectedStatuses,
-      selectedCollections,
-      selectedJobExperience,
-      titleFilter,
-      bookmarked,
-    );
+    emitFilterChange({ selectedSkills: skills });
   };
 
   const handleInstrumentsChange = (instruments: string[]) => {
     setSelectedInstruments(instruments);
-    onFilterChange(
-      jobType,
-      fixedPriceRange,
-      hourlyRateRange,
-      selectedSkills,
-      instruments,
-      selectedStatuses,
-      selectedCollections,
-      selectedJobExperience,
-      titleFilter,
-      bookmarked,
-    );
+    emitFilterChange({ selectedInstruments: instruments });
   };
 
   const handleStatusesChange = (statuses: JobStatus[]) => {
     setSelectedStatuses(statuses);
-    onFilterChange(
-      jobType,
-      fixedPriceRange,
-      hourlyRateRange,
-      selectedSkills,
-      selectedInstruments,
-      statuses,
-      selectedCollections,
-      selectedJobExperience,
-      titleFilter,
-      bookmarked,
-    );
+    emitFilterChange({ selectedStatuses: statuses });
   };
 
   const handleCollectionsChange = (collections: number[]) => {
     setSelectedCollections(collections);
-    onFilterChange(
-      jobType,
-      fixedPriceRange,
-      hourlyRateRange,
-      selectedSkills,
-      selectedInstruments,
-      selectedStatuses,
-      collections,
-      selectedJobExperience,
-      titleFilter,
-      bookmarked,
-    );
+    emitFilterChange({ selectedCollectionIds: collections });
   };
 
   const handleExperienceChange = (experiences: JobExperience[]) => {
     setSelectedJobExperience(experiences);
-    onFilterChange(
-      jobType,
-      fixedPriceRange,
-      hourlyRateRange,
-      selectedSkills,
-      selectedInstruments,
-      selectedStatuses,
-      selectedCollections,
-      experiences,
-      titleFilter,
-      bookmarked,
-    );
+    emitFilterChange({ selectedExperience: experiences });
   };
 
-  const handleBookmarkedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const bookmarked = e.target.checked;
-    setBookmarked(bookmarked);
-    onFilterChange(
-      jobType,
-      fixedPriceRange,
-      hourlyRateRange,
-      selectedSkills,
-      selectedInstruments,
-      selectedStatuses,
-      selectedCollections,
-      selectedJobExperience,
-      titleFilter,
-      bookmarked,
-    );
+  const handleBookmarkedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextBookmarked = event.target.checked;
+    setBookmarked(nextBookmarked);
+    emitFilterChange({ bookmarked: nextBookmarked });
   };
+
+  const fixedPriceMin = fixedPriceRange?.[0] ?? 0;
+  const fixedPriceMax = fixedPriceRange?.[1] ?? INITIAL_FIXED_PRICE_MAX;
+  const hourlyRateMin = hourlyRateRange?.[0] ?? 0;
+  const hourlyRateMax = hourlyRateRange?.[1] ?? INITIAL_HOURLY_RATE_MAX;
 
   return (
-    <div className="rounded-md">
-      <div className="flex flex-wrap gap-6">
-        {/* Title Filter */}
-        <div className="flex flex-col w-full md:w-1/4">
-          <label className="mb-1 text-sm font-semibold text-gray-700">
-            Search in Title
-          </label>
-          <Input
+    <div className="space-y-card">
+      <FilterSection title="Basics">
+        <div className="grid gap-component md:grid-cols-2">
+          <FormField
+            label="Search in title"
             type="text"
             placeholder="Filter by job title..."
             value={titleFilter}
-            onChange={(e) => handleTitleFilterChange(e.target.value)}
+            onValueChange={handleTitleFilterChange}
           />
-        </div>
-        {/* Job Type */}
-        <div className="flex flex-col w-full md:w-1/4">
-          <label className="mb-1 text-sm font-semibold text-gray-700">
-            Job Type
-          </label>
-          <UiSelect
-            value={jobType}
-            onChange={(e) => handleJobTypeChange(e.target.value as JobType)}
-          >
-            <option value="Fixed Price">Fixed Price</option>
-            <option value="Hourly Rate">Hourly Rate</option>
-            <option value="Unspecified">Unspecified</option>
-            <option value="None">None</option>
-          </UiSelect>
-        </div>
 
-        {/* Fixed Price Range */}
-        {jobType === "Fixed Price" && (
-          <div className="flex flex-col w-full md:w-1/2">
-            <label className="mb-1 text-sm font-semibold text-gray-700">
-              Fixed Price Range
-            </label>
-            <div className="flex items-center space-x-3">
-              <Input
-                type="number"
-                min="0"
-                max="5000"
-                value={fixedPriceRange ? fixedPriceRange[0] : 0}
-                onChange={(e) =>
-                  handleFixedPriceChange(
-                    Number(e.target.value),
-                    fixedPriceRange
-                      ? fixedPriceRange[1]
-                      : INITIAL_FIXED_PRICE_MAX,
-                  )
-                }
-                className="w-1/2"
-                placeholder="Min Price"
-              />
-              <span className="text-sm text-gray-700">to</span>
-              <Input
-                type="number"
-                min="0"
-                max="5000"
-                value={
-                  fixedPriceRange ? fixedPriceRange[1] : INITIAL_FIXED_PRICE_MAX
-                }
-                onChange={(e) =>
-                  handleFixedPriceChange(
-                    fixedPriceRange ? fixedPriceRange[0] : 0,
-                    Number(e.target.value),
-                  )
-                }
-                className="w-1/2"
-                placeholder="Max Price"
-              />
-            </div>
+          <Field label="Job type">
+            <Select
+              value={jobType}
+              onValueChange={(value) => handleJobTypeChange(value as JobType)}
+            >
+              <SelectTrigger className="h-target">
+                <SelectValue placeholder="Select job type" />
+              </SelectTrigger>
+              <SelectContent>
+                {JOB_TYPE_OPTIONS.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+        </div>
+      </FilterSection>
+
+      {jobType === "Fixed Price" && (
+        <FilterSection title="Fixed Price">
+          <div className="grid gap-component md:grid-cols-2">
+            <NumberField
+              label="Min price"
+              min="0"
+              max="5000"
+              value={fixedPriceMin}
+              onValueChange={(value) =>
+                handleFixedPriceChange(value, fixedPriceMax)
+              }
+              placeholder="Min price"
+            />
+            <NumberField
+              label="Max price"
+              min="0"
+              max="5000"
+              value={fixedPriceMax}
+              onValueChange={(value) =>
+                handleFixedPriceChange(fixedPriceMin, value)
+              }
+              placeholder="Max price"
+            />
           </div>
-        )}
+        </FilterSection>
+      )}
 
-        {/* Hourly Rate Range */}
-        {jobType === "Hourly Rate" && (
-          <div className="flex flex-col w-full md:w-1/2">
-            <label className="mb-1 text-sm font-semibold text-gray-700">
-              Hourly Rate Range
-            </label>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-3">
+      {jobType === "Hourly Rate" && (
+        <FilterSection title="Hourly Rate">
+          <div className="space-y-component">
+            <Field label="Min hourly rate">
+              <div className="flex items-center gap-control">
                 <RangeInput
                   min="0"
                   max="500"
-                  value={hourlyRateRange ? hourlyRateRange[0] : 0}
-                  onChange={(e) =>
+                  value={hourlyRateMin}
+                  onChange={(event) =>
                     handleHourlyRateChange(
-                      Number(e.target.value),
-                      hourlyRateRange
-                        ? hourlyRateRange[1]
-                        : INITIAL_HOURLY_RATE_MAX,
+                      Number(event.target.value),
+                      hourlyRateMax,
                     )
                   }
                 />
-                <span className="w-16 text-sm text-gray-700">
-                  ${hourlyRateRange ? hourlyRateRange[0] : 0}
+                <span className="w-16 text-right text-data text-text-primary">
+                  ${hourlyRateMin}
                 </span>
               </div>
-              <div className="flex items-center space-x-3">
+            </Field>
+            <Field label="Max hourly rate">
+              <div className="flex items-center gap-control">
                 <RangeInput
                   min="0"
                   max="500"
-                  value={
-                    hourlyRateRange
-                      ? hourlyRateRange[1]
-                      : INITIAL_HOURLY_RATE_MAX
-                  }
-                  onChange={(e) =>
+                  value={hourlyRateMax}
+                  onChange={(event) =>
                     handleHourlyRateChange(
-                      hourlyRateRange ? hourlyRateRange[0] : 0,
-                      Number(e.target.value),
+                      hourlyRateMin,
+                      Number(event.target.value),
                     )
                   }
                 />
-                <span className="w-16 text-sm text-gray-700">
-                  $
-                  {hourlyRateRange
-                    ? hourlyRateRange[1]
-                    : INITIAL_HOURLY_RATE_MAX}
+                <span className="w-16 text-right text-data text-text-primary">
+                  ${hourlyRateMax}
                 </span>
               </div>
-            </div>
+            </Field>
           </div>
-        )}
+        </FilterSection>
+      )}
 
-        {/* Skills */}
-        <div className="flex flex-col w-full md:w-1/4">
-          <label className="mb-1 text-sm font-semibold text-gray-700">
-            Skills
-          </label>
-          <MultiSelect
-            options={skillOptions}
-            value={selectedSkills}
-            onChange={handleSkillsChange}
-            placeholder="Select skills..."
-            searchPlaceholder="Search skills..."
-          />
-        </div>
+      <FilterSection title="Matching">
+        <div className="grid gap-component md:grid-cols-2">
+          <Field label="Skills">
+            <MultiSelect
+              options={skillOptions}
+              value={selectedSkills}
+              onChange={handleSkillsChange}
+              placeholder="Select skills..."
+              searchPlaceholder="Search skills..."
+            />
+          </Field>
 
-        {/* Instruments */}
-        <div className="flex flex-col w-full md:w-1/4">
-          <label className="mb-1 text-sm font-semibold text-gray-700">
-            Instruments
-          </label>
-          <MultiSelect
-            options={instrumentOptions}
-            value={selectedInstruments}
-            onChange={handleInstrumentsChange}
-            placeholder="Select instruments..."
-            searchPlaceholder="Search instruments..."
-          />
-        </div>
+          <Field label="Instruments">
+            <MultiSelect
+              options={instrumentOptions}
+              value={selectedInstruments}
+              onChange={handleInstrumentsChange}
+              placeholder="Select instruments..."
+              searchPlaceholder="Search instruments..."
+            />
+          </Field>
 
-        {/* Job Statuses */}
-        <div className="flex flex-col w-full md:w-1/4">
-          <label className="mb-1 text-sm font-semibold text-gray-700">
-            Job Statuses
-          </label>
-          <MultiSelect
-            options={statusOptions}
-            value={selectedStatuses}
-            onChange={handleStatusesChange}
-            placeholder="Select statuses..."
-            searchPlaceholder="Search statuses..."
-          />
-        </div>
+          <Field label="Job statuses">
+            <MultiSelect
+              options={statusOptions}
+              value={selectedStatuses}
+              onChange={handleStatusesChange}
+              placeholder="Select statuses..."
+              searchPlaceholder="Search statuses..."
+            />
+          </Field>
 
-        {/* Collections */}
-        <div className="flex flex-col w-full md:w-1/4">
-          <label className="mb-1 text-sm font-semibold text-gray-700">
-            Collections
-          </label>
-          <MultiSelect
-            options={collectionOptions}
-            value={selectedCollections}
-            onChange={handleCollectionsChange}
-            placeholder={
-              collectionOptions.length ? "Select collections..." : "No collections"
-            }
-            searchPlaceholder="Search collections..."
-            disabled={collectionOptions.length === 0}
-          />
-        </div>
+          {showCollectionsFilter ? (
+            <Field label="Collections">
+              <MultiSelect
+                options={collectionOptions}
+                value={selectedCollections}
+                onChange={handleCollectionsChange}
+                placeholder={
+                  collectionOptions.length
+                    ? "Select collections..."
+                    : "No collections"
+                }
+                searchPlaceholder="Search collections..."
+                disabled={collectionOptions.length === 0}
+              />
+            </Field>
+          ) : null}
 
-        {/* Job Experience */}
-        <div className="flex flex-col w-full md:w-1/4">
-          <label className="mb-1 text-sm font-semibold text-gray-700">
-            Job Experience
-          </label>
-          <MultiSelect
-            options={experienceOptions}
-            value={selectedJobExperience}
-            onChange={handleExperienceChange}
-            placeholder="Select experience..."
-            searchPlaceholder="Search experience..."
-          />
-        </div>
+          <Field label="Job experience">
+            <MultiSelect
+              options={experienceOptions}
+              value={selectedJobExperience}
+              onChange={handleExperienceChange}
+              placeholder="Select experience..."
+              searchPlaceholder="Search experience..."
+            />
+          </Field>
 
-        {/* Bookmarked filter */}
-        <div className="flex items-center">
-          <label className="flex items-center text-sm font-semibold text-gray-700">
+          <label className="flex min-h-target items-center gap-item rounded-control bg-block-subtle px-component py-control text-ui text-text-secondary transition-colors duration-motion-fast ease-motion-standard hover:bg-fill-tertiary">
             <Checkbox
-              checked={bookmarked === true}
+              checked={bookmarked}
               onChange={handleBookmarkedChange}
-              className="mr-2"
             />
             Only bookmarked jobs
           </label>
         </div>
-      </div>
+      </FilterSection>
     </div>
   );
 };

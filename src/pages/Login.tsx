@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthProvider";
-import { Button, Input } from "../shared/ui";
+import { Button, Card, FormField } from "../shared/ui";
+import ubAppLogo from "../assets/ub-app-logo.svg";
+
+const UpboardMark: React.FC = () => (
+  <img
+    src={ubAppLogo}
+    alt=""
+    aria-hidden="true"
+    className="h-8 w-8"
+  />
+);
 
 const Login: React.FC = () => {
   const { login, token } = useAuth();
@@ -25,7 +35,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!username || !password) {
+    if (!username.trim() || !password) {
       setError("Please provide both username and password.");
       return;
     }
@@ -48,98 +58,74 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#FCFDFF] px-4">
-      <div className="flex w-full max-w-[468px] flex-col gap-10 rounded-[10px] border border-[#EFEFEF] bg-white p-10">
-        <div className="flex justify-center">
-          <svg
-            width="32"
-            height="32"
-            viewBox="0 0 32 32"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-            className="mb-6 text-primary-900"
-          >
-            <path
-              d="M24.748 17.5652C23.2787 17.5652 21.9013 16.934 20.6493 15.9067L20.9533 14.4523L20.964 14.3956C21.24 12.8506 22.096 10.2595 24.7493 10.2595C26.7387 10.2595 28.3533 11.8977 28.3533 13.913C28.352 15.9257 26.7373 17.5652 24.748 17.5652ZM24.748 6.56265C21.3627 6.56265 18.7347 8.79155 17.668 12.464C16.0413 9.98507 14.804 7.0087 14.0853 4.5H10.4373V14.1131C10.4347 16.0135 8.916 17.5544 7.04133 17.5571C5.168 17.5544 3.65067 16.0122 3.648 14.1131V4.5H0V14.1131C0 18.0518 3.16 21.281 7.04133 21.281C10.9253 21.281 14.0853 18.0518 14.0853 14.1131V12.5046C14.7907 14.0009 15.6613 15.5175 16.7173 16.8583L14.4867 27.5H18.216L19.8333 19.782C21.2507 20.6998 22.88 21.281 24.748 21.281C28.748 21.281 32 17.9667 32 13.9144C32 9.85937 28.748 6.56265 24.748 6.56265Z"
-              fill="currentColor"
-            />
-          </svg>
-        </div>
-
-        <div className="flex flex-col gap-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-normal text-[#141414]">
+    <main className="flex min-h-svh items-center justify-center bg-background px-app-gutter py-page">
+      <Card className="w-full max-w-form p-card sm:p-panel">
+        <div className="flex flex-col gap-panel">
+          <header className="flex flex-col items-center gap-component text-center">
+            <UpboardMark />
+            <h1 className="text-heading text-text-primary">
               Sign in to Upboard
             </h1>
-            <p className="mt-2 text-sm text-[#6B7280]">
-              Enter your credentials to access your dashboard.
-            </p>
-          </div>
+          </header>
 
           {error && (
-            <div className="mt-6 px-4 py-3 text-sm text-red-700 bg-red-100 border border-red-200 rounded">
+            <div
+              role="alert"
+              className="rounded-control border border-destructive/20 bg-destructive-muted px-component py-control text-body text-destructive"
+            >
               {error}
             </div>
           )}
 
-          <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="username"
-                  className="block text-xs font-medium text-[#575757]"
-                >
-                  Username
-                </label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  autoComplete="username"
-                  required
-                  value={username}
-                  onChange={(event) => setUsername(event.target.value)}
-                  className="focus:ring-4"
-                  placeholder="Enter your username..."
-                />
-              </div>
+          <form className="flex flex-col gap-card" onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-component">
+              <FormField
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                required
+                label="Username"
+                value={username}
+                onValueChange={(value) => {
+                  setUsername(value);
+                  setError(null);
+                }}
+                placeholder="Enter your username"
+              />
 
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="password"
-                  className="block text-xs font-medium text-[#575757]"
-                >
-                  Password
-                </label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Enter your password..."
-                />
-              </div>
+              <FormField
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                label="Password"
+                value={password}
+                onValueChange={(value) => {
+                  setPassword(value);
+                  setError(null);
+                }}
+                placeholder="Enter your password"
+              />
             </div>
 
             <Button
               type="submit"
               disabled={isSubmitting}
+              aria-busy={isSubmitting}
               className="w-full"
             >
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </form>
 
-          <p className="text-xs font-normal text-center text-[#6B7280]">
+          <p className="text-center text-body text-text-muted">
             Need an account? Contact the administrator to get access.
           </p>
         </div>
-      </div>
-    </div>
+      </Card>
+    </main>
   );
 };
 

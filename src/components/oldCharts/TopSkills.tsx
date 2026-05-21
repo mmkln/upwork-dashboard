@@ -41,7 +41,7 @@ const TopSkills: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
   const limitedData = limit ? sortedData.slice(0, limit) : data;
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-md w-full">
+    <div className="w-full rounded-block bg-block p-block shadow-none">
       <h2 className="text-lg font-semibold mb-8">Top {limit} Skills</h2>
       <div className="overflow-scroll h-[21.5rem]">
         <ValueByCategoryChart

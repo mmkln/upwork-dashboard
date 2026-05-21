@@ -1,0 +1,236 @@
+@import "./base.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Inter,
+    ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: 34px;
+  --text-display--line-height: 41px;
+  --text-display--letter-spacing: 0;
+  --text-display--font-weight: 700;
+  --text-heading: 22px;
+  --text-heading--line-height: 28px;
+  --text-heading--letter-spacing: 0;
+  --text-heading--font-weight: 600;
+  --text-body: 17px;
+  --text-body--line-height: 22px;
+  --text-body--letter-spacing: 0;
+  --text-body--font-weight: 400;
+  --text-ui: 15px;
+  --text-ui--line-height: 20px;
+  --text-ui--letter-spacing: 0;
+  --text-ui--font-weight: 500;
+  --text-label: 13px;
+  --text-label--line-height: 18px;
+  --text-label--letter-spacing: 0;
+  --text-label--font-weight: 600;
+  --text-data: 28px;
+  --text-data--line-height: 34px;
+  --text-data--letter-spacing: 0;
+  --text-data--font-weight: 700;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-surface: hsl(var(--surface));
+  --color-surface-elevated: hsl(var(--surface-elevated));
+  --color-surface-raised: hsl(var(--surface-raised));
+  --color-surface-chrome: hsl(var(--surface-chrome));
+  --color-surface-subtle: hsl(var(--surface-subtle));
+  --color-surface-muted: hsl(var(--surface-muted));
+  --color-block: hsl(var(--block));
+  --color-block-subtle: hsl(var(--block-subtle));
+  --color-block-border: hsl(var(--block-border));
+  --color-control: hsl(var(--control));
+  --color-control-hover: hsl(var(--control-hover));
+  --color-control-selected: hsl(var(--control-selected));
+  --color-control-border: hsl(var(--control-border));
+  --color-island: hsl(var(--island));
+  --color-island-hover: hsl(var(--island-hover));
+  --color-island-selected: hsl(var(--island-selected));
+  --color-island-border: hsl(var(--island-border));
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-primary: hsl(var(--primary));
+  --color-primary-hover: hsl(var(--primary-hover));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-action: hsl(var(--action));
+  --color-action-hover: hsl(var(--action-hover));
+  --color-action-muted: hsl(var(--action-muted));
+  --color-action-foreground: hsl(var(--action-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-link: hsl(var(--link));
+  --color-link-hover: hsl(var(--link-hover));
+  --color-fill: hsl(var(--fill));
+  --color-fill-secondary: hsl(var(--fill-secondary));
+  --color-fill-tertiary: hsl(var(--fill-tertiary));
+  --color-fill-quaternary: hsl(var(--fill-quaternary));
+  --color-border: hsl(var(--border));
+  --color-border-subtle: hsl(var(--border-subtle));
+  --color-border-strong: hsl(var(--border-strong));
+  --color-separator: hsl(var(--separator));
+  --color-separator-opaque: hsl(var(--separator-opaque));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-text-primary: hsl(var(--text-primary));
+  --color-text-secondary: hsl(var(--text-secondary));
+  --color-text-muted: hsl(var(--text-muted));
+  --color-text-quaternary: hsl(var(--text-quaternary));
+  --color-text-placeholder: hsl(var(--text-placeholder));
+  --color-text-inverted: hsl(var(--text-inverted));
+  --color-premium-athens: hsl(var(--neutral-athens));
+  --color-premium-shark: hsl(var(--neutral-shark));
+  --color-premium-graphite: hsl(var(--premium-graphite));
+  --color-premium-blue: hsl(var(--premium-blue));
+  --color-premium-indigo: hsl(var(--premium-indigo));
+  --color-premium-purple: hsl(var(--premium-purple));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-success-muted: hsl(var(--success-muted));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-warning-muted: hsl(var(--warning-muted));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-muted: hsl(var(--destructive-muted));
+  --color-material-ultra-thin: hsl(var(--material-ultra-thin));
+  --color-material-thin: hsl(var(--material-thin));
+  --color-material-regular: hsl(var(--material-regular));
+  --color-material-thick: hsl(var(--material-thick));
+  --color-material-liquid: hsl(var(--material-liquid));
+  --color-material-vibrant: hsl(var(--material-vibrant));
+  --color-material-chrome: hsl(var(--material-chrome));
+  --color-material-border: hsl(var(--material-border));
+
+  --spacing-micro: 4px;
+  --spacing-tag: 6px;
+  --spacing-item: 8px;
+  --spacing-control: 12px;
+  --spacing-component: 16px;
+  --spacing-card: 24px;
+  --spacing-panel: 32px;
+  --spacing-page: 40px;
+  --spacing-section: 40px;
+  --spacing-control-mini: 28px;
+  --spacing-control-small: 32px;
+  --spacing-target: 44px;
+  --spacing-control-large: 52px;
+  --spacing-layout: 48px;
+  --spacing-control-xl: 64px;
+  --spacing-spacious: 64px;
+  --spacing-island: 14px;
+  --spacing-block: 24px;
+  --spacing-sidebar-inset: 16px;
+  --spacing-app-gutter: 24px;
+  --spacing-content-gutter: 24px;
+  --spacing-app-rail: 72px;
+  --spacing-sidebar-collapsed: 72px;
+  --spacing-sidebar-expanded: 288px;
+  --spacing-search: 240px;
+  --spacing-search-compact: 220px;
+  --spacing-number-field: 80px;
+  --spacing-inspector: 420px;
+  --spacing-menu: 160px;
+  --spacing-popover: 320px;
+  --spacing-overlay: 92vh;
+  --spacing-overlay-body: calc(92vh - 168px);
+  --spacing-overlay-detail-body: calc(92vh - 104px);
+  --spacing-table-sm: 640px;
+  --spacing-table-lg: 1120px;
+  --spacing-status-trigger: 138px;
+  --spacing-status-menu: 180px;
+
+  --container-content: 1440px;
+  --container-readable: 768px;
+  --container-form: 440px;
+  --container-inspector: 420px;
+  --container-detail-value: 12rem;
+  --container-title: 300px;
+  --container-chip: 120px;
+  --container-sheet-sm: 360px;
+  --container-sheet-md: 560px;
+  --container-modal-lg: 860px;
+  --container-modal-xl: 1024px;
+  --container-viewport-safe: 92vw;
+
+  --radius-island: 20px;
+  --radius-block: 16px;
+  --radius-control: 12px;
+  --radius-item: 8px;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --shadow-block:
+    0 8px 24px -18px hsl(var(--block-shadow)),
+    0 2px 8px -6px hsl(var(--block-shadow));
+  --shadow-material:
+    0 10px 30px -10px hsl(var(--material-shadow)),
+    0 4px 12px -6px hsl(var(--material-shadow));
+  --shadow-premium:
+    0 18px 48px -18px hsl(var(--premium-shadow)),
+    0 8px 20px -12px hsl(var(--premium-shadow));
+
+  --ease-motion-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-motion-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-motion-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+@utility duration-motion-instant {
+  transition-duration: 0ms;
+}
+
+@utility duration-motion-fast {
+  transition-duration: 120ms;
+}
+
+@utility duration-motion {
+  transition-duration: 180ms;
+}
+
+@utility duration-motion-medium {
+  transition-duration: 220ms;
+}
+
+@utility duration-motion-disclosure {
+  transition-duration: 240ms;
+}
+
+@utility duration-motion-slow {
+  transition-duration: 300ms;
+}
+
+@utility delay-motion-label {
+  transition-delay: 90ms;
+}
+
+@utility grid-cols-overview {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+@utility grid-cols-inspector {
+  grid-template-columns: minmax(0, 1fr) 420px;
+}
+
+@utility grid-cols-job-detail {
+  grid-template-columns: minmax(0, 1fr) 280px;
+}
+
+@utility grid-cols-settings {
+  grid-template-columns: minmax(0, 1fr) 260px;
+}
+
+@utility grid-cols-signal-filters {
+  grid-template-columns: minmax(220px, 1.5fr) repeat(7, minmax(140px, 1fr)) auto;
+}

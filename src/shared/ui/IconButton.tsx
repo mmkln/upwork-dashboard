@@ -19,13 +19,13 @@ const variantMap: Record<IconButtonVariant, ShadcnButtonProps["variant"]> = {
 };
 
 const sizeClassName: Record<IconButtonSize, string> = {
-  sm: "h-8 w-8",
-  md: "h-9 w-9",
+  sm: "h-control-small w-control-small",
+  md: "h-target w-target",
 };
 
 const variantClassName: Record<IconButtonVariant, string> = {
-  ghost: "border-transparent text-text-secondary hover:bg-accent hover:text-accent-foreground",
-  outline: "border-input text-text-secondary hover:bg-accent hover:text-accent-foreground",
+  ghost: "border-transparent text-text-secondary hover:bg-control-hover hover:text-text-primary",
+  outline: "border-control-border bg-control text-text-secondary hover:bg-control-hover hover:text-text-primary",
 };
 
 const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
@@ -39,7 +39,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       variant={variantMap[variant]}
       size="icon"
       className={cn(
-        "rounded-[10px] focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted",
+        "rounded-full focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted",
         variantClassName[variant],
         sizeClassName[size],
         className,

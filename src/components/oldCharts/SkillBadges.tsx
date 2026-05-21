@@ -1,9 +1,8 @@
 import React from "react";
 import { UpworkJob } from "../../models";
-import { ValueByCategoryChart, CategoryValueItem } from "../charts";
-import Card from "../ui/Card";
 import { CopyToClipboardButton } from "../elements";
 import { Badge } from "../ui";
+import { Card } from "../../shared/ui";
 
 interface AverageRateByCountryProps {
   jobs: UpworkJob[];
@@ -46,21 +45,17 @@ const SkillBadges: React.FC<AverageRateByCountryProps> = ({ jobs, limit }) => {
   const instrumentsText = limitedData.map(({ label }) => label).join(", ");
 
   return (
-    <Card>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold">
-            Top {limitedData.length} Skills
-          </h2>
-          <CopyToClipboardButton data={instrumentsText} name="Skills" />
-        </div>
-        {/*<div className="overflow-auto over h-[21.5rem]">*/}
-        <div className="flex flex-wrap gap-2">
-          {limitedData.map(({ label, value }) => (
-            <Badge key={label} label={label} value={value} maxRate={maxRate} />
-          ))}
-        </div>
-        {/*</div>*/}
+    <Card className="p-card">
+      <div className="flex items-center justify-between gap-control">
+        <h2 className="text-heading text-text-primary">
+          Top {limitedData.length} Skills
+        </h2>
+        <CopyToClipboardButton data={instrumentsText} name="Skills" />
+      </div>
+      <div className="mt-card flex flex-wrap gap-item">
+        {limitedData.map(({ label, value }) => (
+          <Badge key={label} label={label} value={value} maxRate={maxRate} />
+        ))}
       </div>
     </Card>
   );

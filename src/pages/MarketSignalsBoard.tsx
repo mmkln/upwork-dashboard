@@ -1,28 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Badge, EmptyState } from "../shared/ui";
-import { fetchAllUpworkJobs } from "../services";
-import type { PreparedUpworkJob, UpworkJob } from "../models";
-import { prepareJobs } from "../utils";
-import { useCollections } from "../features";
+import React from "react";
 import {
-  DEFAULT_MARKET_SIGNAL_BOARD,
-  DEFAULT_MARKET_SIGNAL_FILTERS,
-  buildMarketSignalJobs,
-  buildPatternGroups,
-  filterSignalJobs,
-  getSignalSummary,
-  getUniqueSignalValues,
-  loadActiveMarketSignalBoardId,
-  loadMarketSignalBoards,
-  loadMarketSignalOverrides,
-  saveActiveMarketSignalBoardId,
-  saveMarketSignalBoards,
-  saveMarketSignalOverrides,
-  upsertMarketSignalOverride,
-  type MarketSignalFilters,
-  type MarketSignalJob,
-  type MarketSignalOverride,
-  type MarketSignalsBoardConfig,
+  Button,
+  ContentToolbar,
+  EmptyState,
+  Input,
+  PageHeader,
+  PageShell,
+} from "../shared/ui";
+import { JobsSnapshotProgress } from "../features";
+import {
+  type MarketSignalsFocusMode,
+  useMarketSignalsBoard,
 } from "../features/marketSignals";
 import {
   BoardSettings,
@@ -30,251 +18,203 @@ import {
   SignalFilterBar,
   SignalJobDetailPanel,
   SignalJobsTable,
-  SignalSummaryCounters,
 } from "../features/marketSignals/components";
 
-const PAGE_SIZE = 2000;
-
-const createBoardId = () => `market-signals-${Date.now()}`;
-
-const createNewBoard = (
-  index: number,
-  baseBoard: MarketSignalsBoardConfig = DEFAULT_MARKET_SIGNAL_BOARD,
-): MarketSignalsBoardConfig => {
-  const now = new Date().toISOString();
-
-  return {
-    ...baseBoard,
-    id: createBoardId(),
-    name: `Market Signals Board ${index}`,
-    createdAt: now,
-    updatedAt: now,
-  };
-};
-
-const sortSignalJobs = (jobs: MarketSignalJob[]) =>
-  [...jobs].sort((a, b) => {
-    const relevanceRank = {
-      Relevant: 0,
-      "Maybe Relevant": 1,
-      Irrelevant: 2,
-    };
-    const relevanceDelta =
-      relevanceRank[a.relevanceStatus] - relevanceRank[b.relevanceStatus];
-    if (relevanceDelta !== 0) return relevanceDelta;
-    if (b.marketSignalScore !== a.marketSignalScore) {
-      return b.marketSignalScore - a.marketSignalScore;
-    }
-    return (
-      new Date(b.sourceJob.created_at).getTime() -
-      new Date(a.sourceJob.created_at).getTime()
-    );
-  });
+const getBoardTitle = (board: { marketQuery: string; name: string }) =>
+  board.marketQuery.trim() || board.name.trim() || "Untitled research";
 
 const MarketSignalsBoard: React.FC = () => {
-  const { collections } = useCollections();
-  const [jobs, setJobs] = useState<PreparedUpworkJob[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [boards, setBoards] = useState<MarketSignalsBoardConfig[]>(() =>
-    loadMarketSignalBoards(),
-  );
-  const [activeBoardId, setActiveBoardId] = useState(() =>
-    loadActiveMarketSignalBoardId(),
-  );
-  const [overrides, setOverrides] = useState<MarketSignalOverride[]>(() =>
-    loadMarketSignalOverrides(),
-  );
-  const [filters, setFilters] = useState<MarketSignalFilters>(
-    DEFAULT_MARKET_SIGNAL_FILTERS,
-  );
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadJobs = async () => {
-      setIsLoading(true);
-      setError("");
-      try {
-        const result: UpworkJob[] = await fetchAllUpworkJobs(PAGE_SIZE);
-        if (!cancelled) {
-          setJobs(prepareJobs(result));
-        }
-      } catch (loadError) {
-        console.error("Unable to load market signals:", loadError);
-        if (!cancelled) {
-          setError("Unable to load market signals right now.");
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadJobs();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const activeBoard = useMemo(() => {
-    return boards.find((board) => board.id === activeBoardId) ?? boards[0];
-  }, [activeBoardId, boards]);
-
-  useEffect(() => {
-    if (!activeBoard) return;
-    if (activeBoard.id !== activeBoardId) {
-      setActiveBoardId(activeBoard.id);
-      saveActiveMarketSignalBoardId(activeBoard.id);
-    }
-  }, [activeBoard, activeBoardId]);
-
-  const signalJobs = useMemo(() => {
-    if (!activeBoard) return [];
-    return buildMarketSignalJobs(jobs, activeBoard, overrides);
-  }, [activeBoard, jobs, overrides]);
-
-  const patternGroups = useMemo(
-    () => buildPatternGroups(signalJobs),
-    [signalJobs],
-  );
-
-  const summary = useMemo(() => getSignalSummary(signalJobs), [signalJobs]);
-
-  const filteredSignalJobs = useMemo(
-    () => sortSignalJobs(filterSignalJobs(signalJobs, filters)),
-    [filters, signalJobs],
-  );
-
-  const selectedJob = useMemo(() => {
-    if (!selectedJobId) return null;
-    return signalJobs.find((job) => job.jobId === selectedJobId) ?? null;
-  }, [selectedJobId, signalJobs]);
-
-  const filterOptions = useMemo(
-    () => ({
-      requestCategories: getUniqueSignalValues(
-        signalJobs,
-        (job) => job.requestCategory,
-      ),
-      clientTypes: getUniqueSignalValues(signalJobs, (job) => job.clientType),
-      buyerNeeds: getUniqueSignalValues(signalJobs, (job) => job.buyerNeed),
-      skills: getUniqueSignalValues(signalJobs, (job) => job.requiredSkills),
-      tools: getUniqueSignalValues(signalJobs, (job) => job.relatedTools),
-    }),
-    [signalJobs],
-  );
-
-  const handleSelectBoard = (boardId: string) => {
-    setActiveBoardId(boardId);
-    saveActiveMarketSignalBoardId(boardId);
-    setSelectedJobId(null);
-  };
-
-  const handleChangeBoard = (nextBoard: MarketSignalsBoardConfig) => {
-    const nextBoards = boards.map((board) =>
-      board.id === nextBoard.id ? nextBoard : board,
-    );
-    setBoards(nextBoards);
-    saveMarketSignalBoards(nextBoards);
-  };
-
-  const handleCreateBoard = () => {
-    const nextBoard = createNewBoard(boards.length + 1, activeBoard);
-    const nextBoards = [...boards, nextBoard];
-    setBoards(nextBoards);
-    saveMarketSignalBoards(nextBoards);
-    setActiveBoardId(nextBoard.id);
-    saveActiveMarketSignalBoardId(nextBoard.id);
-    setSelectedJobId(null);
-  };
-
-  const handleSaveOverride = (override: MarketSignalOverride) => {
-    const nextOverrides = upsertMarketSignalOverride(overrides, override);
-    setOverrides(nextOverrides);
-    saveMarketSignalOverrides(nextOverrides);
-  };
+  const board = useMarketSignalsBoard();
 
   return (
-    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-5">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex flex-col gap-2">
-          <Badge tone="info">Market intelligence</Badge>
-          <div>
-            <h1 className="text-2xl font-semibold text-text-primary">
-              Market Signals Board
-            </h1>
-            <p className="mt-1 max-w-3xl text-sm text-text-secondary">
-              Convert scraped jobs into relevant signals, comparable buyer
-              problems, ranked opportunities, and repeated market patterns.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {activeBoard ? (
+    <PageShell>
+      {board.activeBoard ? (
         <>
-          <BoardSettings
-            boards={boards}
-            activeBoard={activeBoard}
-            collections={collections}
-            onSelectBoard={handleSelectBoard}
-            onCreateBoard={handleCreateBoard}
-            onChangeBoard={handleChangeBoard}
+          <PageHeader
+            eyebrow="Market Signals"
+            title={getBoardTitle(board.activeBoard)}
+            actions={
+              <Button
+                size="sm"
+                variant="soft"
+                onClick={() => board.setIsSetupOpen(true)}
+              >
+                Research settings
+              </Button>
+            }
           />
 
-          {error ? (
-            <EmptyState title="Signals unavailable" description={error} />
+          <BoardSettings
+            open={board.isSetupOpen}
+            boards={board.boards}
+            activeBoard={board.activeBoard}
+            collections={board.collections}
+            jobs={board.jobs}
+            onOpenChange={board.setIsSetupOpen}
+            onSelectBoard={board.handleSelectBoard}
+            onCreateBoard={board.handleCreateBoard}
+            onChangeBoard={board.handleChangeBoard}
+          />
+
+          {board.error ? (
+            <EmptyState title="Signals unavailable" description={board.error} />
           ) : null}
 
-          <SignalSummaryCounters
-            totalJobs={summary.totalJobs}
-            relevantJobs={summary.relevantJobs}
-            maybeRelevantJobs={summary.maybeRelevantJobs}
-            irrelevantJobs={summary.irrelevantJobs}
-            strongSignals={summary.strongSignals}
-            patternGroups={patternGroups.length}
-            averageMarketSignalScore={summary.averageMarketSignalScore}
-            isLoading={isLoading}
+          <JobsSnapshotProgress
+            loadedCount={board.jobsSnapshot.loadedCount}
+            totalCount={board.jobsSnapshot.totalCount}
+            isHydrating={board.jobsSnapshot.isHydrating}
+            isReady={board.jobsSnapshot.isReady}
+            error={board.jobsSnapshot.error}
+            label="Loading market signal source jobs"
           />
 
-          <SignalFilterBar
-            filters={filters}
-            requestCategories={filterOptions.requestCategories}
-            clientTypes={filterOptions.clientTypes}
-            buyerNeeds={filterOptions.buyerNeeds}
-            skills={filterOptions.skills}
-            tools={filterOptions.tools}
-            onChange={setFilters}
+          <FocusBar
+            focusMode={board.focusMode}
+            quickSearch={board.quickSearch}
+            priorityCount={board.focusCounts.priority}
+            reviewCount={board.focusCounts.review}
+            correctedCount={board.focusCounts.corrected}
+            patternCount={board.focusCounts.patterns}
+            totalCount={board.focusCounts.all}
+            showAdvancedFilters={board.showAdvancedFilters}
+            onFocusModeChange={board.setFocusMode}
+            onQuickSearchChange={board.setQuickSearch}
+            onToggleAdvancedFilters={() =>
+              board.setShowAdvancedFilters((value) => !value)
+            }
           />
 
-          <div className="grid grid-cols-1 gap-4 2xl:grid-cols-[minmax(0,1fr)_420px]">
-            <div className="flex flex-col gap-4">
-              <SignalJobsTable
-                jobs={filteredSignalJobs}
-                selectedJobId={selectedJobId}
-                isLoading={isLoading}
-                onSelectJob={(job) => setSelectedJobId(job.jobId)}
-              />
-              <PatternGroupsPanel patterns={patternGroups} />
-            </div>
-            <SignalJobDetailPanel
-              job={selectedJob}
-              onSaveOverride={handleSaveOverride}
+          {board.showAdvancedFilters ? (
+            <SignalFilterBar
+              filters={board.filters}
+              requestCategories={board.filterOptions.requestCategories}
+              clientTypes={board.filterOptions.clientTypes}
+              buyerNeeds={board.filterOptions.buyerNeeds}
+              skills={board.filterOptions.skills}
+              tools={board.filterOptions.tools}
+              onChange={board.setFilters}
             />
+          ) : null}
+
+          <div
+            className={
+              board.focusMode === "patterns"
+                ? "grid grid-cols-1 gap-component"
+                : "grid grid-cols-1 gap-component 2xl:grid-cols-inspector"
+            }
+          >
+            <div className="flex flex-col gap-component">
+              {board.focusMode === "patterns" ? (
+                <PatternGroupsPanel patterns={board.patternGroups} />
+              ) : (
+                <SignalJobsTable
+                  jobs={board.filteredSignalJobs}
+                  selectedJobId={board.selectedJobId}
+                  isLoading={board.isLoading}
+                  onSelectJob={(job) => board.setSelectedJobId(job.jobId)}
+                />
+              )}
+            </div>
+            {board.focusMode !== "patterns" ? (
+              <SignalJobDetailPanel
+                job={board.selectedJob}
+                onSaveOverride={board.handleSaveOverride}
+              />
+            ) : null}
           </div>
         </>
       ) : (
-        <EmptyState
-          title="No board configured"
-          description="Create a board to start classifying market signals."
-        />
+        <>
+          <PageHeader title="Market Signals" />
+          <EmptyState
+            title="No board configured"
+            description="Create a board to start classifying market signals."
+          />
+        </>
       )}
-    </div>
+    </PageShell>
   );
 };
+
+type FocusBarProps = {
+  focusMode: MarketSignalsFocusMode;
+  quickSearch: string;
+  priorityCount: number;
+  reviewCount: number;
+  correctedCount: number;
+  patternCount: number;
+  totalCount: number;
+  showAdvancedFilters: boolean;
+  onFocusModeChange: (mode: MarketSignalsFocusMode) => void;
+  onQuickSearchChange: (value: string) => void;
+  onToggleAdvancedFilters: () => void;
+};
+
+const focusOptions: Array<{
+  value: MarketSignalsFocusMode;
+  label: string;
+  getCount: (props: FocusBarProps) => number;
+}> = [
+  {
+    value: "priority",
+    label: "Priority",
+    getCount: (props) => props.priorityCount,
+  },
+  {
+    value: "review",
+    label: "Review",
+    getCount: (props) => props.reviewCount,
+  },
+  {
+    value: "patterns",
+    label: "Patterns",
+    getCount: (props) => props.patternCount,
+  },
+  {
+    value: "corrected",
+    label: "Corrected",
+    getCount: (props) => props.correctedCount,
+  },
+  {
+    value: "all",
+    label: "All",
+    getCount: (props) => props.totalCount,
+  },
+];
+
+const FocusBar: React.FC<FocusBarProps> = (props) => (
+  <ContentToolbar>
+    <div className="flex flex-col gap-control xl:flex-row xl:items-center xl:justify-between">
+      <div className="flex flex-wrap gap-item">
+        {focusOptions.map((option) => (
+          <Button
+            key={option.value}
+            size="xs"
+            variant={props.focusMode === option.value ? "primary" : "soft"}
+            onClick={() => props.onFocusModeChange(option.value)}
+          >
+            {option.label} {option.getCount(props)}
+          </Button>
+        ))}
+      </div>
+      <div className="flex flex-col gap-item sm:flex-row sm:items-center">
+        <Input
+          className="min-w-search"
+          value={props.quickSearch}
+          onChange={(event) => props.onQuickSearchChange(event.target.value)}
+          placeholder="Search current focus"
+        />
+        <Button
+          size="sm"
+          variant={props.showAdvancedFilters ? "primary" : "soft"}
+          onClick={props.onToggleAdvancedFilters}
+        >
+          {props.showAdvancedFilters ? "Hide filters" : "Show filters"}
+        </Button>
+      </div>
+    </div>
+  </ContentToolbar>
+);
 
 export default MarketSignalsBoard;

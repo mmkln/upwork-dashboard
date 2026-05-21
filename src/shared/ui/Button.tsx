@@ -26,15 +26,15 @@ const sizeMap: Record<ButtonSize, ShadcnButtonProps["size"]> = {
 };
 
 const variantClassName: Record<ButtonVariant, string> = {
-  primary: "rounded-[10px] bg-primary text-primary-foreground hover:bg-primary-hover",
-  ghost: "rounded-[10px] text-text-secondary hover:bg-accent hover:text-accent-foreground",
-  soft: "rounded-[6px] bg-surface-muted text-text-secondary hover:bg-muted",
+  primary: "rounded-full bg-primary text-primary-foreground hover:bg-primary-hover",
+  ghost: "rounded-full text-text-secondary hover:bg-control-hover hover:text-text-primary",
+  soft: "rounded-full bg-control text-text-secondary hover:bg-control-hover hover:text-text-primary",
 };
 
 const sizeClassName: Record<ButtonSize, string> = {
-  xs: "h-auto px-3 py-1.5 text-[10px] font-medium",
-  sm: "h-9 px-4 py-2 text-xs",
-  md: "h-auto px-6 py-3 text-sm",
+  xs: "min-h-control-mini px-control py-micro text-label",
+  sm: "h-target px-component text-ui",
+  md: "h-target px-card text-ui",
 };
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -48,7 +48,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant={variantMap[variant]}
       size={sizeMap[size]}
       className={cn(
-        "font-semibold focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted",
+        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted",
         variantClassName[variant],
         sizeClassName[size],
         className,

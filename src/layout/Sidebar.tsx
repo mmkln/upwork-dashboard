@@ -15,11 +15,11 @@ const Sidebar: React.FC = () => {
   const location = useLocation();
 
   return (
-    <div className="fixed left-0 top-0 z-40 flex h-screen w-[72px] flex-col border-r border-border-subtle bg-surface text-text-secondary transition-all duration-300 hover:w-72 group">
-      <div className="flex h-20 items-center justify-center border-b border-border-subtle p-4">
+    <aside className="group/sidebar fixed inset-y-0 left-0 z-40 flex w-sidebar-collapsed flex-col overflow-hidden border-r border-sidebar-border bg-sidebar text-text-secondary transition-[width] duration-motion-disclosure ease-motion-emphasized hover:w-sidebar-expanded">
+      <div className="flex h-control-xl items-center justify-center border-b border-sidebar-border p-component">
         <Logo />
       </div>
-      <nav className="px-3 py-4" aria-label="Primary navigation">
+      <nav className="px-control py-component" aria-label="Primary navigation">
         <SidebarSection>
           <SidebarItem
             icon={<DashboardIcon className="w-6 h-6" />}
@@ -66,7 +66,7 @@ const Sidebar: React.FC = () => {
           {/*/>*/}
         </SidebarSection>
       </nav>
-    </div>
+    </aside>
   );
 };
 

@@ -22,13 +22,13 @@ const getPatternTone = (
 const PatternGroupsPanel: React.FC<PatternGroupsPanelProps> = ({
   patterns,
 }) => (
-  <Card className="p-5">
-    <div className="flex items-start justify-between gap-3">
+  <Card className="p-card">
+    <div className="flex items-start justify-between gap-control">
       <div>
-        <h2 className="text-base font-semibold text-text-primary">
+        <h2 className="text-heading text-text-primary">
           Pattern groups
         </h2>
-        <p className="mt-1 text-xs text-text-muted">
+        <p className="mt-micro text-body text-text-muted">
           Repeated request, buyer, and need combinations.
         </p>
       </div>
@@ -36,18 +36,18 @@ const PatternGroupsPanel: React.FC<PatternGroupsPanelProps> = ({
     </div>
 
     {patterns.length ? (
-      <div className="mt-5 flex max-h-[700px] flex-col gap-3 overflow-y-auto pr-1">
+      <div className="mt-card flex max-h-[700px] flex-col gap-control overflow-y-auto pr-micro">
         {patterns.slice(0, 20).map((pattern) => (
           <div
             key={pattern.patternId}
-            className="rounded-[10px] bg-surface-subtle p-4"
+            className="rounded-control bg-block-subtle p-component"
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-control">
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-text-primary">
+                <p className="text-ui text-text-primary">
                   {pattern.requestCategory}
                 </p>
-                <p className="mt-1 text-xs text-text-secondary">
+                <p className="mt-micro text-body text-text-secondary">
                   {pattern.clientType} / {pattern.buyerNeed}
                 </p>
               </div>
@@ -55,28 +55,28 @@ const PatternGroupsPanel: React.FC<PatternGroupsPanelProps> = ({
                 {pattern.patternStrength}
               </Badge>
             </div>
-            <div className="mt-4 grid grid-cols-3 gap-3 text-xs">
+            <div className="mt-component grid grid-cols-3 gap-control text-body">
               <div>
                 <p className="text-text-muted">Jobs</p>
-                <p className="mt-1 font-semibold text-text-primary">
+                <p className="mt-micro text-data text-text-primary">
                   {pattern.jobCount}
                 </p>
               </div>
               <div>
                 <p className="text-text-muted">Avg score</p>
-                <p className="mt-1 font-semibold text-text-primary">
+                <p className="mt-micro text-data text-text-primary">
                   {pattern.averageMarketSignalScore.toFixed(1)}
                 </p>
               </div>
               <div>
                 <p className="text-text-muted">Avg fixed</p>
-                <p className="mt-1 font-semibold text-text-primary">
+                <p className="mt-micro text-data text-text-primary">
                   {formatCurrency(pattern.averageBudget)}
                 </p>
               </div>
             </div>
             {pattern.commonSkills.length ? (
-              <p className="mt-3 text-xs text-text-secondary">
+              <p className="mt-control text-body text-text-secondary">
                 {pattern.commonSkills.slice(0, 4).join(", ")}
               </p>
             ) : null}
@@ -84,7 +84,7 @@ const PatternGroupsPanel: React.FC<PatternGroupsPanelProps> = ({
         ))}
       </div>
     ) : (
-      <div className="mt-5">
+      <div className="mt-card">
         <EmptyState title="No repeated patterns yet" />
       </div>
     )}
@@ -92,4 +92,3 @@ const PatternGroupsPanel: React.FC<PatternGroupsPanelProps> = ({
 );
 
 export default PatternGroupsPanel;
-

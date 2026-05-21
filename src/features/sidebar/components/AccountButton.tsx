@@ -25,19 +25,19 @@ const AccountButton: React.FC = () => {
       type="button"
       variant="ghost"
       onClick={handleClick}
-      className="group mt-auto flex w-full items-center rounded bg-[#002e82] px-2 py-2 text-gray-200 transition-colors duration-300 hover:bg-[#023ca5] overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#001844] focus:ring-blue-500"
+      className="group/account mt-auto flex h-target w-full items-center overflow-hidden rounded-full bg-control px-control text-text-secondary transition-colors duration-motion-fast ease-motion-standard hover:bg-control-hover hover:text-text-primary focus:outline-none focus:ring-2 focus:ring-ring"
       title={user ? `Signed in as ${user.username}` : "Sign in"}
     >
-      <div className="flex w-8 h-8 items-center justify-center">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#023ca5] text-sm font-semibold text-white">
-        {initials}
+      <div className="flex h-control-small w-control-small items-center justify-center">
+        <div className="flex h-control-small w-control-small items-center justify-center rounded-full bg-premium-blue text-ui text-primary-foreground">
+          {initials}
+        </div>
       </div>
-      </div>
-      <div className="ml-3 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-        <p className="text-xs uppercase tracking-wide text-gray-300">
+      <div className="ml-control whitespace-nowrap text-ui opacity-0 transition-opacity duration-motion-fast ease-motion-standard group-hover/account:opacity-100">
+        <p className="text-label text-text-muted">
           {user ? user.username : "Guest"}
         </p>
-        <p className="text-sm font-semibold text-gray-100">
+        <p className="text-ui text-text-primary">
           {user ? "Sign out" : "Sign in"}
         </p>
       </div>

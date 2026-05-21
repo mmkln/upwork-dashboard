@@ -4,12 +4,19 @@ import { cn } from "lib/utils";
 
 type CardProps = React.HTMLAttributes<HTMLDivElement> & {
   children: React.ReactNode;
+  elevation?: "flat" | "raised";
 };
 
-const Card: React.FC<CardProps> = ({ children, className, ...props }) => (
+const Card: React.FC<CardProps> = ({
+  children,
+  className,
+  elevation = "flat",
+  ...props
+}) => (
   <ShadcnCard
     className={cn(
-      "rounded-[12px] border-border bg-card p-8 text-card-foreground shadow-none",
+      "rounded-block bg-block p-block text-card-foreground",
+      elevation === "raised" ? "shadow-block" : "shadow-none",
       className,
     )}
     {...props}

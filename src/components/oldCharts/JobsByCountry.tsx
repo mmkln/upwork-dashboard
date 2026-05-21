@@ -1,7 +1,7 @@
 import React from "react";
 import { UpworkJob } from "../../models";
 import { ValueByCategoryChart, CategoryValueItem } from "../charts";
-import { Card } from "../ui";
+import { Card } from "../../shared/ui";
 import { COUNTRY_LABELS } from "../../utils";
 
 interface JobsByCountryProps {
@@ -46,8 +46,8 @@ const JobsByCountry: React.FC<JobsByCountryProps> = ({ jobs, limit }) => {
 
     return (
         <Card>
-            <div className="p-6">
-                <h2 className="text-lg font-semibold mb-8">Jobs by Country</h2>
+            <div className="p-card">
+                <h2 className="mb-card text-heading text-text-primary">Jobs by Country</h2>
 
                 <div className="overflow-scroll h-[21.5rem]">
                     <ValueByCategoryChart

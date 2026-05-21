@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import { UpworkJob } from "../../models";
 import { instruments } from "../../utils";
-import Card from "../ui/Card";
 import { CopyToClipboardButton } from "../elements";
 import { Badge } from "../ui";
+import { Card } from "../../shared/ui";
 
 interface ToolFrequencyChartProps {
   jobs: UpworkJob[];
@@ -79,24 +79,22 @@ const ToolFrequencyChart: React.FC<ToolFrequencyChartProps> = ({
   const instrumentsText = limitedData.map(({ tool }) => tool).join(", ");
 
   return (
-    <Card>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold">
-            Top {limit && limit} Instruments
-          </h2>
-          <CopyToClipboardButton data={instrumentsText} name="Instruments" />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {limitedData.map(({ tool, count }) => (
-            <Badge
-              key={tool}
-              label={tool}
-              value={count}
-              maxRate={maxFrequency}
-            />
-          ))}
-        </div>
+    <Card className="p-card">
+      <div className="flex items-center justify-between gap-control">
+        <h2 className="text-heading text-text-primary">
+          Top {limit && limit} Instruments
+        </h2>
+        <CopyToClipboardButton data={instrumentsText} name="Instruments" />
+      </div>
+      <div className="mt-card flex flex-wrap gap-item">
+        {limitedData.map(({ tool, count }) => (
+          <Badge
+            key={tool}
+            label={tool}
+            value={count}
+            maxRate={maxFrequency}
+          />
+        ))}
       </div>
     </Card>
   );

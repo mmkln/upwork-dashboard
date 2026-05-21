@@ -3,12 +3,12 @@
 import React from "react";
 import { JobStatus } from "../../models";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "components/shadcn/ui/select";
+  RadixSelect as Select,
+  RadixSelectContent as SelectContent,
+  RadixSelectItem as SelectItem,
+  RadixSelectTrigger as SelectTrigger,
+  RadixSelectValue as SelectValue,
+} from "../../shared/ui";
 import { cn } from "lib/utils";
 
 interface JobStatusSelectProps {
@@ -19,27 +19,27 @@ interface JobStatusSelectProps {
 const getStatusColor = (status: JobStatus): string => {
   switch (status) {
     case JobStatus.Draft:
-      return "bg-gray-100 text-gray-700";
+      return "bg-fill-secondary text-text-secondary";
     case JobStatus.Submitted:
-      return "bg-blue-50 text-blue-700";
+      return "bg-action-muted text-action";
     case JobStatus.Interview:
-      return "bg-yellow-50 text-yellow-700";
+      return "bg-warning-muted text-warning";
     case JobStatus.OfferReceived:
-      return "bg-green-50 text-green-700";
+      return "bg-success-muted text-success";
     case JobStatus.OfferAccepted:
-      return "bg-indigo-50 text-indigo-700";
+      return "bg-action-muted text-action";
     case JobStatus.InProgress:
-      return "bg-purple-50 text-purple-700";
+      return "bg-action-muted text-action";
     case JobStatus.Completed:
-      return "bg-teal-50 text-teal-700";
+      return "bg-success-muted text-success";
     case JobStatus.Closed:
-      return "bg-red-50 text-red-700";
+      return "bg-destructive-muted text-destructive";
     case JobStatus.Declined:
-      return "bg-pink-50 text-pink-700";
+      return "bg-destructive-muted text-destructive";
     case JobStatus.Withdrawn:
-      return "bg-orange-50 text-orange-700";
+      return "bg-warning-muted text-warning";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-fill-secondary text-text-primary";
   }
 };
 
@@ -62,7 +62,7 @@ const JobStatusSelect: React.FC<JobStatusSelectProps> = ({
 }) => {
   return (
     <div
-      className="min-w-[138px]"
+      className="min-w-status-trigger"
       onClick={(event) => {
         event.stopPropagation();
       }}
@@ -74,13 +74,13 @@ const JobStatusSelect: React.FC<JobStatusSelectProps> = ({
         <SelectTrigger
           id="job-status"
           className={cn(
-            "h-8 rounded-full border-transparent px-3 text-xs font-medium shadow-none focus:ring-1 focus:ring-active-300",
+            "h-control-small rounded-full border-transparent px-control text-ui shadow-none focus:ring-2 focus:ring-ring",
             getStatusColor(status),
           )}
         >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent align="end" className="min-w-[180px] rounded-xl">
+        <SelectContent align="end" className="min-w-status-menu">
           {Object.values(JobStatus).map((statusValue) => (
             <SelectItem key={statusValue} value={statusValue}>
               {statusLabels[statusValue]}

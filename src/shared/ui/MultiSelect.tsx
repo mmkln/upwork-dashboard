@@ -25,7 +25,11 @@ type MultiSelectProps<T extends string | number = string> = {
   searchPlaceholder?: string;
   emptyText?: string;
   disabled?: boolean;
+  size?: "default" | "compact";
   className?: string;
+  popoverClassName?: string;
+  onTriggerClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onContentClick?: React.MouseEventHandler<HTMLDivElement>;
 };
 
 const MultiSelect = <T extends string | number = string>({
@@ -36,7 +40,11 @@ const MultiSelect = <T extends string | number = string>({
   searchPlaceholder = "Search...",
   emptyText = "No options found.",
   disabled = false,
+  size = "default",
   className,
+  popoverClassName,
+  onTriggerClick,
+  onContentClick,
 }: MultiSelectProps<T>) => {
   const [open, setOpen] = useState(false);
   const selectedLabels = useMemo(
@@ -63,18 +71,29 @@ const MultiSelect = <T extends string | number = string>({
           type="button"
           variant="ghost"
           disabled={disabled}
+          onClick={onTriggerClick}
           className={cn(
-            "h-10 w-full justify-between rounded-[10px] border border-input bg-surface px-4 py-2 text-left text-sm font-normal text-text-primary shadow-none hover:bg-accent",
+            "w-full justify-between rounded-control border border-control-border bg-control text-left text-ui text-text-primary shadow-none hover:bg-control-hover",
+            size === "compact"
+              ? "h-control-small px-item py-tag text-label"
+              : "h-target px-component py-item",
             className,
           )}
         >
           <span className="truncate">
             {selectedLabels.length ? selectedLabels.join(", ") : placeholder}
           </span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-item h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-[320px] p-0">
+      <PopoverContent
+        align="start"
+        className={cn(
+          "w-popover max-w-viewport-safe p-0",
+          popoverClassName,
+        )}
+        onClick={onContentClick}
+      >
         <Command>
           <CommandInput placeholder={searchPlaceholder} />
           <CommandList>
@@ -90,10 +109,10 @@ const MultiSelect = <T extends string | number = string>({
                   >
                     <span
                       className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                        "mr-item flex h-4 w-4 items-center justify-center rounded-sm border border-action",
                         selected
-                          ? "bg-primary text-primary-foreground"
-                          : "opacity-50 [&_svg]:invisible",
+                          ? "bg-premium-blue text-primary-foreground"
+                          : "border-separator text-text-quaternary [&_svg]:invisible",
                       )}
                     >
                       <CheckIcon className="h-3 w-3" />

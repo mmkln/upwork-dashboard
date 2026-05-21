@@ -1,117 +1,95 @@
 import React from "react";
 import {
-  format,
-  startOfMonth,
-  endOfMonth,
   eachDayOfInterval,
+  endOfMonth,
+  format,
   getDay,
-  isSameDay,
+  startOfMonth,
 } from "date-fns";
 import { UpworkJob } from "../../models";
 import { isToday } from "../../utils";
-import Card from "../ui/Card";
+import { Card } from "../../shared/ui";
 
 interface JobCalendarProps {
   jobs: UpworkJob[];
-  month: Date; // поточний місяць для відображення
+  month: Date;
 }
 
-// Функція для генерації інтенсивності кольору на основі кількості задач
-const getColorIntensity = (
-  jobCount: number,
-  isToday: boolean = false,
-): string => {
-  if (isToday) {
-    if (jobCount === 0) return "text-orange-200 bg-orange-50 border-orange-50"; // Немає задач
-    if (jobCount <= 5) return "text-orange-300 bg-orange-100 border-orange-100"; // 1-5 задач
-    if (jobCount <= 12)
-      return "text-orange-400 bg-orange-200 border-orange-200"; // 5-12 задач
-    if (jobCount <= 20)
-      return "text-orange-500 bg-orange-300 border-orange-300"; // 12-20 задач
-    if (jobCount <= 30)
-      return "text-orange-600 bg-orange-400 border-orange-400"; // 20-30 задач
-    return "text-orange-700 bg-orange-500 border-orange-500"; // Більше 30 задач
+const getIntensityClass = (jobCount: number, isCurrentDay = false): string => {
+  if (isCurrentDay) {
+    if (jobCount === 0) return "border-action/30 bg-fill-tertiary text-action";
+    if (jobCount <= 12) return "border-action/30 bg-action-muted text-action";
+    return "border-action bg-action text-action-foreground";
   }
-  if (jobCount === 0) return "text-gray-200 bg-gray-50 border-gray-50"; // Немає задач
-  if (jobCount <= 5) return "text-blue-300 bg-blue-100 border-blue-100"; // 1-5 задач
-  if (jobCount <= 12) return "text-blue-400 bg-blue-200 border-blue-200"; // 5-12 задач
-  if (jobCount <= 20) return "text-blue-500 bg-blue-300 border-blue-300"; // 12-20 задач
-  if (jobCount <= 30) return "text-blue-600 bg-blue-400 border-blue-400"; // 20-30 задач
-  return "text-blue-700 bg-blue-500 border-blue-500"; // Більше 30 задач
+
+  if (jobCount === 0) {
+    return "border-transparent bg-fill-quaternary text-text-quaternary";
+  }
+  if (jobCount <= 5) {
+    return "border-transparent bg-fill-tertiary text-text-secondary";
+  }
+  if (jobCount <= 12) {
+    return "border-transparent bg-fill-secondary text-text-primary";
+  }
+  return "border-action/20 bg-action-muted text-action";
 };
 
 const JobCalendar: React.FC<JobCalendarProps> = ({ jobs, month }) => {
-  // Генеруємо дати для поточного місяця
   const start = startOfMonth(month);
   const end = endOfMonth(month);
   const daysInMonth = eachDayOfInterval({ start, end });
 
-  // Підраховуємо кількість задач для кожного дня
-  const jobCountPerDay: { [key: string]: number } = jobs.reduce(
-    (acc: { [key: string]: number }, job) => {
+  const jobCountPerDay: Record<string, number> = jobs.reduce(
+    (acc, job) => {
       const jobDate = format(new Date(job.created_at), "yyyy-MM-dd");
-      if (!acc[jobDate]) {
-        acc[jobDate] = 1;
-      } else {
-        acc[jobDate] += 1;
-      }
+      acc[jobDate] = (acc[jobDate] || 0) + 1;
       return acc;
     },
-    {},
+    {} as Record<string, number>,
   );
 
-  // Додаємо дні для попереднього та наступного місяця, щоб заповнити сітку календаря
   const leadingDays = Array.from({ length: getDay(start) }).map((_, index) => (
-    <div key={`leading-${index}`} className="w-7 h-7"></div>
+    <div key={`leading-${index}`} className="h-control-mini w-control-mini" />
   ));
 
-  const trailingDays = Array.from({ length: 6 - getDay(end) }).map(
-    (_, index) => <div key={`trailing-${index}`} className="w-7 h-7"></div>,
-  );
+  const trailingDays = Array.from({ length: 6 - getDay(end) }).map((_, index) => (
+    <div key={`trailing-${index}`} className="h-control-mini w-control-mini" />
+  ));
 
   return (
-    <Card>
-      <div className="p-6 w-72">
-        <h2 className="text-lg font-medium mb-4">
+    <Card className="w-72 p-card">
+      <div className="space-y-component">
+        <h2 className="text-heading text-text-primary">
           {format(month, "MMMM, yyyy")}
         </h2>
-        <div className="grid grid-cols-7 gap-1.5">
-          {/* Відображаємо назви днів тижня */}
+        <div className="grid grid-cols-7 gap-tag">
           {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
-            <div key={day} className="text-center font-semibold text-gray-300">
+            <div key={day} className="text-center text-label text-text-muted">
               {day}
             </div>
           ))}
 
-          {/* Відображаємо дні з початку місяця */}
           {leadingDays}
 
-          {/* Відображаємо активні дні місяця */}
           {daysInMonth.map((day) => {
             const formattedDay = format(day, "yyyy-MM-dd");
             const jobCount = jobCountPerDay[formattedDay] || 0;
-            const isDayToday = isToday(day);
-
-            const colorClass = getColorIntensity(jobCount, isDayToday);
+            const colorClass = getIntensityClass(jobCount, isToday(day));
 
             return (
-              <div className="flex justify-center">
+              <div key={formattedDay} className="flex justify-center">
                 <div
-                  key={formattedDay}
-                  className={`relative group/day w-7 h-7 flex items-center justify-center rounded-lg border-2 hover:outline outline-2 outline-inherit cursor-pointer ${colorClass}`}
+                  className={`group/day relative flex h-control-mini w-control-mini cursor-pointer items-center justify-center rounded-item border text-label transition-colors hover:ring-2 hover:ring-ring ${colorClass}`}
                 >
-                  <span className="text-base font-medium">
-                    {format(day, "d")}
-                  </span>
-                  <div className="hidden group-hover/day:flex w-max absolute bottom-8 bg-white border border-gray-200 rounded-xl px-2 py-1 text-gray-800">
-                    {jobCount} {jobCount != 1 ? "Jobs" : "Job"}
+                  {format(day, "d")}
+                  <div className="absolute bottom-target hidden w-max rounded-control border border-island-border bg-material-liquid px-item py-micro text-label text-text-primary shadow-premium backdrop-blur-2xl group-hover/day:flex">
+                    {jobCount} {jobCount !== 1 ? "Jobs" : "Job"}
                   </div>
                 </div>
               </div>
             );
           })}
 
-          {/* Додаємо порожні дні після місяця */}
           {trailingDays}
         </div>
       </div>

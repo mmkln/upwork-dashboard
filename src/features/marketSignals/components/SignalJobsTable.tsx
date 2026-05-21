@@ -21,37 +21,34 @@ const SignalJobsTable: React.FC<SignalJobsTableProps> = ({
   isLoading,
   onSelectJob,
 }) => (
-  <Card className="p-5">
-    <div className="flex flex-wrap items-center justify-between gap-3">
+  <Card className="p-card">
+    <div className="flex flex-wrap items-center justify-between gap-control">
       <div>
-        <h2 className="text-base font-semibold text-text-primary">
+        <h2 className="text-heading text-text-primary">
           Signal jobs
         </h2>
-        <p className="mt-1 text-xs text-text-muted">
-          Classified jobs with extracted comparison fields.
-        </p>
       </div>
       <Badge tone="info">{jobs.length.toLocaleString()} visible</Badge>
     </div>
 
     {isLoading ? (
-      <div className="mt-5">
+      <div className="mt-card">
         <EmptyState title="Loading market signals..." />
       </div>
     ) : jobs.length ? (
-      <div className="mt-5 overflow-x-auto">
-        <table className="w-full min-w-[1120px] border-separate border-spacing-y-2 text-left">
+      <div className="mt-card overflow-x-auto">
+        <table className="w-full min-w-table-lg border-separate border-spacing-y-2 text-left">
           <thead>
-            <tr className="text-[11px] uppercase text-text-muted">
-              <th className="px-3 py-2 font-medium">Title</th>
-              <th className="px-3 py-2 font-medium">Category</th>
-              <th className="px-3 py-2 font-medium">Client type</th>
-              <th className="px-3 py-2 font-medium">Buyer need</th>
-              <th className="px-3 py-2 font-medium">Budget</th>
-              <th className="px-3 py-2 font-medium">Urgency</th>
-              <th className="px-3 py-2 font-medium">Skills</th>
-              <th className="px-3 py-2 font-medium">Score</th>
-              <th className="px-3 py-2 font-medium">Relevance</th>
+            <tr className="text-label text-text-muted">
+              <th className="px-control py-item">Title</th>
+              <th className="px-control py-item">Category</th>
+              <th className="px-control py-item">Client type</th>
+              <th className="px-control py-item">Buyer need</th>
+              <th className="px-control py-item">Budget</th>
+              <th className="px-control py-item">Urgency</th>
+              <th className="px-control py-item">Skills</th>
+              <th className="px-control py-item">Score</th>
+              <th className="px-control py-item">Relevance</th>
             </tr>
           </thead>
           <tbody>
@@ -63,45 +60,45 @@ const SignalJobsTable: React.FC<SignalJobsTableProps> = ({
                   key={job.jobId}
                   className={
                     isSelected
-                      ? "cursor-pointer bg-accent text-sm"
-                      : "cursor-pointer bg-surface-subtle text-sm hover:bg-accent"
+                      ? "cursor-pointer bg-island-selected text-body"
+                      : "cursor-pointer bg-block text-body hover:bg-fill-tertiary"
                   }
                   onClick={() => onSelectJob(job)}
                 >
-                  <td className="rounded-l-[10px] px-3 py-3">
-                    <p className="line-clamp-2 max-w-[300px] font-medium text-text-primary">
+                  <td className="rounded-l-[10px] px-control py-control">
+                    <p className="line-clamp-2 max-w-title text-ui text-text-primary">
                       {job.sourceJob.title}
                     </p>
-                    <p className="mt-1 text-[11px] text-text-muted">
+                    <p className="mt-micro text-label text-text-muted">
                       {job.sourceJob.country || "Unknown country"}
                     </p>
                   </td>
-                  <td className="px-3 py-3 text-text-secondary">
+                  <td className="px-control py-control text-text-secondary">
                     {job.requestCategory}
                   </td>
-                  <td className="px-3 py-3 text-text-secondary">
+                  <td className="px-control py-control text-text-secondary">
                     {job.clientType}
                   </td>
-                  <td className="px-3 py-3 text-text-secondary">
+                  <td className="px-control py-control text-text-secondary">
                     {job.buyerNeed}
                   </td>
-                  <td className="px-3 py-3 text-text-secondary">
+                  <td className="px-control py-control text-text-secondary">
                     {job.budgetSignal}
                   </td>
-                  <td className="px-3 py-3 text-text-secondary">
+                  <td className="px-control py-control text-text-secondary">
                     {job.urgencySignal}
                   </td>
-                  <td className="px-3 py-3 text-text-secondary">
+                  <td className="px-control py-control text-text-secondary">
                     {formatSkills(job.requiredSkills)}
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="px-control py-control">
                     <Badge
                       tone={job.marketSignalScore >= 4 ? "success" : "neutral"}
                     >
                       {job.marketSignalScore.toFixed(1)}
                     </Badge>
                   </td>
-                  <td className="rounded-r-[10px] px-3 py-3">
+                  <td className="rounded-r-[10px] px-control py-control">
                     <Badge tone={getRelevanceTone(job.relevanceStatus)}>
                       {job.relevanceStatus}
                     </Badge>
@@ -113,7 +110,7 @@ const SignalJobsTable: React.FC<SignalJobsTableProps> = ({
         </table>
       </div>
     ) : (
-      <div className="mt-5">
+      <div className="mt-card">
         <EmptyState
           title="No signal jobs match these filters"
           description="Adjust the board query, keywords, or filters."
@@ -124,4 +121,3 @@ const SignalJobsTable: React.FC<SignalJobsTableProps> = ({
 );
 
 export default SignalJobsTable;
-

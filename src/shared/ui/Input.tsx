@@ -9,7 +9,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     <ShadcnInput
       ref={ref}
       className={cn(
-        "h-10 rounded-[10px] border-input px-4 text-sm text-text-primary placeholder:text-sm placeholder:font-normal placeholder:text-text-placeholder focus:border-action focus-visible:ring-2 focus-visible:ring-ring disabled:bg-surface-muted",
+        "h-target rounded-control border-control-border bg-control px-component text-ui text-text-primary placeholder:text-ui placeholder:text-text-placeholder hover:bg-control-hover focus:border-action focus-visible:ring-2 focus-visible:ring-ring disabled:bg-control-selected",
         className,
       )}
       {...props}

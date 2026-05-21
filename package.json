@@ -3,9 +3,14 @@
   "homepage": "https://mmklb.github.io/upwork-dashboard",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:ui-foundation": "npm --workspace @upboard/ui-foundation run build",
+    "typecheck:ui-foundation": "npm --workspace @upboard/ui-foundation run typecheck",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",

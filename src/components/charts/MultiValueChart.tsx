@@ -41,14 +41,14 @@ export const MultiValueChart: React.FC<MultiValueChartProps> = memo(
   }) => {
     return (
       <div className="w-full max-w-md">
-        <ul className="flex flex-col gap-4">
+        <ul className="flex flex-col gap-component">
           {data.map((item) => {
             // Вибираємо кольори для елементів, якщо немає, використовуємо стандартні
             const colors = item.colors ? item.colors : defaultColors;
 
             return (
-              <li key={item.label} className="flex flex-col gap-1.5">
-                <div className="bg-gray-500/10 rounded-full w-full h-3 relative mr-4">
+              <li key={item.label} className="flex flex-col gap-item">
+                <div className="relative mr-component h-3 w-full rounded-full bg-muted">
                   {item.values
                     .sort((a, b) => a - b)
                     .map((value, index, arr) => {
@@ -66,14 +66,14 @@ export const MultiValueChart: React.FC<MultiValueChartProps> = memo(
                       );
                     })}
                 </div>
-                <div className="mx-2 flex items-center justify-between text-gray-800 text-sm font-medium">
+                <div className="mx-item flex items-center justify-between text-ui text-text-primary">
                   <span>
                     {item.label}{" "}
                     {item.count && (
-                      <span className="text-gray-500">({item.count})</span>
+                      <span className="text-text-muted">({item.count})</span>
                     )}
                   </span>
-                  <span className="text-gray-500">
+                  <span className="text-text-muted">
                     {labelSuffix}
                     {item.values.map((value, index) => (
                       <span key={index}>

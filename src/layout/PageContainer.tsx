@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "lib/utils";
 
 type PageContainerProps = {
   children: React.ReactNode;
@@ -7,9 +8,9 @@ type PageContainerProps = {
 
 const PageContainer: React.FC<PageContainerProps> = ({
   children,
-  className = "",
+  className,
 }) => (
-  <div className={`h-full w-full bg-surface-subtle p-10 ${className}`}>
+  <div className={cn("h-full w-full bg-background p-app-gutter", className)}>
     {children}
   </div>
 );

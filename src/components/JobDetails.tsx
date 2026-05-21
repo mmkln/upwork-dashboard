@@ -2,8 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Bookmark,
   Check,
-  CheckIcon,
-  ChevronsUpDown,
   Clipboard,
   ExternalLink,
   Link,
@@ -11,31 +9,33 @@ import {
 } from "lucide-react";
 import { JobStatus, UpworkJob } from "../models";
 import { JobStatusSelect } from ".";
-import { updateUpworkJob } from "../services";
+import {
+  serializeJobForExport,
+  stripPreparedJobMeta,
+  updateJobBookmark,
+  updateJobCollections,
+  updateJobStatus,
+} from "../features/jobs";
 import {
   Badge,
   Button,
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
+  DetailRow,
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   IconButton,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  MultiSelect,
+  MutedBlock,
+  OverlayBody,
+  OverlayHeader,
   ScrollArea,
   Separator,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  TooltipIconButton,
 } from "../shared/ui";
 import { cn } from "lib/utils";
 
@@ -47,11 +47,6 @@ interface JobDetailsProps {
   collectionNameById: Record<number, string>;
   availableCollections: { id: number; name: string }[];
 }
-
-type CollectionOption = {
-  value: number;
-  label: string;
-};
 
 const formatPayment = (job: UpworkJob) => {
   if (job.hourly_rates?.length) {
@@ -72,125 +67,6 @@ const formatDate = (date: string) =>
     month: "short",
     day: "numeric",
   });
-
-const EmptyBlock: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="rounded-lg bg-[#FAFAFC] px-3 py-2 text-sm text-[#8A8A8A]">
-    {children}
-  </div>
-);
-
-const DetailMetric: React.FC<{ label: string; value?: React.ReactNode }> = ({
-  label,
-  value,
-}) => (
-  <div className="flex items-start justify-between gap-3 py-2">
-    <p className="text-xs font-medium text-[#8A8A8A]">{label}</p>
-    <div className="max-w-[170px] text-right text-sm font-medium text-[#141414]">
-      {value || <span className="font-normal text-[#8A8A8A]">Not provided</span>}
-    </div>
-  </div>
-);
-
-const HeaderAction: React.FC<{
-  label: string;
-  children: React.ReactNode;
-  onClick?: () => void;
-  asChild?: boolean;
-  className?: string;
-}> = ({ label, children, onClick, asChild, className }) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
-      <IconButton
-        type="button"
-        variant="outline"
-        size="md"
-        asChild={asChild}
-        className={cn(
-          "h-9 w-9 rounded-[10px] border-transparent bg-transparent shadow-none hover:bg-[#F6F8FF]",
-          className,
-        )}
-        aria-label={label}
-        onClick={onClick}
-      >
-        {children}
-      </IconButton>
-    </TooltipTrigger>
-    <TooltipContent>{label}</TooltipContent>
-  </Tooltip>
-);
-
-const CollectionsPicker: React.FC<{
-  options: CollectionOption[];
-  value: number[];
-  disabled: boolean;
-  onChange: (value: number[]) => void;
-}> = ({ options, value, disabled, onChange }) => {
-  const [open, setOpen] = useState(false);
-  const selectedNames = options
-    .filter((option) => value.includes(option.value))
-    .map((option) => option.label);
-
-  const toggleValue = (nextValue: number) => {
-    if (value.includes(nextValue)) {
-      onChange(value.filter((currentValue) => currentValue !== nextValue));
-      return;
-    }
-
-    onChange([...value, nextValue]);
-  };
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          disabled={disabled}
-          className="h-9 w-full justify-between rounded-[10px] border-transparent bg-[#FAFAFC] px-3 text-left text-xs font-normal text-[#575757] shadow-none hover:bg-[#F6F8FF]"
-        >
-          <span className="truncate">
-            {selectedNames.length
-              ? selectedNames.join(", ")
-              : "Add to collections..."}
-          </span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent align="start" className="w-[320px] p-0">
-        <Command>
-          <CommandInput placeholder="Search collections..." />
-          <CommandList>
-            <CommandEmpty>No collections found.</CommandEmpty>
-            <CommandGroup>
-              {options.map((option) => {
-                const selected = value.includes(option.value);
-                return (
-                  <CommandItem
-                    key={option.value}
-                    value={option.label}
-                    onSelect={() => toggleValue(option.value)}
-                  >
-                    <span
-                      className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                        selected
-                          ? "bg-primary text-primary-foreground"
-                          : "opacity-50 [&_svg]:invisible",
-                      )}
-                    >
-                      <CheckIcon className="h-3 w-3" />
-                    </span>
-                    <span className="truncate">{option.label}</span>
-                  </CommandItem>
-                );
-              })}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-};
 
 const JobDetails: React.FC<JobDetailsProps> = ({
   job,
@@ -253,7 +129,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({
     );
 
   const handleStatusChange = (status: JobStatus) => {
-    updateUpworkJob({ ...jobData, status })
+    updateJobStatus(jobData.id, status)
       .then((updatedJob) => {
         setJobData(updatedJob);
         onJobUpdate(updatedJob);
@@ -264,7 +140,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({
   };
 
   const handleBookmark = () => {
-    updateUpworkJob({ ...jobData, is_bookmarked: !jobData.is_bookmarked })
+    updateJobBookmark(jobData.id, !jobData.is_bookmarked)
       .then((updatedJob) => {
         setJobData(updatedJob);
         onJobUpdate(updatedJob);
@@ -277,17 +153,25 @@ const JobDetails: React.FC<JobDetailsProps> = ({
   const updateCollections = (collectionIds: number[]) => {
     setIsUpdatingCollections(true);
     const previous = jobData.collections ?? job.collections ?? [];
-    setJobData({ ...jobData, collections: collectionIds });
-    onJobUpdate({ ...jobData, collections: collectionIds });
-    updateUpworkJob({ ...jobData, collections: collectionIds })
+    const optimisticJob = {
+      ...stripPreparedJobMeta(jobData),
+      collections: collectionIds,
+    };
+    setJobData(optimisticJob);
+    onJobUpdate(optimisticJob);
+    updateJobCollections(jobData.id, collectionIds)
       .then((updatedJob) => {
         setJobData(updatedJob);
         onJobUpdate(updatedJob);
       })
       .catch((error) => {
         console.error("Error updating job collections:", error);
-        setJobData({ ...jobData, collections: previous });
-        onJobUpdate({ ...jobData, collections: previous });
+        const rollbackJob = {
+          ...stripPreparedJobMeta(jobData),
+          collections: previous,
+        };
+        setJobData(rollbackJob);
+        onJobUpdate(rollbackJob);
       })
       .finally(() => setIsUpdatingCollections(false));
   };
@@ -310,7 +194,9 @@ const JobDetails: React.FC<JobDetailsProps> = ({
   const upworkUrl = `https://www.upwork.com/jobs/${job.id}`;
 
   const handleCopyJson = async () => {
-    await navigator.clipboard.writeText(JSON.stringify(jobData, null, 2));
+    await navigator.clipboard.writeText(
+      JSON.stringify(serializeJobForExport(jobData), null, 2),
+    );
     setHasCopiedJson(true);
   };
 
@@ -331,64 +217,75 @@ const JobDetails: React.FC<JobDetailsProps> = ({
           }
         }}
       >
-        <DialogContent className="max-h-[92vh] max-w-5xl gap-0 overflow-hidden rounded-xl border-0 bg-white p-0 shadow-xl">
-          <DialogHeader className="sticky top-0 z-10 bg-white/95 px-8 py-6 pr-16 shadow-[0_1px_0_rgba(20,20,20,0.06)] backdrop-blur">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div className="min-w-0 space-y-2">
+        <DialogContent className="max-h-overlay max-w-modal-xl gap-0 overflow-hidden p-0">
+          <OverlayHeader className="sticky top-0 z-10 pr-spacious text-center sm:text-left">
+            <div className="flex flex-col gap-component lg:flex-row lg:items-start lg:justify-between">
+              <div className="min-w-0 space-y-item">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <DialogTitle className="line-clamp-2 max-h-14 text-xl font-semibold leading-7 text-[#141414]">
+                    <DialogTitle className="line-clamp-2 max-h-14 text-heading text-text-primary">
                       {job.title}
                     </DialogTitle>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-md">{job.title}</TooltipContent>
                 </Tooltip>
-                <DialogDescription className="flex flex-wrap items-center gap-2 text-sm text-[#6B7280]">
+                <DialogDescription className="flex flex-wrap items-center gap-item text-body text-text-secondary">
                   <span>{job.experience || "Experience not specified"}</span>
-                  <span className="h-1 w-1 rounded-full bg-[#C8C8C8]" />
+                  <span className="h-1 w-1 rounded-full bg-border-strong" />
                   <span>{formatDate(job.created_at)}</span>
                   {job.connects && (
                     <>
-                      <span className="h-1 w-1 rounded-full bg-[#C8C8C8]" />
+                      <span className="h-1 w-1 rounded-full bg-border-strong" />
                       <span>{parseInt(job.connects)} connects</span>
                     </>
                   )}
                 </DialogDescription>
               </div>
 
-              <div className="flex shrink-0 items-center gap-2 rounded-xl bg-[#FAFAFC] p-1">
-                <HeaderAction
+              <div className="flex shrink-0 items-center gap-item rounded-control bg-island p-micro">
+                <TooltipIconButton
                   label={
                     hasCopiedJson
                       ? "Copied job JSON"
                       : "Copy job as JSON to clipboard"
                   }
                   onClick={handleCopyJson}
+                  variant="outline"
+                  size="md"
+                  className="h-control-small w-control-small rounded-control border-transparent bg-transparent shadow-none hover:bg-island-hover"
                 >
                   {hasCopiedJson ? (
-                    <Check className="h-4 w-4 text-green-600" />
+                    <Check className="h-4 w-4 text-success" />
                   ) : (
                     <Clipboard className="h-4 w-4" />
                   )}
-                </HeaderAction>
-                <HeaderAction
+                </TooltipIconButton>
+                <TooltipIconButton
                   label={hasCopiedLink ? "Copied job link" : "Copy job link"}
                   onClick={handleCopyLink}
+                  variant="outline"
+                  size="md"
+                  className="h-control-small w-control-small rounded-control border-transparent bg-transparent shadow-none hover:bg-island-hover"
                 >
                   {hasCopiedLink ? (
-                    <Check className="h-4 w-4 text-green-600" />
+                    <Check className="h-4 w-4 text-success" />
                   ) : (
                     <Link className="h-4 w-4" />
                   )}
-                </HeaderAction>
-                <HeaderAction
+                </TooltipIconButton>
+                <TooltipIconButton
                   label={
                     jobData.is_bookmarked
                       ? "Remove from bookmarks"
                       : "Bookmark job"
                   }
                   onClick={handleBookmark}
-                  className={jobData.is_bookmarked ? "text-[#1823F0]" : ""}
+                  variant="outline"
+                  size="md"
+                  className={cn(
+                    "h-control-small w-control-small rounded-control border-transparent bg-transparent shadow-none hover:bg-island-hover",
+                    jobData.is_bookmarked ? "text-action" : "",
+                  )}
                 >
                   <Bookmark
                     className={cn(
@@ -396,73 +293,79 @@ const JobDetails: React.FC<JobDetailsProps> = ({
                       jobData.is_bookmarked && "fill-current",
                     )}
                   />
-                </HeaderAction>
-                <HeaderAction label="Open on Upwork" asChild>
+                </TooltipIconButton>
+                <TooltipIconButton
+                  label="Open on Upwork"
+                  asChild
+                  variant="outline"
+                  size="md"
+                  className="h-control-small w-control-small rounded-control border-transparent bg-transparent shadow-none hover:bg-island-hover"
+                >
                   <a href={upworkUrl} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-4 w-4" />
                   </a>
-                </HeaderAction>
+                </TooltipIconButton>
               </div>
             </div>
-          </DialogHeader>
+          </OverlayHeader>
 
-          <ScrollArea className="max-h-[calc(92vh-104px)]">
-            <div className="grid gap-8 px-8 py-8 lg:grid-cols-[minmax(0,1fr)_280px]">
-              <div className="flex min-w-0 flex-col gap-8">
-                <section className="space-y-3">
-                  <h3 className="text-sm font-semibold text-[#141414]">
+          <ScrollArea className="max-h-overlay-detail-body">
+            <OverlayBody className="grid gap-panel lg:grid-cols-job-detail">
+              <div className="flex min-w-0 flex-col gap-panel">
+                <section className="space-y-control">
+                  <h3 className="text-ui text-text-primary">
                     Description
                   </h3>
                   {job.description ? (
-                    <div className="rounded-xl bg-[#FAFAFC] px-4 py-3">
-                      <p className="whitespace-pre-line text-sm leading-7 text-[#575757]">
+                    <div className="rounded-control bg-block-subtle px-component py-control">
+                      <p className="whitespace-pre-line text-body text-text-secondary">
                         {job.description}
                       </p>
                     </div>
                   ) : (
-                    <EmptyBlock>No description provided.</EmptyBlock>
+                    <MutedBlock>No description provided.</MutedBlock>
                   )}
                 </section>
 
-                <section className="space-y-3">
-                  <h3 className="text-sm font-semibold text-[#141414]">
+                <section className="space-y-control">
+                  <h3 className="text-ui text-text-primary">
                     Skills
                   </h3>
                   {job.skills.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-item">
                       {job.skills.map((skill, index) => (
                         <Badge
                           key={`${skill}-${index}`}
                           tone="info"
-                          className="rounded-full border-transparent bg-[#F6F8FF] px-3 py-1 text-xs font-medium text-secondary-900"
+                          className="bg-action-muted text-text-primary"
                         >
                           {skill}
                         </Badge>
                       ))}
                     </div>
                   ) : (
-                    <EmptyBlock>No skills listed.</EmptyBlock>
+                    <MutedBlock>No skills listed.</MutedBlock>
                   )}
                 </section>
 
-                <section className="space-y-3">
-                  <h3 className="text-sm font-semibold text-[#141414]">
+                <section className="space-y-control">
+                  <h3 className="text-ui text-text-primary">
                     Collections
                   </h3>
-                  <div className="space-y-4">
+                  <div className="space-y-component">
                     {collectionBadges.length > 0 ? (
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-item">
                         {collectionBadges.map(({ id, name }) => (
                           <Badge
                             key={id}
                             tone="info"
-                            className="gap-2 rounded-full border border-[#E6E9F4] bg-[#F6F8FF] px-3 py-1 text-xs font-medium text-[#2A2627]"
+                            className="gap-item border border-border bg-action-muted text-text-primary"
                           >
                             {name}
                             <IconButton
                               variant="ghost"
                               size="sm"
-                              className="h-5 w-5 rounded-full text-[#575757] hover:bg-white hover:text-[#141414]"
+                              className="ml-micro h-control-mini w-control-mini rounded-full text-text-secondary hover:bg-surface hover:text-text-primary"
                               onClick={() => handleRemoveCollection(id)}
                               title="Remove from collection"
                               aria-label="Remove from collection"
@@ -474,23 +377,27 @@ const JobDetails: React.FC<JobDetailsProps> = ({
                         ))}
                       </div>
                     ) : (
-                      <EmptyBlock>No collections assigned.</EmptyBlock>
+                      <MutedBlock>No collections assigned.</MutedBlock>
                     )}
 
                     {availableCollections.length > 0 ? (
                       <>
-                        <Separator className="bg-[#EFEFEF]" />
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                          <CollectionsPicker
+                        <Separator className="bg-separator" />
+                        <div className="flex flex-col gap-item sm:flex-row sm:items-center">
+                          <MultiSelect
                             options={availableOptions}
                             value={selectedCollectionsToAdd}
                             disabled={isUpdatingCollections}
                             onChange={setSelectedCollectionsToAdd}
+                            placeholder="Add to collections..."
+                            searchPlaceholder="Search collections..."
+                            emptyText="No collections found."
+                            className="h-control-small border-transparent bg-block-subtle text-ui text-text-secondary hover:bg-fill-tertiary"
                           />
                           <Button
                             type="button"
                             size="sm"
-                            className="rounded-[10px] shadow-none"
+                            className="rounded-control shadow-none"
                             disabled={
                               selectedCollectionsToAdd.length === 0 ||
                               isUpdatingCollections
@@ -503,19 +410,19 @@ const JobDetails: React.FC<JobDetailsProps> = ({
                       </>
                     ) : (
                       <>
-                        <Separator className="bg-[#EFEFEF]" />
-                        <EmptyBlock>No available collections to add.</EmptyBlock>
+                        <Separator className="bg-separator" />
+                        <MutedBlock>No available collections to add.</MutedBlock>
                       </>
                     )}
                   </div>
                 </section>
               </div>
 
-              <aside className="space-y-4">
-                <div className="rounded-xl bg-[#FAFAFC] p-4">
-                  <div className="flex items-center justify-between gap-3">
+              <aside className="space-y-component">
+                <div className="rounded-control bg-block-subtle p-component">
+                  <div className="flex items-center justify-between gap-control">
                     <div>
-                      <p className="text-[11px] font-medium uppercase text-[#8A8A8A]">
+                      <p className="text-label text-text-muted">
                         Status
                       </p>
                     </div>
@@ -526,16 +433,16 @@ const JobDetails: React.FC<JobDetailsProps> = ({
                   </div>
                 </div>
 
-                <div className="rounded-xl bg-[#FAFAFC] p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-[#141414]">
+                <div className="rounded-control bg-block-subtle p-component">
+                  <div className="mb-control flex items-center justify-between">
+                    <h3 className="text-ui text-text-primary">
                       Summary
                     </h3>
                     <Button
                       asChild
                       variant="ghost"
                       size="sm"
-                      className="h-8 rounded-[10px] border-transparent bg-white shadow-none hover:bg-[#F6F8FF]"
+                      className="h-control-small rounded-control border-transparent bg-block shadow-none hover:bg-fill-tertiary"
                     >
                       <a
                         href={upworkUrl}
@@ -547,32 +454,32 @@ const JobDetails: React.FC<JobDetailsProps> = ({
                       </a>
                     </Button>
                   </div>
-                  <div className="divide-y divide-[#ECEEF3]">
-                    <DetailMetric label="Payment" value={payment} />
-                    <DetailMetric label="Experience" value={job.experience} />
-                    <DetailMetric
+                  <div className="divide-y divide-separator">
+                    <DetailRow label="Payment" value={payment} />
+                    <DetailRow label="Experience" value={job.experience} />
+                    <DetailRow
                       label="Connects"
                       value={job.connects ? parseInt(job.connects) : undefined}
                     />
-                    <DetailMetric
+                    <DetailRow
                       label="Posted"
                       value={formatDate(job.created_at)}
                     />
-                    <DetailMetric
+                    <DetailRow
                       label="Total spent"
                       value={
                         job.total_spent !== null ? `$${job.total_spent}` : undefined
                       }
                     />
-                    <DetailMetric
+                    <DetailRow
                       label="Industry"
                       value={job.client_industry || undefined}
                     />
-                    <DetailMetric label="Job ID" value={job.id} />
+                    <DetailRow label="Job ID" value={job.id} />
                   </div>
                 </div>
               </aside>
-            </div>
+            </OverlayBody>
           </ScrollArea>
         </DialogContent>
       </Dialog>

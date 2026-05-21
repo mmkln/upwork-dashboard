@@ -32,9 +32,9 @@ const ToggleGroup = <T extends string>({
   const groupName = name ?? `toggle-${generatedId}`;
   const sizeClassName: Record<NonNullable<ToggleGroupProps<T>["size"]>, string> =
     {
-      xs: "px-3 py-1 text-[10px]",
-      sm: "h-7 px-3 text-xs",
-      md: "h-9 px-4 text-sm",
+      xs: "h-control-mini px-control text-label",
+      sm: "h-control-small px-control text-label",
+      md: "h-target px-component text-ui",
     };
 
   return (
@@ -47,7 +47,7 @@ const ToggleGroup = <T extends string>({
         }
       }}
       className={cn(
-        "inline-flex items-center gap-0 rounded-[8px] bg-surface-muted p-1",
+        "inline-flex items-center gap-0 rounded-full bg-control p-micro",
         className,
       )}
     >
@@ -59,7 +59,7 @@ const ToggleGroup = <T extends string>({
             value={item.value}
             aria-label={item.label}
             className={cn(
-              "flex h-auto items-center gap-2 rounded-[6px] text-text-secondary transition-colors hover:bg-surface/70 data-[state=on]:bg-surface data-[state=on]:text-text-secondary",
+              "flex items-center gap-item rounded-full text-text-secondary transition-colors duration-motion-fast ease-motion-standard hover:bg-control-hover hover:text-text-primary data-[state=on]:bg-control-selected data-[state=on]:text-text-primary",
               sizeClassName[size],
             )}
             title={item.label}

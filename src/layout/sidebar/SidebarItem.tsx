@@ -1,6 +1,7 @@
 // SidebarItem.tsx
 import React from "react";
 import { Link } from "react-router-dom";
+import { cn } from "lib/utils";
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -20,14 +21,20 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   return (
     <Link
       to={link}
-      className={`flex h-12 min-w-12 w-full items-center gap-2 overflow-hidden rounded-xl px-3 py-3 text-text-secondary transition-colors duration-300 hover:bg-accent hover:text-accent-foreground ${
-        isActive ? "bg-accent text-accent-foreground" : ""
-      }`}
+      aria-current={isActive ? "page" : undefined}
+      aria-label={label}
+      title={label}
+      className={cn(
+        "flex h-target min-w-target w-full items-center justify-start gap-0 overflow-hidden rounded-full px-item text-text-secondary transition-colors duration-motion-fast ease-motion-standard hover:bg-control-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group-hover/sidebar:gap-control",
+        isActive
+          ? "bg-control-selected text-text-primary"
+          : "hover:bg-control-hover",
+      )}
     >
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+      <div className="flex h-control-small w-control-small shrink-0 items-center justify-center">
         {icon}
       </div>
-      <span className="hidden truncate text-xs font-medium group-hover:block">
+      <span className="max-w-0 truncate text-label opacity-0 transition-[max-width,opacity] delay-0 duration-motion-fast ease-motion-standard group-hover/sidebar:max-w-chip group-hover/sidebar:delay-motion-label group-hover/sidebar:opacity-100">
         {label}
       </span>
     </Link>

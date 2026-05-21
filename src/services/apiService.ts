@@ -66,18 +66,45 @@ apiClient.interceptors.response.use(
   },
 );
 
+const JOB_PAYLOAD_KEYS = new Set([
+  "average_rate",
+  "description",
+  "client_industry",
+  "client_rating",
+  "country",
+  "country_raw",
+  "country_code",
+  "experience",
+  "hourly_rates",
+  "skills",
+  "title",
+  "total_spent",
+  "fixed_price",
+  "created_at",
+  "status",
+  "connects",
+  "is_bookmarked",
+  "collection_ids",
+]);
+
 const buildJobPayload = (jobData: Partial<UpworkJob>) => {
-  const payload: Record<string, unknown> = { ...jobData };
-  if (payload.collections && Array.isArray(payload.collections)) {
+  const payload: Record<string, unknown> = {};
+  Object.entries(jobData).forEach(([key, value]) => {
+    if (JOB_PAYLOAD_KEYS.has(key)) {
+      payload[key] = value;
+    }
+  });
+
+  if (jobData.collections && Array.isArray(jobData.collections)) {
     payload.collection_ids = Array.from(
       new Set(
-        payload.collections
+        jobData.collections
           .map((value) => Number(value))
           .filter((value) => !Number.isNaN(value)),
       ),
     );
   }
-  delete payload.collections;
+
   if (Array.isArray(payload.collection_ids)) {
     payload.collection_ids = Array.from(
       new Set(
@@ -209,6 +236,17 @@ export const fetchJobCollections = async (): Promise<JobCollection[]> => {
     }
     throw error;
   }
+};
+
+export const createJobCollection = async ({
+  name,
+  description = "",
+}: Pick<JobCollection, "name"> & Partial<Pick<JobCollection, "description">>) => {
+  const response = await apiClient.post<JobCollection>("/collections/", {
+    name,
+    description,
+  });
+  return response.data;
 };
 
 export const setApiAuthToken = (token: string | null) => {

@@ -1,6 +1,7 @@
 import React from "react";
 import { Clipboard, Download } from "lucide-react";
 import { PreparedUpworkJob } from "../models";
+import { serializeJobsForExport } from "../features/jobs";
 import { IconButton } from "../shared/ui";
 
 interface JobExportActionsProps {
@@ -26,7 +27,7 @@ const JobExportActions: React.FC<JobExportActionsProps> = ({
       .replace(/^[-_]+|[-_]+$/g, "") || "all";
 
   const handleCopy = () => {
-    const jsonString = JSON.stringify(jobs, null, 2);
+    const jsonString = JSON.stringify(serializeJobsForExport(jobs), null, 2);
     navigator.clipboard
       .writeText(jsonString)
       .then(() => {
@@ -39,7 +40,7 @@ const JobExportActions: React.FC<JobExportActionsProps> = ({
   };
 
   const handleDownload = () => {
-    const jsonString = JSON.stringify(jobs, null, 2);
+    const jsonString = JSON.stringify(serializeJobsForExport(jobs), null, 2);
     const blob = new Blob([jsonString], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -55,7 +56,7 @@ const JobExportActions: React.FC<JobExportActionsProps> = ({
   };
 
   return (
-    <div className={`flex gap-2 ${className}`}>
+    <div className={`flex gap-item ${className}`}>
       <IconButton
         variant="ghost"
         size="md"

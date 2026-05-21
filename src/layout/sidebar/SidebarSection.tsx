@@ -3,6 +3,6 @@ import React from "react";
 
 const SidebarSection: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => <div className="flex w-full flex-col gap-3">{children}</div>;
+}) => <div className="flex w-full flex-col gap-control">{children}</div>;
 
 export default SidebarSection;

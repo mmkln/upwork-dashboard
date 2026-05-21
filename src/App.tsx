@@ -25,6 +25,7 @@ import { AuthProvider } from "./features/auth/AuthProvider";
 import RequireAuth from "./features/auth/RequireAuth";
 import { PageLoadingBar } from "./components/ui";
 import { Header, PageContainer, Sidebar } from "./layout";
+import { ThemeProvider } from "./shared/theme";
 
 const GlobalLoadingIndicator: React.FC = () => {
   const { isLoading } = useGlobalLoading();
@@ -36,7 +37,7 @@ const AppShell: React.FC = () => (
     <CollectionsProvider>
       <div className="relative flex h-screen bg-background">
         <Sidebar />
-        <div className="ml-[72px] flex flex-1 flex-col overflow-hidden">
+        <div className="ml-app-rail flex flex-1 flex-col overflow-hidden">
           <Header />
           <div className="flex-1 overflow-y-auto">
             <PageContainer>
@@ -51,34 +52,36 @@ const AppShell: React.FC = () => (
 
 function App() {
   return (
-    <LoadingProvider>
-      <GlobalLoadingIndicator />
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route element={<RequireAuth />}>
-              <Route element={<AppShell />}>
-                <Route path="/upwork-dashboard" element={<Dashboard />} />
-                <Route path="/upwork-dashboard/jobs" element={<JobList />} />
-                <Route
-                  path="/upwork-dashboard/market-signals"
-                  element={<MarketSignalsBoard />}
-                />
-                <Route
-                  path="/upwork-dashboard/radar"
-                  element={<OpportunityRadar />}
-                />
+    <ThemeProvider>
+      <LoadingProvider>
+        <GlobalLoadingIndicator />
+        <AuthProvider>
+          <Router>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<RequireAuth />}>
+                <Route element={<AppShell />}>
+                  <Route path="/upwork-dashboard" element={<Dashboard />} />
+                  <Route path="/upwork-dashboard/jobs" element={<JobList />} />
+                  <Route
+                    path="/upwork-dashboard/market-signals"
+                    element={<MarketSignalsBoard />}
+                  />
+                  <Route
+                    path="/upwork-dashboard/radar"
+                    element={<OpportunityRadar />}
+                  />
+                </Route>
               </Route>
-            </Route>
-            <Route
-              path="*"
-              element={<Navigate to="/upwork-dashboard" replace />}
-            />
-          </Routes>
-        </Router>
-      </AuthProvider>
-    </LoadingProvider>
+              <Route
+                path="*"
+                element={<Navigate to="/upwork-dashboard" replace />}
+              />
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </LoadingProvider>
+    </ThemeProvider>
   );
 }
 

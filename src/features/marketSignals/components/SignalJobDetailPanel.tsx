@@ -1,11 +1,21 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Badge,
   Button,
   Card,
   EmptyState,
-  Input,
+  FormField,
+  NumberField,
+  OverlayBody,
+  OverlayFooter,
+  OverlayHeader,
+  ReadOnlyField,
+  ScrollArea,
   Select,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
   Textarea,
 } from "../../../shared/ui";
 import { getRelevanceTone } from "../filters";
@@ -68,25 +78,19 @@ const SignalJobDetailPanel: React.FC<SignalJobDetailPanelProps> = ({
   job,
   onSaveOverride,
 }) => {
+  const [isCorrectionOpen, setIsCorrectionOpen] = useState(false);
   const [formState, setFormState] = useState<FormState | null>(
     job ? createFormState(job) : null,
   );
 
   useEffect(() => {
     setFormState(job ? createFormState(job) : null);
-  }, [job]);
-
-  const scoreRows = useMemo(() => {
-    if (!job) return [];
-    return Object.entries(job.scoreBreakdown).map(([label, value]) => ({
-      label,
-      value,
-    }));
+    setIsCorrectionOpen(false);
   }, [job]);
 
   if (!job || !formState) {
     return (
-      <Card className="p-5">
+      <Card className="p-card">
         <EmptyState
           title="Select a signal job"
           description="Open a job to review extracted fields and save manual corrections."
@@ -97,6 +101,27 @@ const SignalJobDetailPanel: React.FC<SignalJobDetailPanelProps> = ({
 
   const patchForm = (patch: Partial<FormState>) => {
     setFormState((current) => (current ? { ...current, ...patch } : current));
+  };
+
+  const resetForm = () => {
+    setFormState(createFormState(job));
+  };
+
+  const openCorrection = () => {
+    resetForm();
+    setIsCorrectionOpen(true);
+  };
+
+  const closeCorrection = () => {
+    resetForm();
+    setIsCorrectionOpen(false);
+  };
+
+  const handleCorrectionOpenChange = (open: boolean) => {
+    if (!open) {
+      resetForm();
+    }
+    setIsCorrectionOpen(open);
   };
 
   const handleSave = () => {
@@ -121,224 +146,236 @@ const SignalJobDetailPanel: React.FC<SignalJobDetailPanelProps> = ({
       notes: formState.notes,
       updatedAt: new Date().toISOString(),
     });
+    setIsCorrectionOpen(false);
   };
 
   return (
-    <Card className="p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="line-clamp-2 text-base font-semibold text-text-primary">
-            {job.sourceJob.title}
-          </h2>
-          <p className="mt-1 text-xs text-text-muted">
-            {job.sourceJob.country || "Unknown country"} /{" "}
-            {job.sourceJob.experience || "Unknown experience"}
-          </p>
-        </div>
-        <Badge tone={getRelevanceTone(job.relevanceStatus)}>
-          {job.relevanceStatus}
-        </Badge>
-      </div>
-
-      <div className="mt-5 rounded-[10px] bg-surface-subtle p-3 text-xs text-text-secondary">
-        <div className="flex items-center justify-between gap-3">
-          <p className="font-medium text-text-primary">Automatic suggestion</p>
-          {job.userCorrections ? (
-            <Badge tone="warning">Corrected</Badge>
-          ) : (
-            <Badge tone="neutral">Auto</Badge>
-          )}
-        </div>
-        <div className="mt-3 grid grid-cols-1 gap-2">
-          <AutoValue label="Category" value={job.auto.requestCategory} />
-          <AutoValue label="Client type" value={job.auto.clientType} />
-          <AutoValue label="Buyer need" value={job.auto.buyerNeed} />
-          <AutoValue label="Urgency" value={job.auto.urgencySignal} />
-          <AutoValue
-            label="Score"
-            value={job.auto.marketSignalScore.toFixed(1)}
-          />
-        </div>
-      </div>
-
-      <div className="mt-5 grid grid-cols-2 gap-3 text-xs">
-        {scoreRows.map((row) => (
-          <div key={row.label} className="rounded-[8px] bg-surface-subtle p-3">
-            <p className="truncate text-text-muted">{row.label}</p>
-            <p className="mt-1 font-semibold text-text-primary">{row.value}</p>
+    <>
+      <Card className="p-card">
+        <div className="flex flex-wrap items-start justify-between gap-control">
+          <div className="min-w-0">
+            <h2 className="line-clamp-2 text-heading text-text-primary">
+              {job.sourceJob.title}
+            </h2>
+            <p className="mt-micro text-body text-text-muted">
+              {job.sourceJob.country || "Unknown country"} /{" "}
+              {job.sourceJob.experience || "Unknown experience"}
+            </p>
           </div>
-        ))}
-      </div>
+          <Badge tone={getRelevanceTone(job.relevanceStatus)}>
+            {job.relevanceStatus}
+          </Badge>
+        </div>
 
-      <div className="mt-5 flex flex-col gap-3">
-        <label className="flex flex-col gap-2">
-          <span className="text-xs font-medium text-text-muted">Relevance</span>
-          <Select
-            value={formState.relevanceStatus}
-            onChange={(event) =>
-              patchForm({
-                relevanceStatus: event.target.value as RelevanceStatus,
-              })
-            }
-          >
-            <option value="Relevant">Relevant</option>
-            <option value="Maybe Relevant">Maybe Relevant</option>
-            <option value="Irrelevant">Irrelevant</option>
-          </Select>
-        </label>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-1">
-          <Field
-            label="Category"
-            value={formState.requestCategory}
-            onChange={(value) => patchForm({ requestCategory: value })}
-          />
-          <Field
-            label="Client type"
-            value={formState.clientType}
-            onChange={(value) => patchForm({ clientType: value })}
-          />
-          <Field
-            label="Niche"
-            value={formState.niche}
-            onChange={(value) => patchForm({ niche: value })}
-          />
-          <Field
-            label="Buyer need"
-            value={formState.buyerNeed}
-            onChange={(value) => patchForm({ buyerNeed: value })}
-          />
-          <Field
-            label="Budget"
-            value={formState.budgetSignal}
-            onChange={(value) => patchForm({ budgetSignal: value })}
-          />
-          <Field
-            label="Urgency"
-            value={formState.urgencySignal}
-            onChange={(value) => patchForm({ urgencySignal: value })}
-          />
-        </div>
-        <label className="flex flex-col gap-2">
-          <span className="text-xs font-medium text-text-muted">Problem</span>
-          <Textarea
-            className="min-h-[82px]"
-            value={formState.problem}
-            onChange={(event) => patchForm({ problem: event.target.value })}
-          />
-        </label>
-        <label className="flex flex-col gap-2">
-          <span className="text-xs font-medium text-text-muted">
-            Exact client language
-          </span>
-          <Textarea
-            className="min-h-[82px]"
-            value={formState.exactClientLanguage}
-            onChange={(event) =>
-              patchForm({ exactClientLanguage: event.target.value })
-            }
-          />
-        </label>
-        <Field
-          label="Skills"
-          value={formState.requiredSkills}
-          onChange={(value) => patchForm({ requiredSkills: value })}
-        />
-        <Field
-          label="Tools"
-          value={formState.relatedTools}
-          onChange={(value) => patchForm({ relatedTools: value })}
-        />
-        <div className="grid grid-cols-3 gap-3">
-          <NumberField
-            label="Difficulty"
-            value={formState.difficulty}
-            onChange={(value) => patchForm({ difficulty: value })}
-          />
-          <NumberField
-            label="Speed"
-            value={formState.speedToValue}
-            onChange={(value) => patchForm({ speedToValue: value })}
-          />
-          <NumberField
+        <div className="mt-card grid grid-cols-1 gap-item">
+          <ReadOnlyField label="Category" value={job.requestCategory} />
+          <ReadOnlyField label="Client type" value={job.clientType} />
+          <ReadOnlyField label="Buyer need" value={job.buyerNeed} />
+          <ReadOnlyField label="Urgency" value={job.urgencySignal} />
+          <ReadOnlyField
             label="Score"
-            value={formState.marketSignalScore}
-            step="0.1"
-            onChange={(value) => patchForm({ marketSignalScore: value })}
+            value={job.marketSignalScore.toFixed(1)}
           />
         </div>
-        <label className="flex flex-col gap-2">
-          <span className="text-xs font-medium text-text-muted">Notes</span>
-          <Textarea
-            className="min-h-[82px]"
-            value={formState.notes}
-            onChange={(event) => patchForm({ notes: event.target.value })}
-          />
-        </label>
-        <div className="rounded-[10px] bg-surface-subtle p-3 text-xs text-text-secondary">
-          <p className="font-medium text-text-primary">Relevance reason</p>
-          <p className="mt-1">{job.relevanceReason}</p>
-          <p className="mt-2">
+
+        <div className="mt-card rounded-control bg-block-subtle p-control text-body text-text-secondary">
+          <div className="flex items-center justify-between gap-control">
+            <p className="text-ui text-text-primary">Automatic suggestion</p>
+            {job.userCorrections ? (
+              <Badge tone="warning">Corrected</Badge>
+            ) : (
+              <Badge tone="neutral">Auto</Badge>
+            )}
+          </div>
+          <div className="mt-control grid grid-cols-1 gap-item">
+            <ReadOnlyField label="Category" value={job.auto.requestCategory} />
+            <ReadOnlyField label="Client type" value={job.auto.clientType} />
+            <ReadOnlyField label="Buyer need" value={job.auto.buyerNeed} />
+            <ReadOnlyField label="Urgency" value={job.auto.urgencySignal} />
+            <ReadOnlyField
+              label="Score"
+              value={job.auto.marketSignalScore.toFixed(1)}
+            />
+          </div>
+        </div>
+
+        <div className="mt-card rounded-control bg-block-subtle p-control text-body text-text-secondary">
+          <p className="text-ui text-text-primary">Relevance reason</p>
+          <p className="mt-micro">{job.relevanceReason}</p>
+          <p className="mt-item">
             Include: {job.matchedIncludeKeywords.join(", ") || "-"}
           </p>
           <p>Exclude: {job.matchedExcludeKeywords.join(", ") || "-"}</p>
         </div>
-        <Button size="sm" onClick={handleSave}>
-          Save correction
+
+        <Button
+          className="mt-card w-full"
+          size="sm"
+          onClick={openCorrection}
+        >
+          {job.userCorrections ? "Edit correction" : "Correct signal"}
         </Button>
-      </div>
-    </Card>
+      </Card>
+
+      <Sheet
+        open={isCorrectionOpen}
+        onOpenChange={handleCorrectionOpenChange}
+      >
+        <SheetContent className="flex w-full max-w-viewport-safe flex-col gap-0 overflow-hidden p-0 sm:max-w-sheet-md">
+          <OverlayHeader className="pr-spacious text-left">
+            <SheetTitle className="line-clamp-2 text-heading text-text-primary">
+              Correct signal
+            </SheetTitle>
+            <SheetDescription className="line-clamp-2 text-body text-text-secondary">
+              {job.sourceJob.title}
+            </SheetDescription>
+          </OverlayHeader>
+
+          <ScrollArea className="max-h-overlay-detail-body">
+            <OverlayBody className="flex flex-col gap-control">
+              <label className="flex flex-col gap-item">
+                <span className="text-label text-text-muted">Relevance</span>
+                <Select
+                  value={formState.relevanceStatus}
+                  onChange={(event) =>
+                    patchForm({
+                      relevanceStatus: event.target.value as RelevanceStatus,
+                    })
+                  }
+                >
+                  <option value="Relevant">Relevant</option>
+                  <option value="Maybe Relevant">Maybe Relevant</option>
+                  <option value="Irrelevant">Irrelevant</option>
+                </Select>
+              </label>
+
+              <div className="grid grid-cols-1 gap-control md:grid-cols-2">
+                <FormField
+                  label="Category"
+                  value={formState.requestCategory}
+                  onValueChange={(value) =>
+                    patchForm({ requestCategory: value })
+                  }
+                />
+                <FormField
+                  label="Client type"
+                  value={formState.clientType}
+                  onValueChange={(value) => patchForm({ clientType: value })}
+                />
+                <FormField
+                  label="Niche"
+                  value={formState.niche}
+                  onValueChange={(value) => patchForm({ niche: value })}
+                />
+                <FormField
+                  label="Buyer need"
+                  value={formState.buyerNeed}
+                  onValueChange={(value) => patchForm({ buyerNeed: value })}
+                />
+                <FormField
+                  label="Budget"
+                  value={formState.budgetSignal}
+                  onValueChange={(value) => patchForm({ budgetSignal: value })}
+                />
+                <FormField
+                  label="Urgency"
+                  value={formState.urgencySignal}
+                  onValueChange={(value) => patchForm({ urgencySignal: value })}
+                />
+              </div>
+
+              <label className="flex flex-col gap-item">
+                <span className="text-label text-text-muted">Problem</span>
+                <Textarea
+                  className="min-h-[82px]"
+                  value={formState.problem}
+                  onChange={(event) => patchForm({ problem: event.target.value })}
+                />
+              </label>
+
+              <label className="flex flex-col gap-item">
+                <span className="text-label text-text-muted">
+                  Exact client language
+                </span>
+                <Textarea
+                  className="min-h-[82px]"
+                  value={formState.exactClientLanguage}
+                  onChange={(event) =>
+                    patchForm({ exactClientLanguage: event.target.value })
+                  }
+                />
+              </label>
+
+              <FormField
+                label="Skills"
+                value={formState.requiredSkills}
+                onValueChange={(value) => patchForm({ requiredSkills: value })}
+              />
+              <FormField
+                label="Tools"
+                value={formState.relatedTools}
+                onValueChange={(value) => patchForm({ relatedTools: value })}
+              />
+              <FormField
+                label="Pattern group"
+                value={formState.patternGroup}
+                onValueChange={(value) => patchForm({ patternGroup: value })}
+              />
+
+              <div className="grid grid-cols-3 gap-control">
+                <NumberField
+                  label="Difficulty"
+                  value={formState.difficulty}
+                  min={1}
+                  max={5}
+                  onValueChange={(value) => patchForm({ difficulty: value })}
+                />
+                <NumberField
+                  label="Speed"
+                  value={formState.speedToValue}
+                  min={1}
+                  max={5}
+                  onValueChange={(value) => patchForm({ speedToValue: value })}
+                />
+                <NumberField
+                  label="Score"
+                  value={formState.marketSignalScore}
+                  min={1}
+                  max={5}
+                  step="0.1"
+                  onValueChange={(value) =>
+                    patchForm({ marketSignalScore: value })
+                  }
+                />
+              </div>
+
+              <label className="flex flex-col gap-item">
+                <span className="text-label text-text-muted">Notes</span>
+                <Textarea
+                  className="min-h-[82px]"
+                  value={formState.notes}
+                  onChange={(event) => patchForm({ notes: event.target.value })}
+                />
+              </label>
+            </OverlayBody>
+          </ScrollArea>
+
+          <OverlayFooter className="flex flex-col-reverse gap-item sm:flex-row sm:justify-end">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={closeCorrection}
+            >
+              Cancel
+            </Button>
+            <Button size="sm" onClick={handleSave}>
+              Save correction
+            </Button>
+          </OverlayFooter>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
-
-type FieldProps = {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-};
-
-const Field: React.FC<FieldProps> = ({ label, value, onChange }) => (
-  <label className="flex flex-col gap-2">
-    <span className="text-xs font-medium text-text-muted">{label}</span>
-    <Input value={value} onChange={(event) => onChange(event.target.value)} />
-  </label>
-);
-
-type AutoValueProps = {
-  label: string;
-  value: string;
-};
-
-const AutoValue: React.FC<AutoValueProps> = ({ label, value }) => (
-  <div className="grid grid-cols-[92px_minmax(0,1fr)] gap-2">
-    <span className="text-text-muted">{label}</span>
-    <span className="truncate text-text-primary">{value || "-"}</span>
-  </div>
-);
-
-type NumberFieldProps = {
-  label: string;
-  value: number;
-  step?: string;
-  onChange: (value: number) => void;
-};
-
-const NumberField: React.FC<NumberFieldProps> = ({
-  label,
-  value,
-  step = "1",
-  onChange,
-}) => (
-  <label className="flex flex-col gap-2">
-    <span className="text-xs font-medium text-text-muted">{label}</span>
-    <Input
-      min={1}
-      max={5}
-      step={step}
-      type="number"
-      value={value}
-      onChange={(event) => onChange(Number(event.target.value))}
-    />
-  </label>
-);
 
 export default SignalJobDetailPanel;
