@@ -1,60 +1,19 @@
 import { apiClient } from "../../../services/apiService";
 import type {
   CreateMarketResearchPayload,
+  CreateJobsSnapshotPayload,
+  JobsSnapshot,
+  JobsSnapshotValidationErrors,
   MarketResearch,
   MarketResearchPayload,
-  MarketResearchValidationErrors,
-  ReplaceMarketResearchPayload,
   UpdateMarketResearchPayload,
 } from "../types";
 
 const MARKET_RESEARCH_ENDPOINT = "/market-research/";
-const JOBS_SNAPSHOT_ITEM_ERROR =
-  "Each jobs_snapshot item must be a non-empty string.";
-
-export class MarketResearchValidationError extends Error {
-  errors: MarketResearchValidationErrors;
-
-  constructor(errors: MarketResearchValidationErrors) {
-    super("Invalid market research payload.");
-    this.name = "MarketResearchValidationError";
-    this.errors = errors;
-    Object.setPrototypeOf(this, MarketResearchValidationError.prototype);
-  }
-}
+const APPLIED_FILTERS_ERROR = "applied_filters must be an object.";
 
 const hasOwn = <T extends object>(value: T, key: PropertyKey) =>
   Object.prototype.hasOwnProperty.call(value, key);
-
-const validateJobsSnapshot = (
-  jobsSnapshot: unknown,
-): string[] | undefined => {
-  if (
-    !Array.isArray(jobsSnapshot) ||
-    jobsSnapshot.some(
-      (item) => typeof item !== "string" || item.trim().length === 0,
-    )
-  ) {
-    return [JOBS_SNAPSHOT_ITEM_ERROR];
-  }
-  return undefined;
-};
-
-const assertValidMarketResearchPayload = (
-  payload: Partial<MarketResearchPayload>,
-) => {
-  const errors: MarketResearchValidationErrors = {};
-  if (hasOwn(payload, "jobs_snapshot")) {
-    const jobsSnapshotErrors = validateJobsSnapshot(payload.jobs_snapshot);
-    if (jobsSnapshotErrors) {
-      errors.jobs_snapshot = jobsSnapshotErrors;
-    }
-  }
-
-  if (Object.keys(errors).length > 0) {
-    throw new MarketResearchValidationError(errors);
-  }
-};
 
 const buildMarketResearchPayload = (
   payload: Partial<MarketResearchPayload>,
@@ -64,11 +23,35 @@ const buildMarketResearchPayload = (
   if (hasOwn(payload, "description")) {
     nextPayload.description = payload.description;
   }
-  if (hasOwn(payload, "jobs_snapshot")) {
-    nextPayload.jobs_snapshot = payload.jobs_snapshot;
-  }
-  assertValidMarketResearchPayload(nextPayload);
   return nextPayload;
+};
+
+export class JobsSnapshotValidationError extends Error {
+  errors: JobsSnapshotValidationErrors;
+
+  constructor(errors: JobsSnapshotValidationErrors) {
+    super("Invalid jobs snapshot payload.");
+    this.name = "JobsSnapshotValidationError";
+    this.errors = errors;
+    Object.setPrototypeOf(this, JobsSnapshotValidationError.prototype);
+  }
+}
+
+const buildJobsSnapshotPayload = (
+  payload: CreateJobsSnapshotPayload,
+): CreateJobsSnapshotPayload => {
+  if (
+    payload.applied_filters == null ||
+    Array.isArray(payload.applied_filters) ||
+    typeof payload.applied_filters !== "object"
+  ) {
+    throw new JobsSnapshotValidationError({
+      applied_filters: [APPLIED_FILTERS_ERROR],
+    });
+  }
+  return {
+    applied_filters: payload.applied_filters,
+  };
 };
 
 export const fetchMarketResearchList = async (): Promise<MarketResearch[]> => {
@@ -97,17 +80,6 @@ export const fetchMarketResearch = async (
   return response.data;
 };
 
-export const replaceMarketResearch = async (
-  id: string,
-  payload: ReplaceMarketResearchPayload,
-): Promise<MarketResearch> => {
-  const response = await apiClient.put<MarketResearch>(
-    `${MARKET_RESEARCH_ENDPOINT}${id}/`,
-    buildMarketResearchPayload(payload),
-  );
-  return response.data;
-};
-
 export const updateMarketResearch = async (
   id: string,
   payload: UpdateMarketResearchPayload,
@@ -121,4 +93,15 @@ export const updateMarketResearch = async (
 
 export const deleteMarketResearch = async (id: string): Promise<void> => {
   await apiClient.delete(`${MARKET_RESEARCH_ENDPOINT}${id}/`);
+};
+
+export const createJobsSnapshot = async (
+  researchId: string,
+  payload: CreateJobsSnapshotPayload,
+): Promise<JobsSnapshot> => {
+  const response = await apiClient.post<JobsSnapshot>(
+    `${MARKET_RESEARCH_ENDPOINT}${researchId}/create_snapshot/`,
+    buildJobsSnapshotPayload(payload),
+  );
+  return response.data;
 };

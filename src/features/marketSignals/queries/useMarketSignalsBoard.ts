@@ -244,7 +244,6 @@ export const useMarketSignalsBoard = () => {
     const updatedResearch = await updateMarketResearch(nextBoard.id, {
       title: nextBoard.marketQuery || nextBoard.name,
       description: nextBoard.goal,
-      jobs_snapshot: nextBoard.jobsSnapshot,
     });
     setMarketResearchRecords((records) =>
       records.map((record) =>
@@ -259,10 +258,6 @@ export const useMarketSignalsBoard = () => {
     const createdResearch = await createMarketResearch({
       title,
       description: activeBoard?.goal || "",
-      jobs_snapshot:
-        activeBoard && activeBoard.jobsSnapshot.length > 0
-          ? activeBoard.jobsSnapshot
-          : jobsSnapshot.jobs.map((job) => job.id),
     });
     setMarketResearchRecords((records) => [...records, createdResearch]);
     setActiveBoardId(createdResearch.id);

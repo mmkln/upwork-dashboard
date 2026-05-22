@@ -1,4 +1,5 @@
 export { default as BoardSettings } from "./BoardSettings";
+export { default as MarketResearchList } from "./MarketResearchList";
 export { default as MarketSignalsEmptyState } from "./MarketSignalsEmptyState";
 export { default as PatternGroupsPanel } from "./PatternGroupsPanel";
 export { default as SignalFilterBar } from "./SignalFilterBar";

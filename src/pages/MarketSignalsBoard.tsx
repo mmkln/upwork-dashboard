@@ -1,47 +1,59 @@
-import { useEffect, useState } from "react";
-import { MarketSignalsEmptyState } from "../features/marketSignals/components";
-import { useCollections } from "../features";
-import { fetchUpworkJobs } from "../services/apiService";
+import { useState } from "react";
+import { useMarketResearchList } from "../features/marketResearch";
+import {
+  MarketResearchList,
+  MarketSignalsEmptyState,
+} from "../features/marketSignals/components";
+import { Button, EmptyState, PageShell } from "../shared/ui";
 
 const MarketSignalsBoard = () => {
-  const { collections } = useCollections();
-  const [totalJobsCount, setTotalJobsCount] = useState(0);
-  const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+  const marketResearch = useMarketResearchList();
+  const [isCreating, setIsCreating] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
+  if (marketResearch.isLoading) {
+    return (
+      <PageShell>
+        <EmptyState title="Loading market research..." />
+      </PageShell>
+    );
+  }
 
-    const loadJobsCount = async () => {
-      setIsLoadingJobs(true);
-      try {
-        const response = await fetchUpworkJobs({ page_size: 1 });
-        if (!cancelled) {
-          setTotalJobsCount(response.count);
-        }
-      } catch (error) {
-        console.error("Unable to load jobs count for market research:", error);
-        if (!cancelled) {
-          setTotalJobsCount(0);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoadingJobs(false);
-        }
-      }
-    };
+  if (marketResearch.error) {
+    return (
+      <PageShell>
+        <EmptyState
+          title="Market research unavailable"
+          description={marketResearch.error}
+          action={
+            <Button
+              size="sm"
+              onClick={() => {
+                void marketResearch.refresh();
+              }}
+            >
+              Retry
+            </Button>
+          }
+        />
+      </PageShell>
+    );
+  }
 
-    loadJobsCount();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  if (marketResearch.records.length > 0 && !isCreating) {
+    return (
+      <MarketResearchList
+        records={marketResearch.records}
+        onCreateNew={() => setIsCreating(true)}
+      />
+    );
+  }
 
   return (
     <MarketSignalsEmptyState
-      collections={collections}
-      isLoadingJobs={isLoadingJobs}
-      totalJobsCount={totalJobsCount}
+      onCreated={(record) => {
+        marketResearch.addRecord(record);
+        setIsCreating(false);
+      }}
     />
   );
 };

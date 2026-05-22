@@ -258,16 +258,6 @@ export const createJobCollection = async ({
   return response.data;
 };
 
-export const createMarketResearch = async (title: string): Promise<{ id: string; title: string; description: string }> => {
-  const response = await apiClient.post("/market-research/", { title });
-  return response.data;
-};
-
-export const updateMarketResearch = async (id: string, description: string): Promise<{ id: string; title: string; description: string }> => {
-  const response = await apiClient.patch(`/market-research/${id}/`, { description });
-  return response.data;
-};
-
 export const setApiAuthToken = (token: string | null) => {
   if (typeof window === "undefined") {
     return;

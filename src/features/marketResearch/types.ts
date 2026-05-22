@@ -10,15 +10,46 @@ export type MarketResearch = {
 
 export type MarketResearchPayload = Pick<
   MarketResearch,
-  "title" | "description" | "jobs_snapshot"
+  "title" | "description"
 >;
 
-export type CreateMarketResearchPayload = MarketResearchPayload;
-
-export type ReplaceMarketResearchPayload = MarketResearchPayload;
+export type CreateMarketResearchPayload = Pick<
+  MarketResearch,
+  "title"
+> &
+  Partial<Pick<MarketResearch, "description">>;
 
 export type UpdateMarketResearchPayload = Partial<MarketResearchPayload>;
 
-export type MarketResearchValidationErrors = Partial<
-  Record<keyof MarketResearchPayload, string[]>
->;
+export type JobSnapshotFilters = {
+  search?: string;
+  collections?: string;
+  job_type?: "fixed" | "hourly" | "unspecified";
+  fixed_price_min?: string;
+  fixed_price_max?: string;
+  hourly_rate_min?: string;
+  hourly_rate_max?: string;
+  skills?: string;
+  instruments?: string;
+  statuses?: string;
+  experience?: string;
+  bookmarked?: "true" | "false" | "1" | "0" | "yes" | "no";
+};
+
+export type JobsSnapshot = {
+  id: string;
+  owner: number;
+  title: string;
+  research: string;
+  applied_filters: JobSnapshotFilters;
+  job_ids: string[];
+  created_at: string;
+};
+
+export type CreateJobsSnapshotPayload = {
+  applied_filters: JobSnapshotFilters;
+};
+
+export type JobsSnapshotValidationErrors = {
+  applied_filters?: string[];
+};
