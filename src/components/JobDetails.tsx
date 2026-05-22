@@ -4,6 +4,8 @@ import {
   Check,
   Clipboard,
   ExternalLink,
+  Folder,
+  FolderPlus,
   Link,
   X,
 } from "lucide-react";
@@ -19,13 +21,17 @@ import {
 import {
   Badge,
   Button,
+  Card,
   DetailRow,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   IconButton,
-  MultiSelect,
   MutedBlock,
   OverlayBody,
   OverlayHeader,
@@ -68,6 +74,29 @@ const formatDate = (date: string) =>
     day: "numeric",
   });
 
+const DescriptionReader: React.FC<{ description: string }> = ({
+  description,
+}) => (
+  <Card className="flex min-h-0 flex-col overflow-hidden p-0">
+    <div className="border-b border-separator px-block py-component">
+      <h3 className="text-ui text-text-primary">Description</h3>
+    </div>
+    {description ? (
+      <ScrollArea className="max-h-overlay-body">
+        <div className="px-block py-component">
+          <p className="max-w-readable whitespace-pre-line text-body text-text-secondary">
+            {description}
+          </p>
+        </div>
+      </ScrollArea>
+    ) : (
+      <div className="px-block py-component">
+        <MutedBlock>No description provided.</MutedBlock>
+      </div>
+    )}
+  </Card>
+);
+
 const JobDetails: React.FC<JobDetailsProps> = ({
   job,
   isOpen,
@@ -77,32 +106,23 @@ const JobDetails: React.FC<JobDetailsProps> = ({
   availableCollections,
 }) => {
   const [jobData, setJobData] = useState<UpworkJob>(job);
-  const [selectedCollectionsToAdd, setSelectedCollectionsToAdd] = useState<
-    number[]
-  >([]);
   const [isUpdatingCollections, setIsUpdatingCollections] = useState(false);
   const [hasCopiedJson, setHasCopiedJson] = useState(false);
   const [hasCopiedLink, setHasCopiedLink] = useState(false);
 
-  const availableOptions = useMemo(
+  const availableCollectionsToAdd = useMemo(
     () =>
-      availableCollections
-        .filter(
-          (collection) =>
-            !(jobData.collections ?? job.collections ?? []).includes(
-              collection.id,
-            ),
-        )
-        .map((collection) => ({
-          value: collection.id,
-          label: collection.name,
-        })),
+      availableCollections.filter(
+        (collection) =>
+          !(jobData.collections ?? job.collections ?? []).includes(
+            collection.id,
+          ),
+      ),
     [availableCollections, job.collections, jobData.collections],
   );
 
   useEffect(() => {
     setJobData(job);
-    setSelectedCollectionsToAdd([]);
     setHasCopiedJson(false);
     setHasCopiedLink(false);
   }, [job]);
@@ -181,14 +201,10 @@ const JobDetails: React.FC<JobDetailsProps> = ({
     updateCollections(current.filter((id) => id !== collectionId));
   };
 
-  const handleAddCollection = () => {
-    if (!selectedCollectionsToAdd.length) return;
+  const handleAddCollection = (collectionId: number) => {
     const current = jobData.collections ?? job.collections ?? [];
-    const updated = Array.from(
-      new Set([...current, ...selectedCollectionsToAdd]),
-    );
+    const updated = Array.from(new Set([...current, collectionId]));
     updateCollections(updated);
-    setSelectedCollectionsToAdd([]);
   };
 
   const upworkUrl = `https://www.upwork.com/jobs/${job.id}`;
@@ -217,8 +233,8 @@ const JobDetails: React.FC<JobDetailsProps> = ({
           }
         }}
       >
-        <DialogContent className="max-h-overlay max-w-modal-xl gap-0 overflow-hidden p-0">
-          <OverlayHeader className="sticky top-0 z-10 pr-spacious text-center sm:text-left">
+        <DialogContent className="max-h-overlay max-w-viewport-safe gap-0 overflow-hidden bg-surface-elevated p-0 backdrop-blur-none xl:max-w-modal-xl">
+          <OverlayHeader className="sticky top-0 z-10 border-separator bg-surface-elevated pr-spacious text-center backdrop-blur-none sm:text-left">
             <div className="flex flex-col gap-component lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0 space-y-item">
                 <Tooltip>
@@ -309,23 +325,10 @@ const JobDetails: React.FC<JobDetailsProps> = ({
             </div>
           </OverlayHeader>
 
-          <ScrollArea className="max-h-overlay-detail-body">
-            <OverlayBody className="grid gap-panel lg:grid-cols-job-detail">
+          <ScrollArea className="max-h-overlay-detail-body bg-surface-elevated">
+            <OverlayBody className="grid gap-panel xl:grid-cols-job-detail">
               <div className="flex min-w-0 flex-col gap-panel">
-                <section className="space-y-control">
-                  <h3 className="text-ui text-text-primary">
-                    Description
-                  </h3>
-                  {job.description ? (
-                    <div className="rounded-control bg-block-subtle px-component py-control">
-                      <p className="whitespace-pre-line text-body text-text-secondary">
-                        {job.description}
-                      </p>
-                    </div>
-                  ) : (
-                    <MutedBlock>No description provided.</MutedBlock>
-                  )}
-                </section>
+                <DescriptionReader description={job.description} />
 
                 <section className="space-y-control">
                   <h3 className="text-ui text-text-primary">
@@ -348,78 +351,10 @@ const JobDetails: React.FC<JobDetailsProps> = ({
                   )}
                 </section>
 
-                <section className="space-y-control">
-                  <h3 className="text-ui text-text-primary">
-                    Collections
-                  </h3>
-                  <div className="space-y-component">
-                    {collectionBadges.length > 0 ? (
-                      <div className="flex flex-wrap items-center gap-item">
-                        {collectionBadges.map(({ id, name }) => (
-                          <Badge
-                            key={id}
-                            tone="info"
-                            className="gap-item border border-border bg-action-muted text-text-primary"
-                          >
-                            {name}
-                            <IconButton
-                              variant="ghost"
-                              size="sm"
-                              className="ml-micro h-control-mini w-control-mini rounded-full text-text-secondary hover:bg-surface hover:text-text-primary"
-                              onClick={() => handleRemoveCollection(id)}
-                              title="Remove from collection"
-                              aria-label="Remove from collection"
-                              type="button"
-                            >
-                              <X className="h-3 w-3" />
-                            </IconButton>
-                          </Badge>
-                        ))}
-                      </div>
-                    ) : (
-                      <MutedBlock>No collections assigned.</MutedBlock>
-                    )}
-
-                    {availableCollections.length > 0 ? (
-                      <>
-                        <Separator className="bg-separator" />
-                        <div className="flex flex-col gap-item sm:flex-row sm:items-center">
-                          <MultiSelect
-                            options={availableOptions}
-                            value={selectedCollectionsToAdd}
-                            disabled={isUpdatingCollections}
-                            onChange={setSelectedCollectionsToAdd}
-                            placeholder="Add to collections..."
-                            searchPlaceholder="Search collections..."
-                            emptyText="No collections found."
-                            className="h-control-small border-transparent bg-block-subtle text-ui text-text-secondary hover:bg-fill-tertiary"
-                          />
-                          <Button
-                            type="button"
-                            size="sm"
-                            className="rounded-control shadow-none"
-                            disabled={
-                              selectedCollectionsToAdd.length === 0 ||
-                              isUpdatingCollections
-                            }
-                            onClick={handleAddCollection}
-                          >
-                            {isUpdatingCollections ? "Adding..." : "Add"}
-                          </Button>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <Separator className="bg-separator" />
-                        <MutedBlock>No available collections to add.</MutedBlock>
-                      </>
-                    )}
-                  </div>
-                </section>
               </div>
 
               <aside className="space-y-component">
-                <div className="rounded-control bg-block-subtle p-component">
+                <Card className="p-component">
                   <div className="flex items-center justify-between gap-control">
                     <div>
                       <p className="text-label text-text-muted">
@@ -431,9 +366,9 @@ const JobDetails: React.FC<JobDetailsProps> = ({
                       onStatusChange={handleStatusChange}
                     />
                   </div>
-                </div>
+                </Card>
 
-                <div className="rounded-control bg-block-subtle p-component">
+                <Card className="p-component">
                   <div className="mb-control flex items-center justify-between">
                     <h3 className="text-ui text-text-primary">
                       Summary
@@ -477,7 +412,92 @@ const JobDetails: React.FC<JobDetailsProps> = ({
                     />
                     <DetailRow label="Job ID" value={job.id} />
                   </div>
-                </div>
+                </Card>
+
+                <Card className="space-y-component p-component">
+                  <h3 className="text-ui text-text-primary">Collections</h3>
+                  {collectionBadges.length > 0 ? (
+                    <div className="flex flex-col gap-item">
+                      {collectionBadges.map(({ id, name }) => (
+                        <div
+                          key={id}
+                          className="flex min-h-control-small items-center justify-between gap-item rounded-control bg-block-subtle px-control py-tag text-ui text-text-primary"
+                        >
+                          <span className="flex min-w-0 items-center gap-item">
+                            <Folder className="h-4 w-4 shrink-0 text-text-secondary" />
+                            <span className="truncate">{name}</span>
+                          </span>
+                          <IconButton
+                            variant="ghost"
+                            size="sm"
+                            className="h-control-mini w-control-mini shrink-0 rounded-full text-text-muted hover:bg-control-hover hover:text-text-primary"
+                            onClick={() => handleRemoveCollection(id)}
+                            disabled={isUpdatingCollections}
+                            title="Remove from collection"
+                            aria-label="Remove from collection"
+                            type="button"
+                          >
+                            <X className="h-3 w-3" />
+                          </IconButton>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <MutedBlock>No collections assigned.</MutedBlock>
+                  )}
+
+                  {availableCollectionsToAdd.length > 0 ? (
+                    <>
+                      {collectionBadges.length > 0 ? (
+                        <Separator className="bg-separator" />
+                      ) : null}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="soft"
+                            className="w-full justify-start rounded-control shadow-none"
+                            disabled={isUpdatingCollections}
+                          >
+                            <FolderPlus className="h-4 w-4" />
+                            {isUpdatingCollections
+                              ? "Updating..."
+                              : "Add to Collection"}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="min-w-status-menu rounded-block p-item"
+                        >
+                          {availableCollectionsToAdd.map((collection) => (
+                            <DropdownMenuItem
+                              key={collection.id}
+                              className="min-h-control-small gap-item px-control py-item"
+                              onSelect={() => handleAddCollection(collection.id)}
+                            >
+                              <Folder className="h-4 w-4" />
+                              <span className="truncate">{collection.name}</span>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </>
+                  ) : (
+                    <>
+                      {collectionBadges.length > 0 ? (
+                        <>
+                          <Separator className="bg-separator" />
+                          <p className="text-label text-text-muted">
+                            All collections assigned.
+                          </p>
+                        </>
+                      ) : (
+                        <MutedBlock>No available collections.</MutedBlock>
+                      )}
+                    </>
+                  )}
+                </Card>
               </aside>
             </OverlayBody>
           </ScrollArea>
