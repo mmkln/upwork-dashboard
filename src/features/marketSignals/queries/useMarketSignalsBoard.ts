@@ -4,6 +4,7 @@ import { useJobsSnapshot } from "../../jobs";
 import {
   createMarketResearch,
   fetchMarketResearchList,
+  getLatestMarketResearchSnapshotJobIds,
   updateMarketResearch,
   type MarketResearch,
 } from "../../marketResearch";
@@ -45,7 +46,7 @@ const mapMarketResearchToBoard = (
   name: research.title,
   goal: research.description,
   marketQuery: research.title,
-  jobsSnapshot: research.jobs_snapshot,
+  jobsSnapshot: getLatestMarketResearchSnapshotJobIds(research),
   includeKeywords: parseKeywordInput(research.title.replace(/\s+/g, ",")),
   excludeKeywords: [],
   createdAt: research.created_at,

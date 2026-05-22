@@ -45,7 +45,7 @@ const AccountMenu: React.FC = () => {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="flex h-target items-center gap-item rounded-control border border-transparent bg-control px-item pr-control text-left transition-colors duration-motion-fast ease-motion-standard hover:bg-control-hover focus:outline-none focus:ring-2 focus:ring-ring"
+          className="flex h-target items-center gap-item rounded-control border border-transparent bg-transparent px-item pr-control text-left transition-colors duration-motion-fast ease-motion-standard hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-ring"
           aria-label={`Open account menu for ${displayName}`}
         >
           <span className="flex h-control-small w-control-small items-center justify-center rounded-item bg-premium-blue text-ui text-primary-foreground">

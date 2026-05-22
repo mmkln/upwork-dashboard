@@ -24,6 +24,7 @@
 - In list/table workflows, keep side detail panes as read-only inspectors with focused actions; move long edit/correction forms into a Sheet/Dialog so scanning and editing do not compete in the same persistent layout.
 - Keep API mutation payloads separate from prepared/view-model objects; whitelist transport fields so derived UI data, caches, and non-serializable structures never leak back to the backend.
 - When replacing local persisted UI state with a backend contract, remove unsupported local-only fields from persisted workflows instead of encoding them into unrelated API fields.
+- When a workflow creates child resources through a dedicated endpoint, derive completion from explicit child-existence fields or the child mutation response; do not use legacy container payload fields as the primary completion marker.
 - When wrapping npm package binaries in a Node script on Windows, prefer resolving the package's JavaScript entrypoint and spawning it with `process.execPath` instead of spawning a `.cmd` shim directly.
 - When API transport errors need app-wide UI effects, keep status detection in the API layer and route/navigation side effects in a router-aware React handler instead of importing navigation into the API client.
 

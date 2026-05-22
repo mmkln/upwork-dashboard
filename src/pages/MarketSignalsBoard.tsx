@@ -1,14 +1,20 @@
 import { useState } from "react";
-import { useMarketResearchList } from "../features/marketResearch";
 import {
+  type MarketResearch,
+  useMarketResearchList,
+} from "../features/marketResearch";
+import {
+  MarketResearchCreationFlow,
   MarketResearchList,
-  MarketSignalsEmptyState,
 } from "../features/marketSignals/components";
 import { Button, EmptyState, PageShell } from "../shared/ui";
 
 const MarketSignalsBoard = () => {
   const marketResearch = useMarketResearchList();
   const [isCreating, setIsCreating] = useState(false);
+  const [draftResearch, setDraftResearch] = useState<MarketResearch | null>(
+    null,
+  );
 
   if (marketResearch.isLoading) {
     return (
@@ -43,16 +49,34 @@ const MarketSignalsBoard = () => {
     return (
       <MarketResearchList
         records={marketResearch.records}
-        onCreateNew={() => setIsCreating(true)}
+        onContinue={(record) => {
+          setDraftResearch(record);
+          setIsCreating(true);
+        }}
+        onCreateNew={() => {
+          setDraftResearch(null);
+          setIsCreating(true);
+        }}
       />
     );
   }
 
   return (
-    <MarketSignalsEmptyState
-      onCreated={(record) => {
-        marketResearch.addRecord(record);
+    <MarketResearchCreationFlow
+      canCancel={marketResearch.records.length > 0}
+      initialResearch={draftResearch}
+      onCancel={() => {
+        setDraftResearch(null);
         setIsCreating(false);
+      }}
+      onCompleted={(record) => {
+        marketResearch.upsertRecord(record);
+        setDraftResearch(null);
+        setIsCreating(false);
+      }}
+      onDraftSaved={(record) => {
+        marketResearch.upsertRecord(record);
+        setDraftResearch(record);
       }}
     />
   );

@@ -37,15 +37,25 @@ export const useMarketResearchList = () => {
     };
   }, [load]);
 
-  const addRecord = useCallback((record: MarketResearch) => {
-    setRecords((currentRecords) => [record, ...currentRecords]);
+  const upsertRecord = useCallback((record: MarketResearch) => {
+    setRecords((currentRecords) => {
+      const existingRecord = currentRecords.find(
+        (item) => item.id === record.id,
+      );
+      if (!existingRecord) {
+        return [record, ...currentRecords];
+      }
+      return currentRecords.map((item) =>
+        item.id === record.id ? record : item,
+      );
+    });
   }, []);
 
   return {
     records,
     isLoading,
     error,
-    addRecord,
+    upsertRecord,
     refresh: load,
   };
 };

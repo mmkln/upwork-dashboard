@@ -3,7 +3,7 @@ export type MarketResearch = {
   owner: number;
   title: string;
   description: string;
-  jobs_snapshot: string[];
+  snapshots: JobsSnapshot[];
   created_at: string;
   updated_at: string;
 };
@@ -41,7 +41,7 @@ export type JobsSnapshot = {
   owner: number;
   title: string;
   research: string;
-  applied_filters: JobSnapshotFilters;
+  applied_filters: Record<string, unknown>;
   job_ids: string[];
   created_at: string;
 };

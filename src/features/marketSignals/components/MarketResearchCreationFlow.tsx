@@ -1,9 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   createJobsSnapshot,
   createMarketResearch,
+  fetchMarketResearch,
+  getMarketResearchSetupState,
   type JobSnapshotFilters,
   type MarketResearch,
+  updateMarketResearch,
 } from "../../marketResearch";
 import { Badge, Button, Checkbox, Input, Textarea } from "../../../shared/ui";
 import { useMarketResearchCreationResources } from "../queries/useMarketResearchCreationResources";
@@ -17,8 +20,12 @@ type ExperienceFilter =
   | "Intermediate"
   | "Expert";
 
-type MarketSignalsEmptyStateProps = {
-  onCreated: (record: MarketResearch) => void;
+type MarketResearchCreationFlowProps = {
+  canCancel?: boolean;
+  initialResearch?: MarketResearch | null;
+  onCancel?: () => void;
+  onCompleted: (record: MarketResearch) => void;
+  onDraftSaved?: (record: MarketResearch) => void;
 };
 
 const MIN_TITLE_LENGTH = 3;
@@ -32,18 +39,35 @@ const getTitleError = (value: string) => {
   return "";
 };
 
-const MarketSignalsEmptyState: React.FC<MarketSignalsEmptyStateProps> = ({
-  onCreated,
+const getInitialStep = (
+  research: MarketResearch | null | undefined,
+): ResearchStep => {
+  if (!research) return "title";
+  const setupState = getMarketResearchSetupState(research);
+  if (setupState === "missing_title") return "title";
+  return "scope";
+};
+
+const MarketResearchCreationFlow: React.FC<MarketResearchCreationFlowProps> = ({
+  canCancel = false,
+  initialResearch = null,
+  onCancel,
+  onCompleted,
+  onDraftSaved,
 }) => {
   const resources = useMarketResearchCreationResources();
-  const [step, setStep] = useState<ResearchStep>("title");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [step, setStep] = useState<ResearchStep>(() =>
+    getInitialStep(initialResearch),
+  );
+  const [title, setTitle] = useState(initialResearch?.title ?? "");
+  const [description, setDescription] = useState(
+    initialResearch?.description ?? "",
+  );
   const [titleTouched, setTitleTouched] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [createdResearch, setCreatedResearch] =
-    useState<MarketResearch | null>(null);
+    useState<MarketResearch | null>(initialResearch);
   const [jobScopeMode, setJobScopeMode] = useState<JobScopeMode>("all");
   const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>(
     [],
@@ -74,6 +98,28 @@ const MarketSignalsEmptyState: React.FC<MarketSignalsEmptyStateProps> = ({
       ? "Select at least one collection."
       : "";
   const showScopeError = scopeTouched && Boolean(scopeError);
+  const stepTitle =
+    step === "title"
+      ? "New research"
+      : step === "description"
+        ? trimmedTitle
+        : step === "scope"
+          ? "Choose source"
+          : "Create snapshot";
+  const stepDescription =
+    step === "filters"
+      ? "Backend will freeze matching job IDs from these filters."
+      : step === "scope"
+        ? "Collections are loaded now so the snapshot uses current backend data."
+        : step === "description"
+          ? "Add an optional purpose for this research."
+          : "Start by naming the research container.";
+
+  useEffect(() => {
+    if (step === "scope" && resources.collections.length === 0) {
+      void resources.loadCollections();
+    }
+  }, [resources.collections.length, resources.loadCollections, step]);
 
   const buildAppliedFilters = (): JobSnapshotFilters => {
     const filters: JobSnapshotFilters = {};
@@ -95,16 +141,57 @@ const MarketSignalsEmptyState: React.FC<MarketSignalsEmptyStateProps> = ({
     return filters;
   };
 
-  const handleStart = () => {
-    setTitleTouched(true);
-    if (titleError) return;
-    setStep("description");
+  const saveResearchDraft = async (payload: {
+    title: string;
+    description?: string;
+  }) => {
+    const research = createdResearch
+      ? await updateMarketResearch(createdResearch.id, payload)
+      : await createMarketResearch(payload);
+
+    setCreatedResearch(research);
+    onDraftSaved?.(research);
+    return research;
   };
 
-  const handleDescriptionNext = () => {
-    setStep("scope");
+  const handleStart = async () => {
+    setTitleTouched(true);
     setSaveError("");
-    void resources.loadCollections();
+    if (titleError || isSaving) return;
+
+    setIsSaving(true);
+    try {
+      await saveResearchDraft({ title: trimmedTitle });
+      setStep("description");
+    } catch {
+      setSaveError("Unable to save research.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const saveDescribedResearchDraft = async () => {
+    return saveResearchDraft({
+      title: trimmedTitle,
+      description: trimmedDescription,
+    });
+  };
+
+  const handleDescriptionNext = async () => {
+    setTitleTouched(true);
+    setSaveError("");
+    if (titleError || isSaving) return;
+
+    setIsSaving(true);
+    try {
+      await saveDescribedResearchDraft();
+      setStep("scope");
+      void resources.loadCollections();
+    } catch {
+      setSaveError("Unable to save research.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const toggleCollection = (collectionId: number) => {
@@ -126,17 +213,23 @@ const MarketSignalsEmptyState: React.FC<MarketSignalsEmptyStateProps> = ({
     setIsSaving(true);
     setSaveError("");
     try {
-      const research =
-        createdResearch ??
-        (await createMarketResearch({
-          title: trimmedTitle,
-          description: trimmedDescription,
-        }));
-      setCreatedResearch(research);
-      await createJobsSnapshot(research.id, {
+      const research = await saveDescribedResearchDraft();
+      const snapshot = await createJobsSnapshot(research.id, {
         applied_filters: buildAppliedFilters(),
       });
-      onCreated(research);
+      const refreshedResearch = await fetchMarketResearch(research.id);
+      const refreshedSnapshots = Array.isArray(refreshedResearch.snapshots)
+        ? refreshedResearch.snapshots
+        : [];
+      const snapshots = refreshedSnapshots.some(
+        (item) => item.id === snapshot.id,
+      )
+        ? refreshedSnapshots
+        : [...refreshedSnapshots, snapshot];
+      onCompleted({
+        ...refreshedResearch,
+        snapshots,
+      });
     } catch {
       setSaveError("Unable to create market research snapshot.");
     } finally {
@@ -147,26 +240,12 @@ const MarketSignalsEmptyState: React.FC<MarketSignalsEmptyStateProps> = ({
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="mx-auto flex w-full max-w-[640px] flex-col text-left">
-        <div className="flex flex-col gap-control text-center">
-          <p className="text-heading text-text-primary">
-            {step === "title"
-              ? "New research"
-              : step === "description"
-                ? trimmedTitle
-                : step === "scope"
-                  ? "Choose source"
-                  : "Create snapshot"}
-          </p>
-          <p className="text-body text-text-secondary">
-            {step === "filters"
-              ? "Backend will freeze matching job IDs from these filters."
-              : step === "scope"
-                ? "Collections are loaded now so the snapshot uses current backend data."
-                : step === "description"
-                  ? "Add a short purpose for this research."
-                  : "Start by naming the research container."}
-          </p>
-        </div>
+        <ResearchCreationHeader
+          canCancel={canCancel}
+          description={stepDescription}
+          title={stepTitle}
+          onCancel={onCancel}
+        />
 
         {step === "filters" ? (
           <div className="mt-card flex w-full flex-col gap-component">
@@ -248,7 +327,11 @@ const MarketSignalsEmptyState: React.FC<MarketSignalsEmptyStateProps> = ({
               <Button size="sm" variant="ghost" onClick={() => setStep("scope")}>
                 Back
               </Button>
-              <Button disabled={isSaving} size="sm" onClick={handleCreateResearch}>
+              <Button
+                disabled={isSaving}
+                size="sm"
+                onClick={handleCreateResearch}
+              >
                 {isSaving ? "Creating" : "Create research"}
               </Button>
             </div>
@@ -359,10 +442,15 @@ const MarketSignalsEmptyState: React.FC<MarketSignalsEmptyStateProps> = ({
             <Textarea
               aria-label="Research description"
               className="min-h-[112px] text-left"
-              placeholder="What should this research help you understand?"
+              placeholder="Optional purpose or notes."
               value={description}
               onChange={(event) => setDescription(event.target.value)}
             />
+            {saveError ? (
+              <p className="text-left text-body text-destructive">
+                {saveError}
+              </p>
+            ) : null}
             <div className="flex justify-end gap-item">
               <Button
                 size="sm"
@@ -371,8 +459,14 @@ const MarketSignalsEmptyState: React.FC<MarketSignalsEmptyStateProps> = ({
               >
                 Back
               </Button>
-              <Button size="sm" onClick={handleDescriptionNext}>
-                Next
+              <Button
+                disabled={isSaving}
+                size="sm"
+                onClick={() => {
+                  void handleDescriptionNext();
+                }}
+              >
+                {isSaving ? "Saving" : "Next"}
               </Button>
             </div>
           </div>
@@ -393,17 +487,19 @@ const MarketSignalsEmptyState: React.FC<MarketSignalsEmptyStateProps> = ({
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     event.preventDefault();
-                    handleStart();
+                    void handleStart();
                   }
                 }}
               />
               <Button
                 className="sm:shrink-0"
-                disabled={Boolean(titleError)}
+                disabled={Boolean(titleError) || isSaving}
                 size="sm"
-                onClick={handleStart}
+                onClick={() => {
+                  void handleStart();
+                }}
               >
-                Start new research
+                {isSaving ? "Saving" : "Start new research"}
               </Button>
             </div>
             {showTitleError ? (
@@ -412,6 +508,11 @@ const MarketSignalsEmptyState: React.FC<MarketSignalsEmptyStateProps> = ({
                 className="text-left text-body text-warning"
               >
                 {titleError}
+              </p>
+            ) : null}
+            {saveError ? (
+              <p className="text-left text-body text-destructive">
+                {saveError}
               </p>
             ) : null}
           </div>
@@ -428,6 +529,34 @@ type ScopeOptionProps = {
   meta: string;
   onClick: () => void;
 };
+
+type ResearchCreationHeaderProps = {
+  canCancel: boolean;
+  description: string;
+  title: string;
+  onCancel?: () => void;
+};
+
+const ResearchCreationHeader: React.FC<ResearchCreationHeaderProps> = ({
+  canCancel,
+  description,
+  title,
+  onCancel,
+}) => (
+  <div className="flex flex-col gap-component">
+    <div className="min-h-target">
+      {canCancel && onCancel ? (
+        <Button size="sm" variant="ghost" onClick={onCancel}>
+          Back to research
+        </Button>
+      ) : null}
+    </div>
+    <div className="flex flex-col gap-control text-center">
+      <p className="text-heading text-text-primary">{title}</p>
+      <p className="text-body text-text-secondary">{description}</p>
+    </div>
+  </div>
+);
 
 type FilterChoiceProps = {
   active: boolean;
@@ -491,4 +620,4 @@ const ScopeOption: React.FC<ScopeOptionProps> = ({
   </button>
 );
 
-export default MarketSignalsEmptyState;
+export default MarketResearchCreationFlow;
