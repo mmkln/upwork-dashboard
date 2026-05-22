@@ -11,6 +11,21 @@ In the project directory, you can run:
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
+Choose the backend API when starting local development:
+
+```bash
+npm start
+npm start -- local
+npm start -- remote
+```
+
+`npm start` defaults to the remote backend.
+`local` uses `http://127.0.0.1:8000/api`.
+`remote` uses `https://mxllapi.pythonanywhere.com/api`.
+
+You can also use `npm run start:local` or `npm run start:remote`.
+To use a custom backend, start the app with `REACT_APP_API_URL` set to the full API base URL.
+
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 

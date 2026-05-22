@@ -5,6 +5,7 @@ export {
   createUpworkJob,
   fetchJobCollections,
   createJobCollection,
+  isApiAuthFailureError,
   setApiAuthToken,
   login,
   getApiAuthToken,

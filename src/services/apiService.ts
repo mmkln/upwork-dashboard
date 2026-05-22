@@ -13,6 +13,16 @@ import {
 } from "../features/globalLoadingStore";
 
 export const AUTH_STORAGE_KEY = "authToken";
+const AUTH_FAILURE_STATUS = 403;
+const AUTH_ENDPOINT_PATHS = ["/auth/login/"];
+
+const isAuthEndpoint = (url?: string) =>
+  Boolean(url && AUTH_ENDPOINT_PATHS.some((path) => url.includes(path)));
+
+export const isApiAuthFailureError = (error: unknown): boolean =>
+  axios.isAxiosError(error) &&
+  error.response?.status === AUTH_FAILURE_STATUS &&
+  !isAuthEndpoint(error.config?.url);
 
 export const getApiAuthToken = (): string | null => {
   if (typeof window === "undefined") {
@@ -245,6 +255,16 @@ export const createJobCollection = async ({
     name,
     description,
   });
+  return response.data;
+};
+
+export const createMarketResearch = async (title: string): Promise<{ id: string; title: string; description: string }> => {
+  const response = await apiClient.post("/market-research/", { title });
+  return response.data;
+};
+
+export const updateMarketResearch = async (id: string, description: string): Promise<{ id: string; title: string; description: string }> => {
+  const response = await apiClient.patch(`/market-research/${id}/`, { description });
   return response.data;
 };
 

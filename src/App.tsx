@@ -22,6 +22,7 @@ import {
   useGlobalLoading,
 } from "./features";
 import { AuthProvider } from "./features/auth/AuthProvider";
+import ApiAuthFailureHandler from "./features/auth/ApiAuthFailureHandler";
 import RequireAuth from "./features/auth/RequireAuth";
 import { PageLoadingBar } from "./components/ui";
 import { Header, PageContainer, Sidebar } from "./layout";
@@ -55,8 +56,9 @@ function App() {
     <ThemeProvider>
       <LoadingProvider>
         <GlobalLoadingIndicator />
-        <AuthProvider>
-          <Router>
+        <Router>
+          <AuthProvider>
+            <ApiAuthFailureHandler />
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route element={<RequireAuth />}>
@@ -78,8 +80,8 @@ function App() {
                 element={<Navigate to="/upwork-dashboard" replace />}
               />
             </Routes>
-          </Router>
-        </AuthProvider>
+          </AuthProvider>
+        </Router>
       </LoadingProvider>
     </ThemeProvider>
   );

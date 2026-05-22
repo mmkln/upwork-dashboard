@@ -44,6 +44,7 @@ export interface JobCollection {
   id: number;
   name: string;
   description: string;
+  job_count?: number;
   created_at?: string;
   updated_at?: string;
 }

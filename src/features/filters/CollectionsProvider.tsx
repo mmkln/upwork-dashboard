@@ -7,7 +7,7 @@ import React, {
   useCallback,
 } from "react";
 import { JobCollection } from "../../models";
-import { fetchJobCollections } from "../../services";
+import { fetchJobCollections, isApiAuthFailureError } from "../../services";
 
 type CollectionsContextValue = {
   collections: JobCollection[];
@@ -29,6 +29,9 @@ export const CollectionsProvider: React.FC<{ children: React.ReactNode }> = ({
       const data = await fetchJobCollections();
       setCollections(data);
     } catch (error) {
+      if (isApiAuthFailureError(error)) {
+        return;
+      }
       console.warn("Failed to fetch collections", error);
     }
   }, []);
