@@ -1,63 +1,39 @@
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { useCallback } from "react";
 import type { FilterState } from "../../filters/types";
-import { mapFiltersToJobQuery } from "../api/jobQueryParams";
-import {
-  createJobsSnapshotKey,
-  getJobsSnapshot,
-  loadJobsSnapshot,
-  reloadJobsSnapshot,
-  selectJobsFromSnapshot,
-  subscribeJobsSnapshot,
-} from "../store/jobsSnapshotStore";
+import { useJobsSnapshotQuery } from "./useJobsSnapshotQuery";
 
 type UseJobsSnapshotParams = {
   filters?: FilterState;
   pageSize?: number;
 };
 
+/**
+ * Primary hook for large jobs snapshots.
+ * Backed by TanStack Query for caching, automatic cancellation on unmount/navigation,
+ * and correct loading states.
+ */
 export const useJobsSnapshot = ({
   filters,
   pageSize = 2000,
 }: UseJobsSnapshotParams = {}) => {
-  const query = useMemo(
-    () => (filters ? mapFiltersToJobQuery(filters) : {}),
-    [filters],
-  );
-  const request = useMemo(() => ({ query, pageSize }), [pageSize, query]);
-  const snapshotKey = useMemo(
-    () => createJobsSnapshotKey(request),
-    [request],
-  );
-
-  const snapshot = useSyncExternalStore(
-    useCallback(
-      (listener) => subscribeJobsSnapshot(snapshotKey, listener),
-      [snapshotKey],
-    ),
-    useCallback(() => getJobsSnapshot(snapshotKey), [snapshotKey]),
-    useCallback(() => getJobsSnapshot(snapshotKey), [snapshotKey]),
-  );
-
-  useEffect(() => {
-    if (snapshot.status === "idle") {
-      void loadJobsSnapshot(request);
-    };
-  }, [request, snapshot.status]);
+  const query = useJobsSnapshotQuery({ filters, pageSize });
 
   const reload = useCallback(() => {
-    reloadJobsSnapshot(request);
-  }, [request]);
+    void query.refetch();
+  }, [query]);
 
-  const jobs = useMemo(() => selectJobsFromSnapshot(snapshot), [snapshot]);
+  const data = query.data;
 
   return {
-    jobs,
-    loadedCount: snapshot.loadedCount,
-    totalCount: snapshot.totalCount,
-    isHydrating: snapshot.status === "loading",
-    isReady: snapshot.status === "ready",
-    isLoading: snapshot.status === "idle" || snapshot.status === "loading",
-    error: snapshot.error,
+    jobs: data?.jobs ?? [],
+    loadedCount: data?.jobs?.length ?? 0,
+    totalCount: data?.totalCount ?? 0,
+    isHydrating: query.isLoading,
+    isReady: query.isSuccess,
+    isLoading: query.isLoading || query.isFetching,
+    error: query.error,
     reload,
+    // Raw query for power users (refetch, isFetching, etc.)
+    query,
   };
 };

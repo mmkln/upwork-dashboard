@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Bookmark, Clock3 } from "lucide-react";
 import { UpworkJob } from "../../../models";
-import { updateJobBookmark } from "../../../features/jobs";
+import { useUpdateJobMutation } from "../../../features/jobs";
 import { Badge, Card, IconButton } from "../../../shared/ui";
 import { cn } from "lib/utils";
 
@@ -64,6 +64,7 @@ const JobListItem: React.FC<JobListItemProps> = ({
   collectionNameById,
 }) => {
   const [jobData, setJobData] = useState<UpworkJob>(job);
+  const updateJobMutation = useUpdateJobMutation();
 
   useEffect(() => {
     setJobData(job);
@@ -79,7 +80,8 @@ const JobListItem: React.FC<JobListItemProps> = ({
     );
 
   const handleBookmark = () => {
-    updateJobBookmark(jobData.id, !jobData.is_bookmarked)
+    updateJobMutation
+      .mutateAsync({ id: jobData.id, is_bookmarked: !jobData.is_bookmarked })
       .then((updatedJob) => {
         setJobData(updatedJob);
         onJobUpdate(updatedJob);

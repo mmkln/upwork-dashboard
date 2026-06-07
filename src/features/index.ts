@@ -8,7 +8,8 @@ export {
   CollectionsProvider,
   useCollections,
 } from "./filters/CollectionsProvider";
-export { LoadingProvider, useGlobalLoading } from "./LoadingProvider";
+// Global loading system has been fully removed and replaced by TanStack Query.
+
 export {
   filterJobs,
   filterJobsByState,
@@ -17,6 +18,8 @@ export {
   JobsSnapshotProgress,
   useJobsPage,
   useJobsSnapshot,
+  useJobsSnapshotQuery,
+  useUpdateJobMutation,
   mapFiltersToJobQuery,
   updateJobBookmark,
   updateJobCollections,

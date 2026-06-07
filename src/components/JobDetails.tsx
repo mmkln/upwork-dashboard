@@ -14,9 +14,7 @@ import { JobStatusSelect } from ".";
 import {
   serializeJobForExport,
   stripPreparedJobMeta,
-  updateJobBookmark,
-  updateJobCollections,
-  updateJobStatus,
+  useUpdateJobMutation,
 } from "../features/jobs";
 import {
   Badge,
@@ -110,6 +108,9 @@ const JobDetails: React.FC<JobDetailsProps> = ({
   const [hasCopiedJson, setHasCopiedJson] = useState(false);
   const [hasCopiedLink, setHasCopiedLink] = useState(false);
 
+  // New TanStack Query mutation (updates the query cache for all consumers)
+  const updateJobMutation = useUpdateJobMutation();
+
   const availableCollectionsToAdd = useMemo(
     () =>
       availableCollections.filter(
@@ -149,7 +150,8 @@ const JobDetails: React.FC<JobDetailsProps> = ({
     );
 
   const handleStatusChange = (status: JobStatus) => {
-    updateJobStatus(jobData.id, status)
+    updateJobMutation
+      .mutateAsync({ id: jobData.id, status })
       .then((updatedJob) => {
         setJobData(updatedJob);
         onJobUpdate(updatedJob);
@@ -160,7 +162,8 @@ const JobDetails: React.FC<JobDetailsProps> = ({
   };
 
   const handleBookmark = () => {
-    updateJobBookmark(jobData.id, !jobData.is_bookmarked)
+    updateJobMutation
+      .mutateAsync({ id: jobData.id, is_bookmarked: !jobData.is_bookmarked })
       .then((updatedJob) => {
         setJobData(updatedJob);
         onJobUpdate(updatedJob);
@@ -179,7 +182,9 @@ const JobDetails: React.FC<JobDetailsProps> = ({
     };
     setJobData(optimisticJob);
     onJobUpdate(optimisticJob);
-    updateJobCollections(jobData.id, collectionIds)
+
+    updateJobMutation
+      .mutateAsync({ id: jobData.id, collections: collectionIds })
       .then((updatedJob) => {
         setJobData(updatedJob);
         onJobUpdate(updatedJob);

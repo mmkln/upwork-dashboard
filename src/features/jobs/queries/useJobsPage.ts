@@ -4,7 +4,9 @@ import { fetchUpworkJobs } from "../../../services";
 import { prepareJobs } from "../../../utils";
 import type { FilterState } from "../../filters/types";
 import { mapFiltersToJobQuery } from "../api/jobQueryParams";
-import { replaceJobInSnapshots } from "../store/jobsSnapshotStore";
+import { queryClient } from "../../../lib/queryClient";
+import { jobKeys } from "../queryKeys";
+import type { JobsSnapshotData } from "./useJobsSnapshotQuery";
 
 type UseJobsPageParams = {
   filters: FilterState;
@@ -27,51 +29,72 @@ export const useJobsPage = ({
   const query = useMemo(() => mapFiltersToJobQuery(filters), [filters]);
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
     const loadJobs = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const paginatedJobs = await fetchUpworkJobs({
-          page,
-          page_size: pageSize,
-          ...query,
-        });
+        const paginatedJobs = await fetchUpworkJobs(
+          {
+            page,
+            page_size: pageSize,
+            ...query,
+          },
+          { signal: controller.signal },
+        );
 
-        if (cancelled) return;
+        // If the component unmounted or deps changed, the signal will be aborted.
+        // We still check for good measure.
+        if (controller.signal.aborted) return;
 
         setJobs(sortJobsForPage(prepareJobs(paginatedJobs.results)));
         setTotalJobs(paginatedJobs.count);
       } catch (loadError) {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
         console.error("Error fetching jobs:", loadError);
         setJobs([]);
         setTotalJobs(0);
         setError(loadError);
       } finally {
-        if (!cancelled) {
+        if (!controller.signal.aborted) {
           setIsLoading(false);
         }
       }
     };
 
-    loadJobs();
+    void loadJobs();
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [page, pageSize, query]);
 
   const replaceJob = useCallback((job: UpworkJob) => {
     const [preparedJob] = prepareJobs([job]);
-    replaceJobInSnapshots(job);
+
+    // Update local paginated list state
     setJobs((currentJobs) =>
       currentJobs.map((currentJob) =>
         currentJob.id === preparedJob.id ? preparedJob : currentJob,
       ),
     );
+
+    // Also update any active snapshot queries in TanStack cache for consistency
+    queryClient.setQueriesData<JobsSnapshotData>(
+      { queryKey: jobKeys.all },
+      (oldData: JobsSnapshotData | undefined) => {
+        if (!oldData || !oldData.jobs) return oldData;
+        return {
+          ...oldData,
+          jobs: oldData.jobs.map((j) =>
+            j.id === preparedJob.id ? preparedJob : j,
+          ),
+        };
+      },
+    );
+
     return preparedJob;
   }, []);
 

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useCollections } from "../../filters/CollectionsProvider";
 import { useJobsSnapshot } from "../../jobs";
+import { useMarketResearchListQuery } from "../../marketResearch/queries/useMarketResearchListQuery";
 import {
   createMarketResearch,
-  fetchMarketResearchList,
   getLatestMarketResearchSnapshotJobIds,
   updateMarketResearch,
   type MarketResearch,
@@ -106,7 +106,9 @@ export const useMarketSignalsBoard = () => {
   >([]);
   const [activeBoardId, setActiveBoardId] = useState<string | null>(null);
   const [researchError, setResearchError] = useState("");
-  const [isResearchLoading, setIsResearchLoading] = useState(true);
+
+  // New clean query for market research list (auto-cancels, proper states)
+  const marketResearchQuery = useMarketResearchListQuery();
   const [overrides, setOverrides] = useState<MarketSignalOverride[]>(() =>
     loadMarketSignalOverrides(),
   );
@@ -120,33 +122,22 @@ export const useMarketSignalsBoard = () => {
     useState<MarketSignalsFocusMode>("priority");
   const [quickSearch, setQuickSearch] = useState("");
 
+  // Sync market research list from the new TanStack Query
   useEffect(() => {
-    let isMounted = true;
-    setIsResearchLoading(true);
-    fetchMarketResearchList()
-      .then((records) => {
-        if (!isMounted) return;
-        setMarketResearchRecords(records);
-        setResearchError("");
-        setActiveBoardId((currentId) =>
-          currentId && records.some((record) => record.id === currentId)
-            ? currentId
-            : records[0]?.id ?? null,
-        );
-      })
-      .catch(() => {
-        if (!isMounted) return;
-        setResearchError("Unable to load saved market research right now.");
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsResearchLoading(false);
-        }
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    if (marketResearchQuery.data) {
+      const records = marketResearchQuery.data;
+      setMarketResearchRecords(records);
+      setResearchError("");
+      setActiveBoardId((currentId) =>
+        currentId && records.some((record: MarketResearch) => record.id === currentId)
+          ? currentId
+          : records[0]?.id ?? null,
+      );
+    }
+    if (marketResearchQuery.error) {
+      setResearchError("Unable to load saved market research right now.");
+    }
+  }, [marketResearchQuery.data, marketResearchQuery.error]);
 
   const boards = useMemo(
     () => marketResearchRecords.map(mapMarketResearchToBoard),
@@ -284,7 +275,7 @@ export const useMarketSignalsBoard = () => {
     filterOptions,
     focusCounts,
     focusMode,
-    isLoading: isResearchLoading || jobsSnapshot.isLoading,
+    isLoading: marketResearchQuery.isLoading || marketResearchQuery.isFetching || jobsSnapshot.isLoading,
     isSetupOpen,
     patternGroups,
     quickSearch,

@@ -25,7 +25,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
       aria-label={label}
       title={label}
       className={cn(
-        "flex h-target min-w-target w-full items-center justify-start gap-0 overflow-hidden rounded-full !bg-transparent px-item text-text-secondary transition-colors duration-motion-fast ease-motion-standard hover:!bg-transparent hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group-hover/sidebar:gap-control",
+        "flex h-target min-w-target w-full items-center justify-start gap-0 overflow-hidden rounded-full bg-transparent px-item text-text-secondary transition-colors duration-motion-fast ease-motion-standard hover:bg-control-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group-hover/sidebar:gap-control",
         isActive && "text-text-primary",
       )}
     >

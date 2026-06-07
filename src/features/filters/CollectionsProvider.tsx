@@ -24,9 +24,9 @@ export const CollectionsProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [collections, setCollections] = useState<JobCollection[]>([]);
 
-  const refreshCollections = useCallback(async () => {
+  const refreshCollections = useCallback(async (signal?: AbortSignal) => {
     try {
-      const data = await fetchJobCollections();
+      const data = await fetchJobCollections({ signal });
       setCollections(data);
     } catch (error) {
       if (isApiAuthFailureError(error)) {
@@ -37,7 +37,12 @@ export const CollectionsProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   useEffect(() => {
-    refreshCollections();
+    const controller = new AbortController();
+    void refreshCollections(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
   }, [refreshCollections]);
 
   const value = useMemo(

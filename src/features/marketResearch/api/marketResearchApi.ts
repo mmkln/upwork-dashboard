@@ -54,9 +54,12 @@ const buildJobsSnapshotPayload = (
   };
 };
 
-export const fetchMarketResearchList = async (): Promise<MarketResearch[]> => {
+export const fetchMarketResearchList = async (options?: {
+  signal?: AbortSignal;
+}): Promise<MarketResearch[]> => {
   const response = await apiClient.get<MarketResearch[]>(
     MARKET_RESEARCH_ENDPOINT,
+    { signal: options?.signal },
   );
   return response.data;
 };
@@ -73,9 +76,11 @@ export const createMarketResearch = async (
 
 export const fetchMarketResearch = async (
   id: string,
+  options?: { signal?: AbortSignal },
 ): Promise<MarketResearch> => {
   const response = await apiClient.get<MarketResearch>(
     `${MARKET_RESEARCH_ENDPOINT}${id}/`,
+    { signal: options?.signal },
   );
   return response.data;
 };

@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   type MarketResearch,
-  useMarketResearchList,
+  useMarketResearchListQuery,
 } from "../features/marketResearch";
 import {
   MarketResearchCreationFlow,
@@ -10,13 +11,40 @@ import {
 import { Button, EmptyState, PageShell } from "../shared/ui";
 
 const MarketSignalsBoard = () => {
-  const marketResearch = useMarketResearchList();
+  const marketResearchQuery = useMarketResearchListQuery();
+  const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
   const [draftResearch, setDraftResearch] = useState<MarketResearch | null>(
     null,
   );
 
-  if (marketResearch.isLoading) {
+  const records = marketResearchQuery.data ?? [];
+  const isLoading = marketResearchQuery.isLoading;
+  const error = marketResearchQuery.error
+    ? (marketResearchQuery.error as Error).message || String(marketResearchQuery.error)
+    : "";
+
+  const refresh = () => {
+    void marketResearchQuery.refetch();
+  };
+
+  const upsertRecord = (record: MarketResearch) => {
+    queryClient.setQueryData<MarketResearch[]>(
+      ["marketResearch", "list"],
+      (oldRecords: MarketResearch[] | undefined = []) => {
+        const current = oldRecords ?? [];
+        const existingIndex = current.findIndex((r) => r.id === record.id);
+        if (existingIndex >= 0) {
+          const next = [...current];
+          next[existingIndex] = record;
+          return next;
+        }
+        return [record, ...current];
+      },
+    );
+  };
+
+  if (isLoading) {
     return (
       <PageShell>
         <EmptyState title="Loading market research..." />
@@ -24,18 +52,16 @@ const MarketSignalsBoard = () => {
     );
   }
 
-  if (marketResearch.error) {
+  if (error) {
     return (
       <PageShell>
         <EmptyState
           title="Market research unavailable"
-          description={marketResearch.error}
+          description={error}
           action={
             <Button
               size="sm"
-              onClick={() => {
-                void marketResearch.refresh();
-              }}
+              onClick={refresh}
             >
               Retry
             </Button>
@@ -45,10 +71,10 @@ const MarketSignalsBoard = () => {
     );
   }
 
-  if (marketResearch.records.length > 0 && !isCreating) {
+  if (records.length > 0 && !isCreating) {
     return (
       <MarketResearchList
-        records={marketResearch.records}
+        records={records}
         onContinue={(record) => {
           setDraftResearch(record);
           setIsCreating(true);
@@ -63,19 +89,19 @@ const MarketSignalsBoard = () => {
 
   return (
     <MarketResearchCreationFlow
-      canCancel={marketResearch.records.length > 0}
+      canCancel={records.length > 0}
       initialResearch={draftResearch}
       onCancel={() => {
         setDraftResearch(null);
         setIsCreating(false);
       }}
       onCompleted={(record) => {
-        marketResearch.upsertRecord(record);
+        upsertRecord(record);
         setDraftResearch(null);
         setIsCreating(false);
       }}
       onDraftSaved={(record) => {
-        marketResearch.upsertRecord(record);
+        upsertRecord(record);
         setDraftResearch(record);
       }}
     />

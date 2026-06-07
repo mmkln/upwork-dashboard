@@ -1,10 +1,5 @@
 export { mapFiltersToJobQuery } from "./api/jobQueryParams";
 export { default as JobsSnapshotProgress } from "./components/JobsSnapshotProgress";
-export {
-  updateJobBookmark,
-  updateJobCollections,
-  updateJobStatus,
-} from "./api/jobMutations";
 export { filterJobs, filterJobsByState } from "./model/jobFilters";
 export { buildDashboardAnalytics } from "./model/dashboardAnalytics";
 export { buildJobFacets } from "./model/jobFacets";
@@ -17,3 +12,10 @@ export { useDashboardAnalytics } from "./queries/useDashboardAnalytics";
 export { useJobFacets } from "./queries/useJobFacets";
 export { useJobsPage } from "./queries/useJobsPage";
 export { useJobsSnapshot } from "./queries/useJobsSnapshot";
+export { useJobsSnapshotQuery, type JobsSnapshotData } from "./queries/useJobsSnapshotQuery";
+export {
+  useUpdateJobMutation,
+  updateJobStatus,
+  updateJobBookmark,
+  updateJobCollections,
+} from "./queries/useUpdateJobMutation";

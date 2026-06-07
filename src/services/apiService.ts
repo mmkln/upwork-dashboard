@@ -7,10 +7,6 @@ import {
   UpworkJob,
 } from "../models";
 import { environment } from "../environments";
-import {
-  decrementRequestLoaders,
-  incrementRequestLoaders,
-} from "../features/globalLoadingStore";
 
 export const AUTH_STORAGE_KEY = "authToken";
 const AUTH_FAILURE_STATUS = 403;
@@ -44,7 +40,6 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    incrementRequestLoaders();
     const token = getApiAuthToken();
     if (token) {
       if (!config.headers) {
@@ -58,21 +53,12 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    decrementRequestLoaders();
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
 apiClient.interceptors.response.use(
-  (response) => {
-    decrementRequestLoaders();
-    return response;
-  },
-  (error) => {
-    decrementRequestLoaders();
-    return Promise.reject(error);
-  },
+  (response) => response,
+  (error) => Promise.reject(error),
 );
 
 const JOB_PAYLOAD_KEYS = new Set([
@@ -181,11 +167,13 @@ const normalizeUpworkJobsResponse = (
 // Функція для отримання робіт із пагінацією
 export const fetchUpworkJobs = async (
   params?: JobQueryParams,
+  options?: { signal?: AbortSignal },
 ): Promise<PaginatedResponse<UpworkJob>> => {
   const response = await apiClient.get<
     PaginatedResponse<UpworkJob> | UpworkJob[]
   >("/jobs/", {
     params,
+    signal: options?.signal,
   });
 
   return normalizeUpworkJobsResponse(response.data);
@@ -193,16 +181,22 @@ export const fetchUpworkJobs = async (
 
 export const fetchAllUpworkJobs = async (
   pageSize = 2000,
+  options?: { signal?: AbortSignal },
 ): Promise<UpworkJob[]> => {
   let page = 1;
   let hasNext = true;
   const jobs: UpworkJob[] = [];
 
   while (hasNext) {
-    const { results, next } = await fetchUpworkJobs({
-      page,
-      page_size: pageSize,
-    });
+    if (options?.signal?.aborted) break;
+
+    const { results, next } = await fetchUpworkJobs(
+      {
+        page,
+        page_size: pageSize,
+      },
+      { signal: options?.signal },
+    );
     jobs.push(...results);
     if (next) {
       page += 1;
@@ -234,9 +228,13 @@ export const updateUpworkJob = async (
   return response.data;
 };
 
-export const fetchJobCollections = async (): Promise<JobCollection[]> => {
+export const fetchJobCollections = async (options?: {
+  signal?: AbortSignal;
+}): Promise<JobCollection[]> => {
   try {
-    const response = await apiClient.get<JobCollection[]>("/collections/");
+    const response = await apiClient.get<JobCollection[]>("/collections/", {
+      signal: options?.signal,
+    });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
