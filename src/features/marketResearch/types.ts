@@ -70,6 +70,14 @@ export type ExtractSnapshotSignalsResult = {
   skipped_extracted: number;
   skipped_manually_edited: number;
   remaining_pending: number;
+  extracted_count: number;
+  pending_count: number;
+  failed_count: number;
+  needs_review_count: number;
+  manually_edited_count: number;
+  remaining_failed: number;
+  is_complete: boolean;
+  recommended_next_action: "run_next_batch" | "retry_failed" | "complete";
 };
 
 export type SnapshotSignalsSummary = {
