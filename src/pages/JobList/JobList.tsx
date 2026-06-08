@@ -401,6 +401,7 @@ const JobList: React.FC = () => {
             <CollectionsDropdown
               collections={collections}
               selectedCollectionIds={[]}
+              totalJobs={totalJobs}
               onCollectionChange={async (collectionIds) => {
                 if (collectionIds.length === 0) return;
                 const collectionId = collectionIds[0];

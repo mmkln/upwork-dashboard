@@ -65,8 +65,7 @@ const JobListItem: React.FC<JobListItemProps> = ({
     setJobData(job);
   }, [job]);
 
-  const handleToggleSelect = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleToggleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     onToggleSelect?.(job.id);
   };
 
@@ -133,6 +132,7 @@ const JobListItem: React.FC<JobListItemProps> = ({
                 {parseInt(job.connects)} connects
               </span>
             )}
+            </div>
           </div>
 
           <div className="flex shrink-0 items-center gap-item">
