@@ -26,6 +26,7 @@ import { PageLoadingBar } from "./components/ui";
 import { useIsFetching } from "@tanstack/react-query";
 import { Header, PageContainer, Sidebar } from "./layout";
 import { ThemeProvider } from "./shared/theme";
+import { ToastProvider } from "./shared/toast/ToastProvider";
 
 // TanStack Query (added for clean request management, automatic cancellation, and proper loading states)
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -70,6 +71,7 @@ function App() {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
+        <ToastProvider>
           <GlobalLoadingIndicator />
           <Router>
             <AuthProvider>
@@ -98,8 +100,9 @@ function App() {
             </AuthProvider>
           </Router>
 
-        {/* Devtools — only visible in development */}
-        <ReactQueryDevtools initialIsOpen={false} />
+          {/* Devtools — only visible in development */}
+          <ReactQueryDevtools initialIsOpen={false} />
+        </ToastProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Bookmark, Clock3 } from "lucide-react";
 import { UpworkJob } from "../../../models";
 import { useUpdateJobMutation } from "../../../features/jobs";
-import { Badge, Card, IconButton } from "../../../shared/ui";
+import { Badge, Card, Checkbox, IconButton } from "../../../shared/ui";
 import { formatRelativeTime } from "../../../shared/formatters";
 import { cn } from "lib/utils";
 
@@ -114,12 +114,12 @@ const JobListItem: React.FC<JobListItemProps> = ({
         <div className="flex items-start justify-between gap-control">
           <div className="flex items-center gap-item">
             {onToggleSelect && (
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={isSelected}
                 onChange={handleToggleSelect}
                 onClick={(e) => e.stopPropagation()}
-                className="h-4 w-4 accent-action"
+                aria-label={isSelected ? "Deselect job" : "Select job"}
+                className="cursor-pointer transition-transform duration-motion-fast ease-motion-standard hover:scale-110"
               />
             )}
             <div className="flex min-w-0 flex-wrap items-center gap-item text-label text-text-muted">

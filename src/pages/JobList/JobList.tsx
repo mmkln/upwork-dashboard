@@ -22,7 +22,10 @@ import { buildFilterSlug } from "../../features/filters/utils/filterSlug.util";
 import CollectionsDropdown from "./components/CollectionsDropdown";
 import JobListItem from "./components/JobListItem";
 import { useJobSelection } from "../../features/jobs/hooks/useJobSelection";
+import { useBulkJobActions } from "../../features/jobs/hooks/useBulkJobActions";
 import { useUpdateJobMutation, updateJobCollections } from "../../features/jobs";
+import BulkActionBar from "./components/BulkActionBar";
+import AddToCollectionMenu from "./components/AddToCollectionMenu";
 import {
   Button,
   ContentToolbar,
@@ -95,9 +98,16 @@ const JobList: React.FC = () => {
   });
   const { facets } = useJobFacets({ pageSize: FACETS_PAGE_SIZE });
   const selection = useJobSelection();
-  const { selectedIds, selectedCount, toggle, selectAllOnPage, deselectAllOnPage, isSelected, isAllSelectedOnPage, clear } = selection;
+  const { selectedIds, selectedCount, toggle, selectMany, selectAllOnPage, deselectAllOnPage, isSelected, isAllSelectedOnPage, clear } = selection;
+  const [selectionMode, setSelectionMode] = useState(false);
+
+  const exitSelectionMode = () => {
+    setSelectionMode(false);
+    clear();
+  };
 
   const filteredJobsData = jobsData;
+  const pageIds = useMemo(() => filteredJobsData.map((job) => job.id), [filteredJobsData]);
   const availableStatuses = useMemo(() => Object.values(JobStatus), []);
   const availableInstruments = useMemo(
     () =>
@@ -125,34 +135,17 @@ const JobList: React.FC = () => {
 
   const { mutateAsync: updateJobAsync } = useUpdateJobMutation();
 
+  const bulkActions = useBulkJobActions({
+    jobsData,
+    replaceJob,
+    updateJobAsync,
+    selectedIds,
+    clearSelection: clear,
+    reselect: selectMany,
+  });
+
   const addSelectedToCollection = async (collectionId: number) => {
-    const ids = Array.from(selectedIds);
-    if (ids.length === 0) return;
-
-    for (const id of ids) {
-      const job = jobsData.find((j) => j.id === id);
-      if (!job) continue;
-
-      const current = job.collections ?? [];
-      if (current.includes(collectionId)) continue;
-
-      const nextCollections = [...current, collectionId];
-
-      try {
-        // Optimistic update
-        const optimistic = { ...job, collections: nextCollections };
-        replaceJob(optimistic as any);
-
-        // Server update
-        await updateJobAsync({ id, collections: nextCollections });
-      } catch (e) {
-        console.error("Failed to add job to collection", id, e);
-        // Optionally revert optimistic here
-      }
-    }
-
-    clear();
-    // Optionally refresh collections count or facets
+    await bulkActions.addToCollection(collectionId);
     void refreshCollections();
   };
 
@@ -279,7 +272,7 @@ const JobList: React.FC = () => {
     <PageShell>
       <ContentToolbar className="rounded-none bg-transparent p-0">
         <div className="flex flex-col gap-component xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex min-w-0 items-center gap-control">
+          <div className="flex min-w-0 flex-col gap-control lg:flex-row lg:items-center">
             <div className="min-w-0 space-y-micro">
               <p className="text-ui text-text-primary">
                 {isLoading ? (
@@ -298,6 +291,43 @@ const JobList: React.FC = () => {
                   ? "Preparing current page"
                 : `Showing ${firstVisibleJob}-${lastVisibleJob} | Page ${page} of ${totalPages}`}
               </p>
+            </div>
+
+            <div className="flex min-w-0 flex-wrap items-center gap-control">
+              <label className="flex items-center gap-item text-ui text-text-secondary">
+                Page size
+                <Select
+                  className="w-auto"
+                  value={pageSize}
+                  onChange={handlePageSizeChange}
+                  disabled={isLoading}
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </Select>
+              </label>
+
+              <div className="flex items-center gap-item">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => goToPage(page - 1)}
+                  disabled={isFirstPage || isLoading}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => goToPage(page + 1)}
+                  disabled={isLastPage || isLoading}
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -319,41 +349,6 @@ const JobList: React.FC = () => {
               className="justify-start xl:justify-end"
             />
 
-            <label className="flex items-center gap-item text-ui text-text-secondary">
-              Page size
-              <Select
-                className="w-auto"
-                value={pageSize}
-                onChange={handlePageSizeChange}
-                disabled={isLoading}
-              >
-                {PAGE_SIZE_OPTIONS.map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </Select>
-            </label>
-
-            <div className="flex items-center gap-item">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => goToPage(page - 1)}
-                disabled={isFirstPage || isLoading}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => goToPage(page + 1)}
-                disabled={isLastPage || isLoading}
-              >
-                Next
-              </Button>
-            </div>
-
             <CollectionsDropdown
               collections={collections}
               selectedCollectionIds={activeFilters.selectedCollectionIds}
@@ -362,6 +357,14 @@ const JobList: React.FC = () => {
               onCreateCollection={handleCreateCollection}
             />
 
+            <Button
+              variant={selectionMode ? "soft" : "ghost"}
+              size="sm"
+              onClick={() => (selectionMode ? exitSelectionMode() : setSelectionMode(true))}
+            >
+              {selectionMode ? "Exit selection" : "Select jobs"}
+            </Button>
+
             <JobExportActions
               jobs={filteredJobsData}
               filterDescriptor={lastFilterSlug || "all"}
@@ -369,50 +372,6 @@ const JobList: React.FC = () => {
           </div>
         </div>
       </ContentToolbar>
-
-      {/* Bulk selection toolbar */}
-      {selectedCount > 0 && (
-        <div className="mb-component flex items-center justify-between rounded-block bg-control px-control py-item text-ui">
-          <span className="text-text-primary">
-            {selectedCount} job{selectedCount > 1 ? "s" : ""} selected
-          </span>
-          <div className="flex items-center gap-control">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                const pageIds = filteredJobsData.map((j) => j.id);
-                if (isAllSelectedOnPage(pageIds)) {
-                  deselectAllOnPage(pageIds);
-                } else {
-                  selectAllOnPage(pageIds);
-                }
-              }}
-            >
-              {isAllSelectedOnPage(filteredJobsData.map((j) => j.id))
-                ? "Deselect page"
-                : "Select page"}
-            </Button>
-            <Button size="sm" variant="ghost" onClick={clear}>
-              Clear
-            </Button>
-
-            {/* Приклад bulk action: Add to collection */}
-            <CollectionsDropdown
-              collections={collections}
-              selectedCollectionIds={[]}
-              totalJobs={totalJobs}
-              onCollectionChange={async (collectionIds) => {
-                if (collectionIds.length === 0) return;
-                const collectionId = collectionIds[0];
-                // Для простоти беремо першу; для multi — цикл
-                await addSelectedToCollection(collectionId);
-              }}
-              onCreateCollection={handleCreateCollection}
-            />
-          </div>
-        </div>
-      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 gap-component sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -434,8 +393,8 @@ const JobList: React.FC = () => {
               onJobUpdate={updateJob}
               isLastClicked={lastClickedJobId === job.id}
               collectionNameById={collectionNameById}
-              isSelected={isSelected(job.id)}
-              onToggleSelect={toggle}
+              isSelected={selectionMode ? isSelected(job.id) : undefined}
+              onToggleSelect={selectionMode ? toggle : undefined}
             />
           )}
         />
@@ -455,6 +414,25 @@ const JobList: React.FC = () => {
           collectionNameById={collectionNameById}
           availableCollections={collections}
         />
+      )}
+
+      {selectionMode && (
+        <BulkActionBar
+          selectedCount={selectedCount}
+          isAllOnPageSelected={isAllSelectedOnPage(pageIds)}
+          onToggleSelectAllOnPage={() =>
+            isAllSelectedOnPage(pageIds) ? deselectAllOnPage(pageIds) : selectAllOnPage(pageIds)
+          }
+          onClear={clear}
+          isBusy={bulkActions.isRunning}
+        >
+          <AddToCollectionMenu
+            collections={collections}
+            disabled={selectedCount === 0}
+            onSelectCollection={addSelectedToCollection}
+            onCreateCollection={handleCreateCollection}
+          />
+        </BulkActionBar>
       )}
     </PageShell>
   );
