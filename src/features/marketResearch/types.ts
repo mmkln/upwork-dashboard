@@ -96,6 +96,9 @@ export type SnapshotSignalRow = {
   };
   signal: {
     request_category: string;
+    normalized_request_category: string | null;
+    normalized_request_category_version: string | null;
+    normalized_request_category_at: string | null;
     client_type: string;
     niche: string;
     buyer_need: string;
@@ -114,6 +117,7 @@ export type SnapshotSignalsQuery = {
   status?: string;
   search?: string;
   request_category?: string;
+  normalized_request_category?: string;
   client_type?: string;
   niche?: string;
   buyer_need?: string;
@@ -131,6 +135,7 @@ export type SnapshotSignalsResponse = {
 };
 
 export type SnapshotSignalFacetField =
+  | "normalized_request_category"
   | "request_category"
   | "client_type"
   | "niche"

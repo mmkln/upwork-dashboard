@@ -35,7 +35,11 @@ const FACET_SECTIONS: Array<{
   field: SnapshotSignalFacetField;
   label: string;
 }> = [
-  { field: "request_category", label: "Request categories" },
+  {
+    field: "normalized_request_category",
+    label: "Normalized request categories",
+  },
+  { field: "request_category", label: "Raw request categories" },
   { field: "client_type", label: "Client types" },
   { field: "niche", label: "Niches" },
   { field: "buyer_need", label: "Buyer needs" },
@@ -48,6 +52,8 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
   const latestSnapshot = getLatestMarketResearchSnapshot(research);
   const [status, setStatus] = React.useState("");
   const [search, setSearch] = React.useState("");
+  const [normalizedRequestCategory, setNormalizedRequestCategory] =
+    React.useState("");
   const [requestCategory, setRequestCategory] = React.useState("");
   const [clientType, setClientType] = React.useState("");
   const [niche, setNiche] = React.useState("");
@@ -64,6 +70,7 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
             snapshot_id: latestSnapshot.id,
             status,
             search,
+            normalized_request_category: normalizedRequestCategory,
             request_category: requestCategory,
             client_type: clientType,
             niche,
@@ -72,7 +79,16 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
             offset: 0,
           }
         : null,
-    [buyerNeed, clientType, latestSnapshot, niche, requestCategory, search, status],
+    [
+      buyerNeed,
+      clientType,
+      latestSnapshot,
+      niche,
+      normalizedRequestCategory,
+      requestCategory,
+      search,
+      status,
+    ],
   );
   const snapshotSignalsQuery = useSnapshotSignalsQuery(research.id, query);
   const snapshotFacetsQuery = useSnapshotSignalFacetsQuery(research.id, query);
@@ -120,6 +136,10 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
       setRequestCategory(value);
       return;
     }
+    if (field === "normalized_request_category") {
+      setNormalizedRequestCategory(value);
+      return;
+    }
     if (field === "client_type") {
       setClientType(value);
       return;
@@ -136,6 +156,7 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
   const clearFilters = () => {
     setStatus("");
     setSearch("");
+    setNormalizedRequestCategory("");
     setRequestCategory("");
     setClientType("");
     setNiche("");
@@ -143,7 +164,13 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
   };
 
   const hasActiveFilters = Boolean(
-    status || search || requestCategory || clientType || niche || buyerNeed,
+    status ||
+      search ||
+      normalizedRequestCategory ||
+      requestCategory ||
+      clientType ||
+      niche ||
+      buyerNeed,
   );
 
   return (
@@ -214,6 +241,7 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
         <ActiveFilters
           filters={{
             status,
+            normalized_request_category: normalizedRequestCategory,
             request_category: requestCategory,
             client_type: clientType,
             niche,
@@ -262,7 +290,19 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
                     </p>
                   </td>
                   <td className="px-component py-control text-text-secondary">
-                    {row.signal.request_category || "Unknown"}
+                    <p className="text-ui text-text-primary">
+                      {row.signal.normalized_request_category ||
+                        row.signal.request_category ||
+                        "Unknown"}
+                    </p>
+                    {row.signal.normalized_request_category &&
+                    row.signal.request_category &&
+                    row.signal.normalized_request_category !==
+                      row.signal.request_category ? (
+                      <p className="mt-micro max-w-title truncate text-label text-text-muted">
+                        Raw: {row.signal.request_category}
+                      </p>
+                    ) : null}
                   </td>
                   <td className="px-component py-control text-text-secondary">
                     {row.signal.buyer_need || "Unknown"}
@@ -323,6 +363,7 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
 const ActiveFilters: React.FC<{
   filters: {
     status: string;
+    normalized_request_category: string;
     request_category: string;
     client_type: string;
     niche: string;
@@ -355,7 +396,7 @@ const SnapshotSignalFacetsPanel: React.FC<{
         {totalSignals.toLocaleString()} signals
       </span>
     </div>
-    <div className="mt-component grid gap-component lg:grid-cols-5">
+    <div className="mt-component grid gap-component md:grid-cols-2 xl:grid-cols-6">
       {FACET_SECTIONS.map(({ field, label }) => (
         <div key={field} className="min-w-0">
           <p className="mb-control text-label text-text-muted">{label}</p>
@@ -430,8 +471,18 @@ const SignalDetailEditor: React.FC<{
       <div className="mt-component flex flex-col gap-item">
         <div className="grid gap-item md:grid-cols-2">
           <ReadOnlySignalField
-            label="Request category"
+            label="Normalized request category"
+            value={formatFieldValue(row.signal.normalized_request_category)}
+          />
+          <ReadOnlySignalField
+            label="Raw request category"
             value={formatFieldValue(row.signal.request_category)}
+          />
+          <ReadOnlySignalField
+            label="Normalization version"
+            value={formatFieldValue(
+              row.signal.normalized_request_category_version,
+            )}
           />
           <ReadOnlySignalField
             label="Client type"
