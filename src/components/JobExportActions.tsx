@@ -1,8 +1,14 @@
 import React from "react";
-import { Clipboard, Download } from "lucide-react";
+import { Clipboard, Download, Menu } from "lucide-react";
 import { PreparedUpworkJob } from "../models";
 import { serializeJobsForExport } from "../features/jobs";
-import { IconButton } from "../shared/ui";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconButton,
+} from "../shared/ui";
 
 interface JobExportActionsProps {
   jobs: PreparedUpworkJob[];
@@ -56,28 +62,40 @@ const JobExportActions: React.FC<JobExportActionsProps> = ({
   };
 
   return (
-    <div className={`flex gap-item ${className}`}>
-      <IconButton
-        variant="ghost"
-        size="md"
-        title="Copy jobs to clipboard"
-        aria-label="Copy jobs to clipboard"
-        onClick={handleCopy}
-        disabled={!hasJobs}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <IconButton
+          variant="outline"
+          size="sm"
+          title="More job actions"
+          aria-label="Open job actions"
+          className={className}
+        >
+          <Menu className="h-4 w-4" />
+        </IconButton>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        className="min-w-menu rounded-block p-item"
       >
-        <Clipboard className="h-4 w-4" />
-      </IconButton>
-      <IconButton
-        variant="ghost"
-        size="md"
-        title="Export jobs as JSON file"
-        aria-label="Export jobs as JSON file"
-        onClick={handleDownload}
-        disabled={!hasJobs}
-      >
-        <Download className="h-4 w-4" />
-      </IconButton>
-    </div>
+        <DropdownMenuItem
+          className="min-h-control-small gap-item px-control py-item"
+          disabled={!hasJobs}
+          onSelect={handleCopy}
+        >
+          <Clipboard className="h-4 w-4" />
+          <span>Copy jobs</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="min-h-control-small gap-item px-control py-item"
+          disabled={!hasJobs}
+          onSelect={handleDownload}
+        >
+          <Download className="h-4 w-4" />
+          <span>Export JSON</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
