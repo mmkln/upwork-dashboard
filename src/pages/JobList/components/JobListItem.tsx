@@ -3,6 +3,7 @@ import { Bookmark, Clock3 } from "lucide-react";
 import { UpworkJob } from "../../../models";
 import { useUpdateJobMutation } from "../../../features/jobs";
 import { Badge, Card, IconButton } from "../../../shared/ui";
+import { formatRelativeTime } from "../../../shared/formatters";
 import { cn } from "lib/utils";
 
 interface JobListItemProps {
@@ -12,16 +13,6 @@ interface JobListItemProps {
   isLastClicked?: boolean;
   collectionNameById: Record<number, string>;
 }
-
-const formatPostedTime = (dateString: string) => {
-  const diffMs = Date.now() - new Date(dateString).getTime();
-  const minutes = Math.max(1, Math.round(diffMs / 60000));
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.round(hours / 24);
-  return `${days}d ago`;
-};
 
 const getPriceInfo = (job: UpworkJob) => {
   if (job.hourly_rates && job.hourly_rates.length > 0) {
@@ -115,7 +106,7 @@ const JobListItem: React.FC<JobListItemProps> = ({
           <div className="flex min-w-0 flex-wrap items-center gap-item text-label text-text-muted">
             <span className="inline-flex items-center gap-item">
               <Clock3 className="h-3.5 w-3.5" />
-              {formatPostedTime(job.created_at)}
+              {formatRelativeTime(job.created_at)}
             </span>
             {job.connects && (
               <span className="inline-flex min-h-control-mini items-center justify-center rounded-full bg-surface-muted px-control py-0 leading-none">
