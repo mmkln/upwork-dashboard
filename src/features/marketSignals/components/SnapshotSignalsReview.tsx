@@ -3,8 +3,11 @@ import {
   extractSnapshotSignals,
   getLatestMarketResearchSnapshot,
   type MarketResearch,
+  type SnapshotSignalFacetField,
+  type SnapshotSignalFacetItem,
   type SnapshotSignalRow,
   updateMarketSignal,
+  useSnapshotSignalFacetsQuery,
   useSnapshotSignalsQuery,
 } from "../../marketResearch";
 import { Badge, Button, EmptyState } from "../../../shared/ui";
@@ -28,12 +31,27 @@ const formatStatus = (value: string) =>
 const formatFieldValue = (value: string | null | undefined) =>
   value && value.trim() ? value : "-";
 
+const FACET_SECTIONS: Array<{
+  field: SnapshotSignalFacetField;
+  label: string;
+}> = [
+  { field: "request_category", label: "Request categories" },
+  { field: "client_type", label: "Client types" },
+  { field: "niche", label: "Niches" },
+  { field: "buyer_need", label: "Buyer needs" },
+  { field: "extraction_status", label: "Statuses" },
+];
+
 const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
   research,
 }) => {
   const latestSnapshot = getLatestMarketResearchSnapshot(research);
   const [status, setStatus] = React.useState("");
   const [search, setSearch] = React.useState("");
+  const [requestCategory, setRequestCategory] = React.useState("");
+  const [clientType, setClientType] = React.useState("");
+  const [niche, setNiche] = React.useState("");
+  const [buyerNeed, setBuyerNeed] = React.useState("");
   const [selectedRow, setSelectedRow] =
     React.useState<SnapshotSignalRow | null>(null);
   const [isExtracting, setIsExtracting] = React.useState(false);
@@ -46,13 +64,18 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
             snapshot_id: latestSnapshot.id,
             status,
             search,
+            request_category: requestCategory,
+            client_type: clientType,
+            niche,
+            buyer_need: buyerNeed,
             limit: 50,
             offset: 0,
           }
         : null,
-    [latestSnapshot, search, status],
+    [buyerNeed, clientType, latestSnapshot, niche, requestCategory, search, status],
   );
   const snapshotSignalsQuery = useSnapshotSignalsQuery(research.id, query);
+  const snapshotFacetsQuery = useSnapshotSignalFacetsQuery(research.id, query);
 
   const handleExtractSignals = async () => {
     if (!latestSnapshot) return;
@@ -65,7 +88,10 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
         retry_failed: false,
         limit: 50,
       });
-      await snapshotSignalsQuery.refetch();
+      await Promise.all([
+        snapshotSignalsQuery.refetch(),
+        snapshotFacetsQuery.refetch(),
+      ]);
     } catch (error) {
       setExtractError(
         error instanceof Error ? error.message : "Unable to extract signals.",
@@ -80,6 +106,45 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
   }
 
   const data = snapshotSignalsQuery.data;
+  const facets = snapshotFacetsQuery.data;
+
+  const handleFacetClick = (
+    field: SnapshotSignalFacetField,
+    value: string,
+  ) => {
+    if (field === "extraction_status") {
+      setStatus(value);
+      return;
+    }
+    if (field === "request_category") {
+      setRequestCategory(value);
+      return;
+    }
+    if (field === "client_type") {
+      setClientType(value);
+      return;
+    }
+    if (field === "niche") {
+      setNiche(value);
+      return;
+    }
+    if (field === "buyer_need") {
+      setBuyerNeed(value);
+    }
+  };
+
+  const clearFilters = () => {
+    setStatus("");
+    setSearch("");
+    setRequestCategory("");
+    setClientType("");
+    setNiche("");
+    setBuyerNeed("");
+  };
+
+  const hasActiveFilters = Boolean(
+    status || search || requestCategory || clientType || niche || buyerNeed,
+  );
 
   return (
     <section className="flex flex-col gap-card">
@@ -139,8 +204,31 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
               </option>
             ))}
           </select>
+          {hasActiveFilters ? (
+            <Button size="sm" variant="ghost" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          ) : null}
         </div>
+
+        <ActiveFilters
+          filters={{
+            status,
+            request_category: requestCategory,
+            client_type: clientType,
+            niche,
+            buyer_need: buyerNeed,
+          }}
+        />
       </header>
+
+      {facets ? (
+        <SnapshotSignalFacetsPanel
+          facets={facets.facets}
+          totalSignals={facets.total_signals}
+          onFacetClick={handleFacetClick}
+        />
+      ) : null}
 
       {snapshotSignalsQuery.isLoading ? (
         <EmptyState title="Loading signals..." />
@@ -221,13 +309,79 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
           onClose={() => setSelectedRow(null)}
           onSaved={() => {
             setSelectedRow(null);
-            void snapshotSignalsQuery.refetch();
+            void Promise.all([
+              snapshotSignalsQuery.refetch(),
+              snapshotFacetsQuery.refetch(),
+            ]);
           }}
         />
       ) : null}
     </section>
   );
 };
+
+const ActiveFilters: React.FC<{
+  filters: {
+    status: string;
+    request_category: string;
+    client_type: string;
+    niche: string;
+    buyer_need: string;
+  };
+}> = ({ filters }) => {
+  const activeEntries = Object.entries(filters).filter(([, value]) => value);
+  if (!activeEntries.length) return null;
+
+  return (
+    <div className="flex flex-wrap gap-item text-label text-text-secondary">
+      {activeEntries.map(([field, value]) => (
+        <span key={field} className="rounded-full bg-surface-muted px-control py-micro">
+          {field.replace(/_/g, " ")}: {value}
+        </span>
+      ))}
+    </div>
+  );
+};
+
+const SnapshotSignalFacetsPanel: React.FC<{
+  facets: Record<SnapshotSignalFacetField, SnapshotSignalFacetItem[]>;
+  totalSignals: number;
+  onFacetClick: (field: SnapshotSignalFacetField, value: string) => void;
+}> = ({ facets, totalSignals, onFacetClick }) => (
+  <section className="rounded-block border border-border bg-block p-component">
+    <div className="flex items-center justify-between gap-item">
+      <h3 className="text-ui text-text-primary">Field distribution</h3>
+      <span className="text-label text-text-muted">
+        {totalSignals.toLocaleString()} signals
+      </span>
+    </div>
+    <div className="mt-component grid gap-component lg:grid-cols-5">
+      {FACET_SECTIONS.map(({ field, label }) => (
+        <div key={field} className="min-w-0">
+          <p className="mb-control text-label text-text-muted">{label}</p>
+          <div className="flex flex-col gap-micro">
+            {(facets[field] ?? []).slice(0, 8).map((item) => (
+              <button
+                key={`${field}-${item.value}`}
+                type="button"
+                className="flex min-h-control-mini items-center justify-between gap-control rounded-control px-control py-micro text-left text-label text-text-secondary hover:bg-control-hover hover:text-text-primary"
+                onClick={() => onFacetClick(field, item.value)}
+              >
+                <span className="min-w-0 truncate">{item.value}</span>
+                <span className="shrink-0 text-text-muted">
+                  {item.count.toLocaleString()}
+                </span>
+              </button>
+            ))}
+            {facets[field]?.length ? null : (
+              <span className="text-label text-text-muted">-</span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+);
 
 const SignalDetailEditor: React.FC<{
   row: SnapshotSignalRow;

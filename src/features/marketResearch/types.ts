@@ -130,4 +130,22 @@ export type SnapshotSignalsResponse = {
   results: SnapshotSignalRow[];
 };
 
+export type SnapshotSignalFacetField =
+  | "request_category"
+  | "client_type"
+  | "niche"
+  | "buyer_need"
+  | "extraction_status";
+
+export type SnapshotSignalFacetItem = {
+  value: string;
+  count: number;
+};
+
+export type SnapshotSignalFacetsResponse = {
+  snapshot_id: string;
+  total_signals: number;
+  facets: Record<SnapshotSignalFacetField, SnapshotSignalFacetItem[]>;
+};
+
 export type UpdateMarketSignalPayload = Partial<SnapshotSignalRow["signal"]>;

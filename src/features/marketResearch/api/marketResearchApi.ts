@@ -8,6 +8,7 @@ import type {
   JobsSnapshotValidationErrors,
   MarketResearch,
   MarketResearchPayload,
+  SnapshotSignalFacetsResponse,
   SnapshotSignalsQuery,
   SnapshotSignalsResponse,
   UpdateMarketSignalPayload,
@@ -134,6 +135,21 @@ export const fetchSnapshotSignals = async (
 ): Promise<SnapshotSignalsResponse> => {
   const response = await apiClient.get<SnapshotSignalsResponse>(
     `${MARKET_RESEARCH_ENDPOINT}${researchId}/snapshot_signals/`,
+    {
+      params: query,
+      signal: options?.signal,
+    },
+  );
+  return response.data;
+};
+
+export const fetchSnapshotSignalFacets = async (
+  researchId: string,
+  query: SnapshotSignalsQuery,
+  options?: { signal?: AbortSignal },
+): Promise<SnapshotSignalFacetsResponse> => {
+  const response = await apiClient.get<SnapshotSignalFacetsResponse>(
+    `${MARKET_RESEARCH_ENDPOINT}${researchId}/snapshot_signal_facets/`,
     {
       params: query,
       signal: options?.signal,
