@@ -12,6 +12,8 @@ interface JobListItemProps {
   onJobUpdate: (job: UpworkJob) => void;
   isLastClicked?: boolean;
   collectionNameById: Record<number, string>;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 const getPriceInfo = (job: UpworkJob) => {
@@ -53,6 +55,8 @@ const JobListItem: React.FC<JobListItemProps> = ({
   onJobUpdate,
   isLastClicked = false,
   collectionNameById,
+  isSelected = false,
+  onToggleSelect,
 }) => {
   const [jobData, setJobData] = useState<UpworkJob>(job);
   const updateJobMutation = useUpdateJobMutation();
@@ -60,6 +64,11 @@ const JobListItem: React.FC<JobListItemProps> = ({
   useEffect(() => {
     setJobData(job);
   }, [job]);
+
+  const handleToggleSelect = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleSelect?.(job.id);
+  };
 
   const collectionBadges = (jobData.collections ?? job.collections ?? [])
     .map((collectionId) => ({
@@ -96,6 +105,7 @@ const JobListItem: React.FC<JobListItemProps> = ({
       className={cn(
         "h-full overflow-hidden p-0 transition-colors duration-motion-fast ease-motion-standard",
         isLastClicked && "ring-2 ring-action/30",
+        isSelected && "ring-2 ring-action",
       )}
     >
       <article
@@ -103,11 +113,21 @@ const JobListItem: React.FC<JobListItemProps> = ({
         onClick={() => onClick(job)}
       >
         <div className="flex items-start justify-between gap-control">
-          <div className="flex min-w-0 flex-wrap items-center gap-item text-label text-text-muted">
-            <span className="inline-flex items-center gap-item">
-              <Clock3 className="h-3.5 w-3.5" />
-              {formatRelativeTime(job.created_at)}
-            </span>
+          <div className="flex items-center gap-item">
+            {onToggleSelect && (
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={handleToggleSelect}
+                onClick={(e) => e.stopPropagation()}
+                className="h-4 w-4 accent-action"
+              />
+            )}
+            <div className="flex min-w-0 flex-wrap items-center gap-item text-label text-text-muted">
+              <span className="inline-flex items-center gap-item">
+                <Clock3 className="h-3.5 w-3.5" />
+                {formatRelativeTime(job.created_at)}
+              </span>
             {job.connects && (
               <span className="inline-flex min-h-control-mini items-center justify-center rounded-full bg-surface-muted px-control py-0 leading-none">
                 {parseInt(job.connects)} connects
