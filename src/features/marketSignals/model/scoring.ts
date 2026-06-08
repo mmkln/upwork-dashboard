@@ -1,9 +1,9 @@
-import type { PreparedUpworkJob } from "../../models";
+import type { PreparedUpworkJob } from "../../../models";
 import type {
   ExtractedSignalFields,
   RelevanceResult,
   SignalScoreBreakdown,
-} from "./types";
+} from "../types";
 
 const clampScore = (value: number) => Math.min(Math.max(value, 1), 5);
 

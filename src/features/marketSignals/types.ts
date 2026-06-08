@@ -124,3 +124,10 @@ export type MarketSignalPatternGroup = {
   exampleJobIds: string[];
   patternStrength: PatternStrength;
 };
+
+export type MarketSignalsFocusMode =
+  | "priority"
+  | "review"
+  | "corrected"
+  | "patterns"
+  | "all";

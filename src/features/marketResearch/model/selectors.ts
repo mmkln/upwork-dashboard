@@ -1,4 +1,4 @@
-import type { JobsSnapshot, MarketResearch } from "./types";
+import type { JobsSnapshot, MarketResearch } from "../types";
 
 export type MarketResearchSetupState =
   | "missing_title"

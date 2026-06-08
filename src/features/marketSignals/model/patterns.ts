@@ -2,7 +2,7 @@ import type {
   MarketSignalJob,
   MarketSignalPatternGroup,
   PatternStrength,
-} from "./types";
+} from "../types";
 
 const getPatternKey = (job: Pick<
   MarketSignalJob,

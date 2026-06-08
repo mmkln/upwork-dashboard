@@ -15,7 +15,7 @@ import {
   Select,
   Textarea,
 } from "../../../shared/ui";
-import { buildMarketSignalJobs, getSignalSummary } from "../selectors";
+import { buildMarketSignalJobs, getSignalSummary } from "../model/selectors";
 import type { MarketSignalsBoardConfig } from "../types";
 
 type BoardSettingsProps = {

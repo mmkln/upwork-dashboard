@@ -1,4 +1,4 @@
-import type { PreparedUpworkJob } from "../../models";
+import type { PreparedUpworkJob } from "../../../models";
 import { classifyRelevance } from "./relevance";
 import { extractSignalFields } from "./extraction";
 import { getMarketSignalPatternKey, getPatternJobCounts } from "./patterns";
@@ -7,7 +7,7 @@ import type {
   MarketSignalJob,
   MarketSignalOverride,
   MarketSignalsBoardConfig,
-} from "./types";
+} from "../types";
 
 const matchesJobsSnapshot = (
   job: PreparedUpworkJob,

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { JobStatus } from "../../../models";
 import { updateUpworkJob } from "../../../services";
-import { jobKeys } from "../queryKeys";
+import { jobKeys } from "./keys";
 import type { JobsSnapshotData } from "./useJobsSnapshotQuery";
 import type { PreparedUpworkJob, UpworkJob } from "../../../models";
 import { prepareJobs } from "../../../utils";

@@ -2,7 +2,7 @@ import type {
   MarketSignalFilters,
   MarketSignalJob,
   RelevanceStatus,
-} from "./types";
+} from "../types";
 
 export const filterSignalJobs = (
   jobs: MarketSignalJob[],

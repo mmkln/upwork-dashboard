@@ -1,6 +1,6 @@
-import type { PreparedUpworkJob } from "../../models";
-import { UNKNOWN_VALUE } from "./constants";
-import type { ExtractedSignalFields, RelevanceResult } from "./types";
+import type { PreparedUpworkJob } from "../../../models";
+import { UNKNOWN_VALUE } from "../constants";
+import type { ExtractedSignalFields, RelevanceResult } from "../types";
 
 type KeywordRule = {
   label: string;

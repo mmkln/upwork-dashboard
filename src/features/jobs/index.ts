@@ -19,3 +19,4 @@ export {
   updateJobBookmark,
   updateJobCollections,
 } from "./queries/useUpdateJobMutation";
+export { jobKeys } from "./queries/keys";

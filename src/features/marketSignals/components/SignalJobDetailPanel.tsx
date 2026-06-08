@@ -18,7 +18,7 @@ import {
   SheetTitle,
   Textarea,
 } from "../../../shared/ui";
-import { getRelevanceTone } from "../filters";
+import { getRelevanceTone } from "../model/filters";
 import type {
   MarketSignalJob,
   MarketSignalOverride,

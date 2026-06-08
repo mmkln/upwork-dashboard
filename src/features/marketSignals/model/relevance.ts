@@ -1,5 +1,5 @@
-import type { PreparedUpworkJob } from "../../models";
-import type { MarketSignalsBoardConfig, RelevanceResult } from "./types";
+import type { PreparedUpworkJob } from "../../../models";
+import type { MarketSignalsBoardConfig, RelevanceResult } from "../types";
 
 const normalizeKeyword = (keyword: string) => keyword.trim().toLowerCase();
 

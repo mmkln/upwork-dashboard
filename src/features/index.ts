@@ -20,6 +20,7 @@ export {
   useJobsSnapshot,
   useJobsSnapshotQuery,
   useUpdateJobMutation,
+  jobKeys,
   mapFiltersToJobQuery,
   updateJobBookmark,
   updateJobCollections,
@@ -29,3 +30,4 @@ export {
   stripPreparedJobMeta,
 } from "./jobs";
 export * from "./marketResearch";
+export * from "./marketSignals";

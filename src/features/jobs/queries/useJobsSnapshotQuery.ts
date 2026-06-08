@@ -4,7 +4,7 @@ import { DEFAULT_FILTERS } from "../../filters/types";
 import { fetchUpworkJobs } from "../../../services";
 import { prepareJobs } from "../../../utils";
 import { mapFiltersToJobQuery } from "../api/jobQueryParams";
-import { jobKeys } from "../queryKeys";
+import { jobKeys } from "./keys";
 import type { PreparedUpworkJob } from "../../../models";
 import { queryClient } from "../../../lib/queryClient";
 

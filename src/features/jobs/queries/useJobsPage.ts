@@ -5,7 +5,7 @@ import { prepareJobs } from "../../../utils";
 import type { FilterState } from "../../filters/types";
 import { mapFiltersToJobQuery } from "../api/jobQueryParams";
 import { queryClient } from "../../../lib/queryClient";
-import { jobKeys } from "../queryKeys";
+import { jobKeys } from "./keys";
 import type { JobsSnapshotData } from "./useJobsSnapshotQuery";
 
 type UseJobsPageParams = {

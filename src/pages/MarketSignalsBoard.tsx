@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   type MarketResearch,
   useMarketResearchListQuery,
+  marketResearchKeys,
 } from "../features/marketResearch";
 import {
   MarketResearchCreationFlow,
@@ -30,7 +31,7 @@ const MarketSignalsBoard = () => {
 
   const upsertRecord = (record: MarketResearch) => {
     queryClient.setQueryData<MarketResearch[]>(
-      ["marketResearch", "list"],
+      marketResearchKeys.list(),
       (oldRecords: MarketResearch[] | undefined = []) => {
         const current = oldRecords ?? [];
         const existingIndex = current.findIndex((r) => r.id === record.id);

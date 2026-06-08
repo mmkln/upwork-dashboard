@@ -1,6 +1,6 @@
 import React from "react";
 import { Badge, Card, EmptyState } from "../../../shared/ui";
-import { getRelevanceTone } from "../filters";
+import { getRelevanceTone } from "../model/filters";
 import type { MarketSignalJob } from "../types";
 
 type SignalJobsTableProps = {

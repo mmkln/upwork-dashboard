@@ -1,0 +1,80 @@
+﻿
+> upwork-dashboard@0.3.0 build
+> react-scripts build
+
+node.exe : (node:16720) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+At line:1 char:1
++ & "C:\nvm4w\nodejs/node.exe" "C:\nvm4w\nodejs/node_modules/npm/bin/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:16720) [D...ts.F_OK instead:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Creating an optimized production build...
+Compiled with warnings.
+
+[eslint] 
+src\components\JobExportActions.tsx
+  Line 25:27:  Unnecessary escape character: \-  no-useless-escape
+
+src\components\index.ts
+  Line 1:8:  'JobCalendar' is defined but never used    @typescript-eslint/no-unused-vars
+  Line 2:8:  'JobsByCountry' is defined but never used  @typescript-eslint/no-unused-vars
+
+src\components\oldCharts\JobStats.tsx
+  Line 56:9:  'totalSpent' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+src\components\oldCharts\JobsByBinnedRangeChart.tsx
+  Line 57:15:  'assignRateToCategoryOld' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+src\components\oldCharts\TopSkills.tsx
+  Line 3:32:  'CategoryValueItem' is defined but never used  @typescript-eslint/no-unused-vars
+
+src\features\auth\ApiAuthFailureHandler.tsx
+  Line 45:6:  React Hook useEffect has a missing dependency: 'location'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\features\filters\Filters.tsx
+  Line 197:6:  React Hook useEffect has a missing dependency: 'emitFilterChange'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\features\filters\utils\filterSlug.util.ts
+  Line 6:25:  Unnecessary escape character: \-  no-useless-escape
+
+src\features\marketSignals\components\MarketResearchCreationFlow.tsx
+  Line 122:6:  React Hook useEffect has a missing dependency: 'resources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\layout\sidebar\Logo.tsx
+  Line 7:5:  The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+
+src\pages\OpportunityRadar.tsx
+  Line 1:1:    Unexpected Unicode BOM (Byte Order Mark)                                                                         unicode-bom
+  Line 138:6:  React Hook useEffect has a missing dependency: 'buildMatches'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 285:9:  'handleCloneRadar' is assigned a value but never used                                                            @typescript-eslint/no-unused-vars
+  Line 297:9:  'handleDeleteRadar' is assigned a value but never used                                                           @typescript-eslint/no-unused-vars
+  Line 324:9:  'handleDisable' is assigned a value but never used                                                               @typescript-eslint/no-unused-vars
+
+src\utils\booleanSearch.util.ts
+  Line 40:52:   Unnecessary escape character: \(                  no-useless-escape
+  Line 44:52:   Unnecessary escape character: \(                  no-useless-escape
+  Line 48:51:   Unnecessary escape character: \(                  no-useless-escape
+  Line 48:53:   Unnecessary escape character: \|                  no-useless-escape
+  Line 123:13:  'operator' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  Line 205:7:   'debugSearch' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+File sizes after gzip:
+
+  360.55 kB        build\static\js\main.e297f428.js
+  9.69 kB (-14 B)  build\static\css\main.f9ab7e5a.css
+  1.77 kB          build\static\js\453.6d16c642.chunk.js
+
+The project was built assuming it is hosted at /upwork-dashboard/.
+You can control this with the homepage field in your package.json.
+
+The build folder is ready to be deployed.
+
+Find out more about deployment here:
+
+  https://cra.link/deployment
+
