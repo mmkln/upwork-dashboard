@@ -25,6 +25,9 @@ const STATUS_OPTIONS = [
 const formatStatus = (value: string) =>
   value ? value.replace(/_/g, " ") : "All statuses";
 
+const formatFieldValue = (value: string | null | undefined) =>
+  value && value.trim() ? value : "-";
+
 const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
   research,
 }) => {
@@ -271,13 +274,59 @@ const SignalDetailEditor: React.FC<{
       </div>
 
       <div className="mt-component flex flex-col gap-item">
-        {row.signal.exact_client_language.length ? (
-          <div className="rounded-control bg-surface-muted p-control">
-            <p className="text-label text-text-muted">Buyer language</p>
-            <p className="mt-micro text-body text-text-secondary">
-              {row.signal.exact_client_language[0]}
-            </p>
-          </div>
+        <div className="grid gap-item md:grid-cols-2">
+          <ReadOnlySignalField
+            label="Request category"
+            value={formatFieldValue(row.signal.request_category)}
+          />
+          <ReadOnlySignalField
+            label="Client type"
+            value={formatFieldValue(row.signal.client_type)}
+          />
+          <ReadOnlySignalField
+            label="Niche"
+            value={formatFieldValue(row.signal.niche)}
+          />
+          <ReadOnlySignalField
+            label="Buyer need"
+            value={formatFieldValue(row.signal.buyer_need)}
+          />
+          <ReadOnlySignalField
+            label="Budget signal"
+            value={formatFieldValue(row.signal.budget_signal)}
+          />
+          <ReadOnlySignalField
+            label="Urgency signal"
+            value={formatFieldValue(row.signal.urgency_signal)}
+          />
+          <ReadOnlySignalField
+            label="Status"
+            value={formatStatus(row.signal.extraction_status)}
+          />
+        </div>
+
+        <ReadOnlySignalField
+          label="Exact client language"
+          value={
+            row.signal.exact_client_language.length ? (
+              <ul className="space-y-micro">
+                {row.signal.exact_client_language.map((language, index) => (
+                  <li key={`${language}-${index}`}>{language}</li>
+                ))}
+              </ul>
+            ) : (
+              "-"
+            )
+          }
+        />
+
+        <ReadOnlySignalField
+          label="Value connection"
+          value={formatFieldValue(row.signal.value_connection)}
+        />
+
+        {row.signal.error ? (
+          <ReadOnlySignalField label="Error" value={row.signal.error} />
         ) : null}
 
         <label className="flex flex-col gap-micro text-label text-text-secondary">
@@ -312,5 +361,15 @@ const SignalDetailEditor: React.FC<{
     </aside>
   );
 };
+
+const ReadOnlySignalField: React.FC<{
+  label: string;
+  value: React.ReactNode;
+}> = ({ label, value }) => (
+  <div className="rounded-control bg-surface-muted p-control">
+    <p className="text-label text-text-muted">{label}</p>
+    <div className="mt-micro text-body text-text-secondary">{value}</div>
+  </div>
+);
 
 export default SnapshotSignalsReview;

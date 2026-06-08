@@ -105,6 +105,7 @@ export type SnapshotSignalRow = {
     budget_signal: string;
     urgency_signal: string;
     extraction_status: string;
+    error: string;
   };
 };
 
