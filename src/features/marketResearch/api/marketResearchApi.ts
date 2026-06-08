@@ -8,6 +8,9 @@ import type {
   JobsSnapshotValidationErrors,
   MarketResearch,
   MarketResearchPayload,
+  SnapshotSignalsQuery,
+  SnapshotSignalsResponse,
+  UpdateMarketSignalPayload,
   UpdateMarketResearchPayload,
 } from "../types";
 
@@ -119,6 +122,32 @@ export const extractSnapshotSignals = async (
 ): Promise<ExtractSnapshotSignalsResult> => {
   const response = await apiClient.post<ExtractSnapshotSignalsResult>(
     `${MARKET_RESEARCH_ENDPOINT}${researchId}/extract_snapshot_signals/`,
+    payload,
+  );
+  return response.data;
+};
+
+export const fetchSnapshotSignals = async (
+  researchId: string,
+  query: SnapshotSignalsQuery,
+  options?: { signal?: AbortSignal },
+): Promise<SnapshotSignalsResponse> => {
+  const response = await apiClient.get<SnapshotSignalsResponse>(
+    `${MARKET_RESEARCH_ENDPOINT}${researchId}/snapshot_signals/`,
+    {
+      params: query,
+      signal: options?.signal,
+    },
+  );
+  return response.data;
+};
+
+export const updateMarketSignal = async (
+  signalId: string,
+  payload: UpdateMarketSignalPayload,
+): Promise<unknown> => {
+  const response = await apiClient.patch(
+    `/market-signals/${signalId}/`,
     payload,
   );
   return response.data;

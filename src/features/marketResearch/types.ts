@@ -71,3 +71,62 @@ export type ExtractSnapshotSignalsResult = {
   skipped_manually_edited: number;
   remaining_pending: number;
 };
+
+export type SnapshotSignalsSummary = {
+  total_snapshot_jobs: number;
+  total_signals: number;
+  pending: number;
+  extracted: number;
+  needs_review: number;
+  failed: number;
+  manually_edited: number;
+  missing_signals: number;
+};
+
+export type SnapshotSignalRow = {
+  signal_id: string;
+  job: {
+    id: string;
+    title: string;
+    country: string | null;
+    fixed_price: string | null;
+    hourly_rates: number[] | null;
+    total_spent: string | null;
+    is_payment_verified: boolean;
+  };
+  signal: {
+    request_category: string;
+    client_type: string;
+    niche: string;
+    buyer_need: string;
+    problem: string;
+    exact_client_language: string[];
+    value_connection: string;
+    budget_signal: string;
+    urgency_signal: string;
+    extraction_status: string;
+  };
+};
+
+export type SnapshotSignalsQuery = {
+  snapshot_id: string;
+  status?: string;
+  search?: string;
+  request_category?: string;
+  client_type?: string;
+  niche?: string;
+  buyer_need?: string;
+  limit?: number;
+  offset?: number;
+};
+
+export type SnapshotSignalsResponse = {
+  snapshot_id: string;
+  total: number;
+  limit: number;
+  offset: number;
+  summary: SnapshotSignalsSummary;
+  results: SnapshotSignalRow[];
+};
+
+export type UpdateMarketSignalPayload = Partial<SnapshotSignalRow["signal"]>;

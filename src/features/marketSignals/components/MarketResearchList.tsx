@@ -1,18 +1,34 @@
 import React from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { MoreHorizontal, Trash2 } from "lucide-react";
 import {
+  deleteMarketResearch,
   extractSnapshotSignals,
-  type ExtractSnapshotSignalsResult,
   getLatestMarketResearchSnapshot,
   getMarketResearchSnapshots,
   getMarketResearchSetupStatus,
+  marketResearchKeys,
+  type JobsSnapshot,
   type MarketResearch,
+  type SnapshotSignalsSummary,
+  useSnapshotSignalsQuery,
 } from "../../marketResearch";
 import {
   Badge,
   Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   EmptyState,
   PageShell,
 } from "../../../shared/ui";
+import SnapshotSignalsReview from "./SnapshotSignalsReview";
 
 type MarketResearchListProps = {
   records: MarketResearch[];
@@ -31,15 +47,8 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
   records,
   onCreateNew,
 }) => {
-  const [extractingSnapshotId, setExtractingSnapshotId] = React.useState<
-    string | null
-  >(null);
-  const [extractionResults, setExtractionResults] = React.useState<
-    Record<string, ExtractSnapshotSignalsResult>
-  >({});
-  const [extractionErrors, setExtractionErrors] = React.useState<
-    Record<string, string>
-  >({});
+  const [reviewResearch, setReviewResearch] =
+    React.useState<MarketResearch | null>(null);
 
   const { completeRecords, unfinishedRecords } = React.useMemo(
     () =>
@@ -62,52 +71,27 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
   );
   const hasUnfinishedRecords = unfinishedRecords.length > 0;
 
-  const handleExtractSignals = async (
-    record: MarketResearch,
-    snapshotId: string,
-  ) => {
-    setExtractingSnapshotId(snapshotId);
-    setExtractionErrors((current) => {
-      const next = { ...current };
-      delete next[snapshotId];
-      return next;
-    });
-
-    try {
-      const result = await extractSnapshotSignals(record.id, {
-        snapshot_id: snapshotId,
-        retry_failed: false,
-        limit: 50,
-      });
-      setExtractionResults((current) => ({
-        ...current,
-        [snapshotId]: result,
-      }));
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Unable to extract signals.";
-      setExtractionErrors((current) => ({
-        ...current,
-        [snapshotId]: message,
-      }));
-    } finally {
-      setExtractingSnapshotId(null);
-    }
-  };
+  if (reviewResearch) {
+    return (
+      <PageShell>
+        <div className="flex justify-start">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setReviewResearch(null)}
+          >
+            Back
+          </Button>
+        </div>
+        <SnapshotSignalsReview research={reviewResearch} />
+      </PageShell>
+    );
+  }
 
   const renderRecord = (record: MarketResearch) => {
     const status = getMarketResearchSetupStatus(record);
     const snapshots = getMarketResearchSnapshots(record);
     const latestSnapshot = getLatestMarketResearchSnapshot(record);
-    const latestSnapshotId = latestSnapshot?.id ?? null;
-    const isExtracting =
-      latestSnapshotId != null && extractingSnapshotId === latestSnapshotId;
-    const extractionResult = latestSnapshotId
-      ? extractionResults[latestSnapshotId]
-      : null;
-    const extractionError = latestSnapshotId
-      ? extractionErrors[latestSnapshotId]
-      : "";
 
     return (
       <article
@@ -139,17 +123,13 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
               </Button>
             ) : null}
             {status.isComplete && latestSnapshot ? (
-              <Button
-                size="sm"
-                variant="soft"
-                disabled={isExtracting}
-                onClick={() => {
-                  void handleExtractSignals(record, latestSnapshot.id);
-                }}
-              >
-                {isExtracting ? "Extracting..." : "Extract signals"}
-              </Button>
+              <MarketResearchSignalAction
+                record={record}
+                snapshot={latestSnapshot}
+                onReview={() => setReviewResearch(record)}
+              />
             ) : null}
+            <MarketResearchActionsMenu record={record} />
           </span>
         </span>
         <span className="text-label text-text-muted">
@@ -163,20 +143,6 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
             ? ` - Latest ${latestSnapshot.job_ids.length.toLocaleString()} jobs`
             : ""}
         </span>
-        {extractionResult ? (
-          <span className="text-label text-text-secondary">
-            Processed {extractionResult.processed.toLocaleString()} signals,{" "}
-            extracted {extractionResult.extracted.toLocaleString()}, needs
-            review {extractionResult.needs_review.toLocaleString()}, failed{" "}
-            {extractionResult.failed.toLocaleString()}, remaining{" "}
-            {extractionResult.remaining_pending.toLocaleString()}.
-          </span>
-        ) : null}
-        {extractionError ? (
-          <span className="text-label text-destructive">
-            {extractionError}
-          </span>
-        ) : null}
       </article>
     );
   };
@@ -230,6 +196,180 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
         />
       )}
     </PageShell>
+  );
+};
+
+const MarketResearchActionsMenu: React.FC<{
+  record: MarketResearch;
+}> = ({ record }) => {
+  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+  const [error, setError] = React.useState("");
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    setError("");
+    try {
+      await deleteMarketResearch(record.id);
+      await queryClient.invalidateQueries({
+        queryKey: marketResearchKeys.list(),
+      });
+      setIsConfirmOpen(false);
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Unable to delete research.",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-target w-target rounded-full px-0"
+            aria-label="Research actions"
+            disabled={isDeleting}
+          >
+            <MoreHorizontal className="h-icon w-icon" aria-hidden="true" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-popover">
+          <DropdownMenuItem
+            disabled={isDeleting}
+            className="gap-control text-destructive focus:text-destructive"
+            onSelect={() => {
+              setError("");
+              setIsConfirmOpen(true);
+            }}
+          >
+            <Trash2 className="h-icon-sm w-icon-sm" aria-hidden="true" />
+            Delete research
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent className="max-w-modal-sm">
+          <DialogTitle>Delete research</DialogTitle>
+          <DialogDescription>
+            This will delete "{record.title || "Untitled research"}" and its
+            linked market research data.
+          </DialogDescription>
+          {error ? <p className="text-body text-destructive">{error}</p> : null}
+          <DialogFooter>
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={isDeleting}
+              onClick={() => setIsConfirmOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                void handleDelete();
+              }}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+const hasReviewableSignals = (summary: SnapshotSignalsSummary | undefined) =>
+  Boolean(
+    summary &&
+      summary.extracted +
+        summary.needs_review +
+        summary.failed +
+        summary.manually_edited >
+        0,
+  );
+
+const MarketResearchSignalAction: React.FC<{
+  record: MarketResearch;
+  snapshot: JobsSnapshot;
+  onReview: () => void;
+}> = ({ record, snapshot, onReview }) => {
+  const [isExtracting, setIsExtracting] = React.useState(false);
+  const [error, setError] = React.useState("");
+
+  const query = React.useMemo(
+    () => ({
+      snapshot_id: snapshot.id,
+      limit: 1,
+      offset: 0,
+    }),
+    [snapshot.id],
+  );
+  const snapshotSignalsQuery = useSnapshotSignalsQuery(record.id, query);
+  const canReview = hasReviewableSignals(snapshotSignalsQuery.data?.summary);
+
+  const handleExtract = async () => {
+    setIsExtracting(true);
+    setError("");
+    try {
+      await extractSnapshotSignals(record.id, {
+        snapshot_id: snapshot.id,
+        retry_failed: false,
+        limit: 50,
+      });
+      await snapshotSignalsQuery.refetch();
+    } catch (extractError) {
+      setError(
+        extractError instanceof Error
+          ? extractError.message
+          : "Unable to extract signals.",
+      );
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
+  if (snapshotSignalsQuery.isLoading && !snapshotSignalsQuery.data) {
+    return (
+      <Button size="sm" variant="soft" disabled>
+        Loading signals
+      </Button>
+    );
+  }
+
+  return (
+    <span className="flex items-center gap-item">
+      {canReview ? (
+        <Button size="sm" variant="soft" onClick={onReview}>
+          Review signals
+        </Button>
+      ) : (
+        <Button
+          size="sm"
+          variant="soft"
+          disabled={isExtracting}
+          onClick={() => {
+            void handleExtract();
+          }}
+        >
+          {isExtracting ? "Extracting..." : "Extract signals"}
+        </Button>
+      )}
+      {error ? (
+        <span className="max-w-[220px] truncate text-label text-destructive">
+          {error}
+        </span>
+      ) : null}
+    </span>
   );
 };
 
