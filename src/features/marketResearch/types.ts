@@ -53,3 +53,21 @@ export type CreateJobsSnapshotPayload = {
 export type JobsSnapshotValidationErrors = {
   applied_filters?: string[];
 };
+
+export type ExtractSnapshotSignalsPayload = {
+  snapshot_id: string;
+  retry_failed?: boolean;
+  limit?: number;
+};
+
+export type ExtractSnapshotSignalsResult = {
+  snapshot_id: string;
+  total_signals: number;
+  processed: number;
+  extracted: number;
+  needs_review: number;
+  failed: number;
+  skipped_extracted: number;
+  skipped_manually_edited: number;
+  remaining_pending: number;
+};

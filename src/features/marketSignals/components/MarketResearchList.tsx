@@ -1,5 +1,7 @@
 import React from "react";
 import {
+  extractSnapshotSignals,
+  type ExtractSnapshotSignalsResult,
   getLatestMarketResearchSnapshot,
   getMarketResearchSnapshots,
   getMarketResearchSetupStatus,
@@ -29,6 +31,16 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
   records,
   onCreateNew,
 }) => {
+  const [extractingSnapshotId, setExtractingSnapshotId] = React.useState<
+    string | null
+  >(null);
+  const [extractionResults, setExtractionResults] = React.useState<
+    Record<string, ExtractSnapshotSignalsResult>
+  >({});
+  const [extractionErrors, setExtractionErrors] = React.useState<
+    Record<string, string>
+  >({});
+
   const { completeRecords, unfinishedRecords } = React.useMemo(
     () =>
       records.reduce(
@@ -50,10 +62,52 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
   );
   const hasUnfinishedRecords = unfinishedRecords.length > 0;
 
+  const handleExtractSignals = async (
+    record: MarketResearch,
+    snapshotId: string,
+  ) => {
+    setExtractingSnapshotId(snapshotId);
+    setExtractionErrors((current) => {
+      const next = { ...current };
+      delete next[snapshotId];
+      return next;
+    });
+
+    try {
+      const result = await extractSnapshotSignals(record.id, {
+        snapshot_id: snapshotId,
+        retry_failed: false,
+        limit: 50,
+      });
+      setExtractionResults((current) => ({
+        ...current,
+        [snapshotId]: result,
+      }));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to extract signals.";
+      setExtractionErrors((current) => ({
+        ...current,
+        [snapshotId]: message,
+      }));
+    } finally {
+      setExtractingSnapshotId(null);
+    }
+  };
+
   const renderRecord = (record: MarketResearch) => {
     const status = getMarketResearchSetupStatus(record);
     const snapshots = getMarketResearchSnapshots(record);
     const latestSnapshot = getLatestMarketResearchSnapshot(record);
+    const latestSnapshotId = latestSnapshot?.id ?? null;
+    const isExtracting =
+      latestSnapshotId != null && extractingSnapshotId === latestSnapshotId;
+    const extractionResult = latestSnapshotId
+      ? extractionResults[latestSnapshotId]
+      : null;
+    const extractionError = latestSnapshotId
+      ? extractionErrors[latestSnapshotId]
+      : "";
 
     return (
       <article
@@ -84,6 +138,18 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
                 Continue setup
               </Button>
             ) : null}
+            {status.isComplete && latestSnapshot ? (
+              <Button
+                size="sm"
+                variant="soft"
+                disabled={isExtracting}
+                onClick={() => {
+                  void handleExtractSignals(record, latestSnapshot.id);
+                }}
+              >
+                {isExtracting ? "Extracting..." : "Extract signals"}
+              </Button>
+            ) : null}
           </span>
         </span>
         <span className="text-label text-text-muted">
@@ -97,6 +163,20 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
             ? ` - Latest ${latestSnapshot.job_ids.length.toLocaleString()} jobs`
             : ""}
         </span>
+        {extractionResult ? (
+          <span className="text-label text-text-secondary">
+            Processed {extractionResult.processed.toLocaleString()} signals,{" "}
+            extracted {extractionResult.extracted.toLocaleString()}, needs
+            review {extractionResult.needs_review.toLocaleString()}, failed{" "}
+            {extractionResult.failed.toLocaleString()}, remaining{" "}
+            {extractionResult.remaining_pending.toLocaleString()}.
+          </span>
+        ) : null}
+        {extractionError ? (
+          <span className="text-label text-destructive">
+            {extractionError}
+          </span>
+        ) : null}
       </article>
     );
   };

@@ -2,6 +2,8 @@ import { apiClient } from "../../../services/apiService";
 import type {
   CreateMarketResearchPayload,
   CreateJobsSnapshotPayload,
+  ExtractSnapshotSignalsPayload,
+  ExtractSnapshotSignalsResult,
   JobsSnapshot,
   JobsSnapshotValidationErrors,
   MarketResearch,
@@ -107,6 +109,17 @@ export const createJobsSnapshot = async (
   const response = await apiClient.post<JobsSnapshot>(
     `${MARKET_RESEARCH_ENDPOINT}${researchId}/create_snapshot/`,
     buildJobsSnapshotPayload(payload),
+  );
+  return response.data;
+};
+
+export const extractSnapshotSignals = async (
+  researchId: string,
+  payload: ExtractSnapshotSignalsPayload,
+): Promise<ExtractSnapshotSignalsResult> => {
+  const response = await apiClient.post<ExtractSnapshotSignalsResult>(
+    `${MARKET_RESEARCH_ENDPOINT}${researchId}/extract_snapshot_signals/`,
+    payload,
   );
   return response.data;
 };
