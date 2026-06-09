@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { SlidersHorizontal, X } from "lucide-react";
 import { JobExperience, JobStatus } from "../../models";
 import {
   Badge,
@@ -43,6 +43,12 @@ type FiltersLauncherProps = {
   className?: string;
 };
 
+type FilterBadge = {
+  id: string;
+  label: string;
+  onRemove: () => void;
+};
+
 const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
   activeFilters,
   onFilterChange,
@@ -73,55 +79,151 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
     }
   }, [activeFilters, isFiltersModalOpen]);
 
+  const applyFilters = useCallback(
+    (nextFilters: FilterState) => {
+      onFilterChange(
+        nextFilters.jobType,
+        nextFilters.fixedPriceRange,
+        nextFilters.hourlyRateRange,
+        nextFilters.selectedSkills,
+        nextFilters.selectedInstruments,
+        nextFilters.selectedStatuses,
+        nextFilters.selectedCollectionIds,
+        nextFilters.selectedExperience,
+        nextFilters.titleFilter,
+        nextFilters.bookmarked,
+      );
+    },
+    [onFilterChange],
+  );
+
   const badges = useMemo(() => {
-    const list: string[] = [];
+    const list: FilterBadge[] = [];
 
     if (activeFilters.jobType !== "None") {
-      list.push(`Type: ${activeFilters.jobType}`);
+      list.push({
+        id: "job-type",
+        label: `Type: ${activeFilters.jobType}`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            jobType: DEFAULT_FILTERS.jobType,
+            fixedPriceRange: DEFAULT_FILTERS.fixedPriceRange,
+            hourlyRateRange: DEFAULT_FILTERS.hourlyRateRange,
+          }),
+      });
     }
     if (
       activeFilters.jobType === "Fixed Price" &&
       activeFilters.fixedPriceRange
     ) {
-      list.push(
-        `Fixed $${activeFilters.fixedPriceRange[0]}-${activeFilters.fixedPriceRange[1]}`,
-      );
+      list.push({
+        id: "fixed-price",
+        label: `Fixed $${activeFilters.fixedPriceRange[0]}-${activeFilters.fixedPriceRange[1]}`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            fixedPriceRange: DEFAULT_FILTERS.fixedPriceRange,
+          }),
+      });
     }
     if (
       activeFilters.jobType === "Hourly Rate" &&
       activeFilters.hourlyRateRange
     ) {
-      list.push(
-        `Hourly $${activeFilters.hourlyRateRange[0]}-${activeFilters.hourlyRateRange[1]}`,
-      );
+      list.push({
+        id: "hourly-rate",
+        label: `Hourly $${activeFilters.hourlyRateRange[0]}-${activeFilters.hourlyRateRange[1]}`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            hourlyRateRange: DEFAULT_FILTERS.hourlyRateRange,
+          }),
+      });
     }
     if (activeFilters.selectedSkills.length) {
-      list.push(`Skills: ${activeFilters.selectedSkills.join(", ")}`);
+      list.push({
+        id: "skills",
+        label: `Skills: ${activeFilters.selectedSkills.join(", ")}`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            selectedSkills: DEFAULT_FILTERS.selectedSkills,
+          }),
+      });
     }
     if (activeFilters.selectedInstruments.length) {
-      list.push(`Tools: ${activeFilters.selectedInstruments.join(", ")}`);
+      list.push({
+        id: "tools",
+        label: `Tools: ${activeFilters.selectedInstruments.join(", ")}`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            selectedInstruments: DEFAULT_FILTERS.selectedInstruments,
+          }),
+      });
     }
     if (activeFilters.selectedStatuses.length) {
-      list.push(`Statuses: ${activeFilters.selectedStatuses.join(", ")}`);
+      list.push({
+        id: "statuses",
+        label: `Statuses: ${activeFilters.selectedStatuses.join(", ")}`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            selectedStatuses: DEFAULT_FILTERS.selectedStatuses,
+          }),
+      });
     }
     if (activeFilters.selectedCollectionIds.length) {
       const names = activeFilters.selectedCollectionIds
         .map((id) => collectionNameById[id] || `Collection ${id}`)
         .join(", ");
-      list.push(`Collections: ${names}`);
+      list.push({
+        id: "collections",
+        label: `Collections: ${names}`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            selectedCollectionIds: DEFAULT_FILTERS.selectedCollectionIds,
+          }),
+      });
     }
     if (activeFilters.selectedExperience.length) {
-      list.push(`Experience: ${activeFilters.selectedExperience.join(", ")}`);
+      list.push({
+        id: "experience",
+        label: `Experience: ${activeFilters.selectedExperience.join(", ")}`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            selectedExperience: DEFAULT_FILTERS.selectedExperience,
+          }),
+      });
     }
     if (activeFilters.titleFilter.trim()) {
-      list.push(`Search: "${activeFilters.titleFilter.trim()}"`);
+      list.push({
+        id: "search",
+        label: `Search: "${activeFilters.titleFilter.trim()}"`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            titleFilter: DEFAULT_FILTERS.titleFilter,
+          }),
+      });
     }
     if (activeFilters.bookmarked) {
-      list.push("Bookmarked only");
+      list.push({
+        id: "bookmarked",
+        label: "Bookmarked only",
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            bookmarked: DEFAULT_FILTERS.bookmarked,
+          }),
+      });
     }
 
     return list;
-  }, [activeFilters, collectionNameById]);
+  }, [activeFilters, applyFilters, collectionNameById]);
   const visibleBadges = badges.slice(0, 3);
   const hiddenBadgeCount = Math.max(0, badges.length - visibleBadges.length);
 
@@ -131,34 +233,12 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
   };
 
   const handleApply = () => {
-    onFilterChange(
-      pendingFilters.jobType,
-      pendingFilters.fixedPriceRange,
-      pendingFilters.hourlyRateRange,
-      pendingFilters.selectedSkills,
-      pendingFilters.selectedInstruments,
-      pendingFilters.selectedStatuses,
-      pendingFilters.selectedCollectionIds,
-      pendingFilters.selectedExperience,
-      pendingFilters.titleFilter,
-      pendingFilters.bookmarked,
-    );
+    applyFilters(pendingFilters);
     setFiltersModalOpen(false);
   };
 
   const handleClear = () => {
-    onFilterChange(
-      DEFAULT_FILTERS.jobType,
-      DEFAULT_FILTERS.fixedPriceRange,
-      DEFAULT_FILTERS.hourlyRateRange,
-      DEFAULT_FILTERS.selectedSkills,
-      DEFAULT_FILTERS.selectedInstruments,
-      DEFAULT_FILTERS.selectedStatuses,
-      DEFAULT_FILTERS.selectedCollectionIds,
-      DEFAULT_FILTERS.selectedExperience,
-      DEFAULT_FILTERS.titleFilter,
-      DEFAULT_FILTERS.bookmarked,
-    );
+    applyFilters(DEFAULT_FILTERS);
     setPendingFilters(DEFAULT_FILTERS);
     setFiltersModalOpen(false);
   };
@@ -187,11 +267,19 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
       ) : (
         visibleBadges.map((badge) => (
           <Badge
-            key={badge}
+            key={badge.id}
             tone="info"
-            className="max-w-search-compact text-action"
+            className="max-w-search-compact gap-tag pr-tag text-action"
           >
-            <span className="truncate">{badge}</span>
+            <span className="truncate">{badge.label}</span>
+            <button
+              type="button"
+              className="inline-flex h-control-mini w-control-mini shrink-0 items-center justify-center rounded-full text-action/70 transition-colors duration-motion-fast ease-motion-standard hover:bg-action/10 hover:text-action focus:outline-none focus:ring-2 focus:ring-ring"
+              aria-label={`Remove ${badge.label} filter`}
+              onClick={badge.onRemove}
+            >
+              <X className="h-3 w-3" />
+            </button>
           </Badge>
         ))
       )}
