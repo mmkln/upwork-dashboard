@@ -115,9 +115,21 @@ export type SnapshotSignalRow = {
     value_connection: string;
     budget_signal: string;
     urgency_signal: string;
+    semantic_attributes: MarketSignalSemanticAttributes;
+    semantic_attributes_version: string | null;
+    semantic_attributes_extracted_at: string | null;
     extraction_status: string;
     error: string;
   };
+};
+
+export type MarketSignalSemanticAttributes = {
+  platforms?: string[];
+  tools?: string[];
+  delivery_type?: string;
+  action_type?: string;
+  business_function?: string;
+  object_type?: string;
 };
 
 export type SnapshotSignalsQuery = {
@@ -159,6 +171,22 @@ export type SnapshotSignalFacetsResponse = {
   snapshot_id: string;
   total_signals: number;
   facets: Record<SnapshotSignalFacetField, SnapshotSignalFacetItem[]>;
+};
+
+export type SnapshotAttributeFacetField =
+  | "platforms"
+  | "tools"
+  | "delivery_type"
+  | "action_type"
+  | "business_function"
+  | "object_type";
+
+export type SnapshotAttributeFacetsResponse = {
+  snapshot_id: string;
+  total_signals: number;
+  with_attributes: number;
+  missing_attributes: number;
+  facets: Record<SnapshotAttributeFacetField, SnapshotSignalFacetItem[]>;
 };
 
 export type UpdateMarketSignalPayload = Partial<SnapshotSignalRow["signal"]>;

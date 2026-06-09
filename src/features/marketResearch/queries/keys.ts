@@ -7,4 +7,6 @@ export const marketResearchKeys = {
     [...marketResearchKeys.detail(researchId), "snapshotSignals", query] as const,
   snapshotSignalFacets: (researchId: string, query: unknown) =>
     [...marketResearchKeys.detail(researchId), "snapshotSignalFacets", query] as const,
+  snapshotAttributeFacets: (researchId: string, query: unknown) =>
+    [...marketResearchKeys.detail(researchId), "snapshotAttributeFacets", query] as const,
 };

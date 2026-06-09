@@ -3,10 +3,13 @@ import {
   extractSnapshotSignals,
   getLatestMarketResearchSnapshot,
   type MarketResearch,
+  type SnapshotAttributeFacetField,
+  type SnapshotAttributeFacetsResponse,
   type SnapshotSignalFacetField,
   type SnapshotSignalFacetItem,
   type SnapshotSignalRow,
   updateMarketSignal,
+  useSnapshotAttributeFacetsQuery,
   useSnapshotSignalFacetsQuery,
   useSnapshotSignalsQuery,
 } from "../../marketResearch";
@@ -44,6 +47,18 @@ const FACET_SECTIONS: Array<{
   { field: "niche", label: "Niches" },
   { field: "buyer_need", label: "Buyer needs" },
   { field: "extraction_status", label: "Statuses" },
+];
+
+const ATTRIBUTE_FACET_SECTIONS: Array<{
+  field: SnapshotAttributeFacetField;
+  label: string;
+}> = [
+  { field: "platforms", label: "Platforms" },
+  { field: "tools", label: "Tools" },
+  { field: "delivery_type", label: "Delivery types" },
+  { field: "action_type", label: "Action types" },
+  { field: "business_function", label: "Business functions" },
+  { field: "object_type", label: "Object types" },
 ];
 
 const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
@@ -92,6 +107,10 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
   );
   const snapshotSignalsQuery = useSnapshotSignalsQuery(research.id, query);
   const snapshotFacetsQuery = useSnapshotSignalFacetsQuery(research.id, query);
+  const attributeFacetsQuery = useSnapshotAttributeFacetsQuery(
+    research.id,
+    query,
+  );
 
   const handleExtractSignals = async () => {
     if (!latestSnapshot) return;
@@ -107,6 +126,7 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
       await Promise.all([
         snapshotSignalsQuery.refetch(),
         snapshotFacetsQuery.refetch(),
+        attributeFacetsQuery.refetch(),
       ]);
     } catch (error) {
       setExtractError(
@@ -123,6 +143,7 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
 
   const data = snapshotSignalsQuery.data;
   const facets = snapshotFacetsQuery.data;
+  const attributeFacets = attributeFacetsQuery.data;
 
   const handleFacetClick = (
     field: SnapshotSignalFacetField,
@@ -258,6 +279,10 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
         />
       ) : null}
 
+      {attributeFacets ? (
+        <SnapshotAttributeFacetsPanel data={attributeFacets} />
+      ) : null}
+
       {snapshotSignalsQuery.isLoading ? (
         <EmptyState title="Loading signals..." />
       ) : data?.results.length ? (
@@ -352,6 +377,7 @@ const SnapshotSignalsReview: React.FC<SnapshotSignalsReviewProps> = ({
             void Promise.all([
               snapshotSignalsQuery.refetch(),
               snapshotFacetsQuery.refetch(),
+              attributeFacetsQuery.refetch(),
             ]);
           }}
         />
@@ -415,6 +441,48 @@ const SnapshotSignalFacetsPanel: React.FC<{
               </button>
             ))}
             {facets[field]?.length ? null : (
+              <span className="text-label text-text-muted">-</span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+const SnapshotAttributeFacetsPanel: React.FC<{
+  data: SnapshotAttributeFacetsResponse;
+}> = ({ data }) => (
+  <section className="rounded-block border border-border bg-block p-component">
+    <div className="flex items-center justify-between gap-item">
+      <div>
+        <h3 className="text-ui text-text-primary">Semantic attributes</h3>
+        <p className="mt-micro text-label text-text-muted">
+          {data.with_attributes.toLocaleString()} with attributes -{" "}
+          {data.missing_attributes.toLocaleString()} missing
+        </p>
+      </div>
+      <span className="text-label text-text-muted">
+        {data.total_signals.toLocaleString()} signals
+      </span>
+    </div>
+    <div className="mt-component grid gap-component md:grid-cols-2 xl:grid-cols-6">
+      {ATTRIBUTE_FACET_SECTIONS.map(({ field, label }) => (
+        <div key={field} className="min-w-0">
+          <p className="mb-control text-label text-text-muted">{label}</p>
+          <div className="flex flex-col gap-micro">
+            {(data.facets[field] ?? []).slice(0, 8).map((item) => (
+              <div
+                key={`${field}-${item.value}`}
+                className="flex min-h-control-mini items-center justify-between gap-control rounded-control px-control py-micro text-label text-text-secondary"
+              >
+                <span className="min-w-0 truncate">{item.value}</span>
+                <span className="shrink-0 text-text-muted">
+                  {item.count.toLocaleString()}
+                </span>
+              </div>
+            ))}
+            {data.facets[field]?.length ? null : (
               <span className="text-label text-text-muted">-</span>
             )}
           </div>
@@ -530,6 +598,11 @@ const SignalDetailEditor: React.FC<{
           value={formatFieldValue(row.signal.value_connection)}
         />
 
+        <ReadOnlySignalField
+          label="Semantic attributes"
+          value={<SemanticAttributesView row={row} />}
+        />
+
         {row.signal.error ? (
           <ReadOnlySignalField label="Error" value={row.signal.error} />
         ) : null}
@@ -564,6 +637,44 @@ const SignalDetailEditor: React.FC<{
         </div>
       </div>
     </aside>
+  );
+};
+
+const SemanticAttributesView: React.FC<{
+  row: SnapshotSignalRow;
+}> = ({ row }) => {
+  const attributes = row.signal.semantic_attributes ?? {};
+
+  return (
+    <div className="grid gap-control md:grid-cols-2">
+      <AttributeValue label="Platforms" value={attributes.platforms} />
+      <AttributeValue label="Tools" value={attributes.tools} />
+      <AttributeValue label="Delivery" value={attributes.delivery_type} />
+      <AttributeValue label="Action" value={attributes.action_type} />
+      <AttributeValue
+        label="Business function"
+        value={attributes.business_function}
+      />
+      <AttributeValue label="Object" value={attributes.object_type} />
+    </div>
+  );
+};
+
+const AttributeValue: React.FC<{
+  label: string;
+  value?: string | string[];
+}> = ({ label, value }) => {
+  const displayValue = Array.isArray(value)
+    ? value.length
+      ? value.join(", ")
+      : "-"
+    : formatFieldValue(value);
+
+  return (
+    <div>
+      <p className="text-label text-text-muted">{label}</p>
+      <p className="mt-micro text-body text-text-secondary">{displayValue}</p>
+    </div>
   );
 };
 
