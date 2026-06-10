@@ -40,7 +40,6 @@ import SnapshotSignalsReview from "./SnapshotSignalsReview";
 type MarketResearchListProps = {
   records: MarketResearch[];
   onContinue: (record: MarketResearch) => void;
-  onCreateNew: () => void;
 };
 
 const formatDate = (value: string) =>
@@ -66,7 +65,6 @@ const ResearchMetaSeparator = () => (
 const MarketResearchList: React.FC<MarketResearchListProps> = ({
   onContinue,
   records,
-  onCreateNew,
 }) => {
   const [reviewResearch, setReviewResearch] =
     React.useState<MarketResearch | null>(null);
@@ -179,16 +177,6 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
 
   return (
     <PageShell>
-      <div className="flex justify-end">
-        <Button
-          size="sm"
-          variant={hasUnfinishedRecords ? "soft" : "primary"}
-          onClick={onCreateNew}
-        >
-          New research
-        </Button>
-      </div>
-
       {records.length ? (
         <div className="flex flex-col gap-card">
           {unfinishedRecords.length ? (
@@ -218,11 +206,6 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
         <EmptyState
           title="No market research"
           description="Create research from a fresh job snapshot."
-          action={
-            <Button size="sm" onClick={onCreateNew}>
-              New research
-            </Button>
-          }
         />
       )}
     </PageShell>

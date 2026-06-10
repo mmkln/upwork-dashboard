@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  getMarketResearchSetupStatus,
   type MarketResearch,
   useMarketResearchListQuery,
   marketResearchKeys,
@@ -10,6 +11,7 @@ import {
   MarketResearchList,
 } from "../features/marketSignals/components";
 import { Button, EmptyState, PageShell } from "../shared/ui";
+import { useHeaderActions } from "../layout";
 
 const MarketSignalsBoard = () => {
   const marketResearchQuery = useMarketResearchListQuery();
@@ -24,6 +26,32 @@ const MarketSignalsBoard = () => {
   const error = marketResearchQuery.error
     ? (marketResearchQuery.error as Error).message || String(marketResearchQuery.error)
     : "";
+  const hasUnfinishedRecords = useMemo(
+    () =>
+      records.some(
+        (record) => !getMarketResearchSetupStatus(record).isComplete,
+      ),
+    [records],
+  );
+
+  const headerActions = useMemo(() => {
+    if (isLoading || error || isCreating || records.length === 0) return null;
+
+    return (
+      <Button
+        size="sm"
+        variant={hasUnfinishedRecords ? "soft" : "primary"}
+        onClick={() => {
+          setDraftResearch(null);
+          setIsCreating(true);
+        }}
+      >
+        New research
+      </Button>
+    );
+  }, [error, hasUnfinishedRecords, isCreating, isLoading, records.length]);
+
+  useHeaderActions(headerActions);
 
   const refresh = () => {
     void marketResearchQuery.refetch();
@@ -78,10 +106,6 @@ const MarketSignalsBoard = () => {
         records={records}
         onContinue={(record) => {
           setDraftResearch(record);
-          setIsCreating(true);
-        }}
-        onCreateNew={() => {
-          setDraftResearch(null);
           setIsCreating(true);
         }}
       />

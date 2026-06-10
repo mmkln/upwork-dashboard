@@ -24,7 +24,12 @@ import ApiAuthFailureHandler from "./features/auth/ApiAuthFailureHandler";
 import RequireAuth from "./features/auth/RequireAuth";
 import { PageLoadingBar } from "./components/ui";
 import { useIsFetching } from "@tanstack/react-query";
-import { Header, PageContainer, Sidebar } from "./layout";
+import {
+  Header,
+  HeaderActionsProvider,
+  PageContainer,
+  Sidebar,
+} from "./layout";
 import { ThemeProvider } from "./shared/theme";
 import { ToastProvider } from "./shared/toast/ToastProvider";
 
@@ -55,12 +60,14 @@ const AppShell: React.FC = () => (
       <div className="relative flex h-screen bg-background">
         <Sidebar />
         <div className="ml-app-rail flex flex-1 flex-col overflow-hidden">
-          <Header />
-          <div className="flex-1 overflow-y-auto">
-            <PageContainer>
-              <Outlet />
-            </PageContainer>
-          </div>
+          <HeaderActionsProvider>
+            <Header />
+            <div className="flex-1 overflow-y-auto">
+              <PageContainer>
+                <Outlet />
+              </PageContainer>
+            </div>
+          </HeaderActionsProvider>
         </div>
       </div>
     </CollectionsProvider>
