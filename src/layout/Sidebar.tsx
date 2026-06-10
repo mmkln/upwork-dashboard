@@ -1,6 +1,7 @@
 // Sidebar.tsx
 import React from "react";
 import { useLocation } from "react-router-dom";
+import AccountMenu from "./sidebar/AccountMenu";
 import Logo from "./sidebar/Logo";
 import SidebarItem from "./sidebar/SidebarItem";
 import SidebarSection from "./sidebar/SidebarSection";
@@ -19,7 +20,7 @@ const Sidebar: React.FC = () => {
       <div className="flex h-control-xl items-center justify-center border-b border-sidebar-border p-component">
         <Logo />
       </div>
-      <nav className="px-control py-component" aria-label="Primary navigation">
+      <nav className="min-h-0 flex-1 px-control py-component" aria-label="Primary navigation">
         <SidebarSection>
           <SidebarItem
             icon={<DashboardIcon className="w-6 h-6" />}
@@ -66,6 +67,9 @@ const Sidebar: React.FC = () => {
           {/*/>*/}
         </SidebarSection>
       </nav>
+      <div className="border-t border-sidebar-border px-control py-component">
+        <AccountMenu />
+      </div>
     </aside>
   );
 };

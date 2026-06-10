@@ -69,7 +69,8 @@ Compact controls can go smaller only when all of these are true:
 - Use `border-border-subtle` or `border-block-border` only when separation cannot be communicated by spacing, grouped backgrounds, or separators.
 - Keep island/block/control shapes concentric: `rounded-island` outside, `rounded-block` for content blocks, `rounded-control` for controls.
 - Use `rounded-item` for compact rows, chips, avatars, and tooltip shells nested inside larger controls.
-- Use `PageShell` with `max-w-content` for dense application pages instead of page-local `max-w-[...]` values.
+- Use `PageShell` with `max-w-content` for standard application pages instead of page-local `max-w-[...]` values.
+- Use `PageShell width="wide"` / `max-w-wide` only for intentionally wide comparison views, large tables, and board-style workflows.
 - Use `ContentToolbar` for repeated search/filter/pagination rows instead of bordered local toolbar blocks.
 
 ## Practical Patterns

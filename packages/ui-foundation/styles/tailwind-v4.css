@@ -151,7 +151,8 @@
   --spacing-status-trigger: 138px;
   --spacing-status-menu: 180px;
 
-  --container-content: 1440px;
+  --container-content: 1120px;
+  --container-wide: 1440px;
   --container-readable: 768px;
   --container-form: 440px;
   --container-inspector: 420px;

@@ -1,6 +1,5 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import AccountMenu from "./header/AccountMenu";
 
 const PAGE_TITLES: Array<{ path: string; title: string }> = [
   {
@@ -28,15 +27,11 @@ const Header: React.FC = () => {
     PAGE_TITLES[0];
 
   return (
-    <header className="flex h-control-xl shrink-0 items-center justify-between border-b border-separator bg-surface px-panel">
+    <header className="flex h-control-xl shrink-0 items-center bg-surface px-panel">
       <div className="min-w-0">
         <h1 className="truncate text-heading text-text-primary">
           {page.title}
         </h1>
-      </div>
-
-      <div className="flex shrink-0 items-center gap-component">
-        <AccountMenu />
       </div>
     </header>
   );

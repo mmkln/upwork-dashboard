@@ -3,15 +3,27 @@ import { cn } from "../lib/cn";
 
 type PageShellProps = React.HTMLAttributes<HTMLDivElement> & {
   children: React.ReactNode;
+  width?: "content" | "wide" | "full";
 };
+
+const pageWidthClassName = {
+  content: "mx-auto max-w-content",
+  wide: "mx-auto max-w-wide",
+  full: "max-w-none",
+} as const;
 
 const PageShell: React.FC<PageShellProps> = ({
   children,
   className,
+  width = "content",
   ...props
 }) => (
   <div
-    className={cn("mx-auto flex w-full max-w-content flex-col gap-card", className)}
+    className={cn(
+      "flex w-full flex-col gap-card",
+      pageWidthClassName[width],
+      className,
+    )}
     {...props}
   >
     {children}

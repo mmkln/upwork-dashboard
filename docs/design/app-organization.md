@@ -41,6 +41,7 @@ AppShell
 
 - Use a clear outer app gutter before adding extra panels.
 - Keep the main content constrained with `max-w-content` on dense app pages.
+- Use `max-w-wide` only for intentionally wide comparison views, large tables, and board-style workflows that need more scan width than the default content column.
 - Use `max-w-readable` for page title actions, compact metadata, and long text outside the page header.
 - Use `max-w-form` for single-purpose forms like login.
 - Use `grid-cols-inspector` or `max-w-inspector` for list/detail and board/detail layouts.
@@ -101,5 +102,5 @@ AppShell
 
 - Use `PageShell`, `PageHeader`, and `ContentToolbar` from `src/shared/ui` for page-level structure.
 - Use `PageContainer` only as the app-level page gutter, not as a feature-specific layout component.
-- Use semantic layout tokens: `p-app-gutter`, `pt-content-gutter`, `ml-app-rail`, `max-w-content`, `max-w-readable`, `max-w-form`, `max-w-inspector`, `max-w-sheet-sm`, `max-w-sheet-md`, `max-w-modal-lg`, `max-w-modal-xl`, `max-w-viewport-safe`, `max-h-overlay`, `max-h-overlay-body`, `max-h-overlay-detail-body`, `max-w-detail-value`, `max-w-title`, `max-w-chip`, `min-w-table-sm`, `min-w-table-lg`, `min-w-status-trigger`, `min-w-status-menu`, `grid-cols-overview`, `grid-cols-inspector`, `grid-cols-job-detail`, `grid-cols-settings`, `grid-cols-signal-filters`, `w-sidebar-collapsed`, `hover:w-sidebar-expanded`, `min-w-search`, `max-w-search-compact`, `w-number-field`, and `w-popover`.
+- Use semantic layout tokens: `p-app-gutter`, `pt-content-gutter`, `ml-app-rail`, `max-w-content`, `max-w-wide`, `max-w-readable`, `max-w-form`, `max-w-inspector`, `max-w-sheet-sm`, `max-w-sheet-md`, `max-w-modal-lg`, `max-w-modal-xl`, `max-w-viewport-safe`, `max-h-overlay`, `max-h-overlay-body`, `max-h-overlay-detail-body`, `max-w-detail-value`, `max-w-title`, `max-w-chip`, `min-w-table-sm`, `min-w-table-lg`, `min-w-status-trigger`, `min-w-status-menu`, `grid-cols-overview`, `grid-cols-inspector`, `grid-cols-job-detail`, `grid-cols-settings`, `grid-cols-signal-filters`, `w-sidebar-collapsed`, `hover:w-sidebar-expanded`, `min-w-search`, `max-w-search-compact`, `w-number-field`, and `w-popover`.
 - Do not introduce hardcoded widths for repeated layout roles when a semantic token exists.

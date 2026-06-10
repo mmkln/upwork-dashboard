@@ -98,7 +98,8 @@ module.exports = {
         popover: "320px",
       },
       maxWidth: {
-        content: "1440px",
+        content: "1120px",
+        wide: "1440px",
         readable: "768px",
         form: "440px",
         inspector: "420px",

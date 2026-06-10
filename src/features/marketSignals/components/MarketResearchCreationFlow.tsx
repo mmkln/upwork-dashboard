@@ -239,7 +239,7 @@ const MarketResearchCreationFlow: React.FC<MarketResearchCreationFlowProps> = ({
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="mx-auto flex w-full max-w-[640px] flex-col text-left">
+      <div className="mx-auto flex w-full max-w-form flex-col text-left">
         <ResearchCreationHeader
           canCancel={canCancel}
           description={stepDescription}

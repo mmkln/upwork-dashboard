@@ -45,13 +45,13 @@ const AccountMenu: React.FC = () => {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="flex h-target items-center gap-item rounded-control border border-transparent bg-transparent px-item pr-control text-left transition-colors duration-motion-fast ease-motion-standard hover:bg-control-hover focus:outline-none focus:ring-2 focus:ring-ring"
+          className="flex h-target w-full items-center gap-item overflow-hidden rounded-control border border-transparent bg-transparent px-item text-left text-text-secondary transition-colors duration-motion-fast ease-motion-standard hover:bg-control-hover hover:text-text-primary focus:outline-none focus:ring-2 focus:ring-ring"
           aria-label={`Open account menu for ${displayName}`}
         >
-          <span className="flex h-control-small w-control-small items-center justify-center rounded-item bg-premium-blue text-ui text-primary-foreground">
+          <span className="flex h-control-small w-control-small shrink-0 items-center justify-center rounded-item bg-premium-blue text-ui text-primary-foreground">
             {initials}
           </span>
-          <span className="hidden min-w-0 sm:block">
+          <span className="min-w-0 whitespace-nowrap opacity-0 transition-opacity delay-0 duration-motion-fast ease-motion-standard group-hover/sidebar:delay-motion-label group-hover/sidebar:opacity-100">
             <span className="block truncate text-ui text-text-primary">
               {displayName}
             </span>
@@ -62,7 +62,12 @@ const AccountMenu: React.FC = () => {
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-popover">
+      <DropdownMenuContent
+        align="end"
+        className="w-popover"
+        side="right"
+        sideOffset={8}
+      >
         <DropdownMenuLabel className="flex flex-col gap-micro">
           <span className="text-ui text-text-primary">{displayName}</span>
           <span className="text-label text-text-muted">{displayTitle}</span>
