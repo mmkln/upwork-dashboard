@@ -36,7 +36,7 @@ import {
 } from "../features";
 import { instruments } from "../utils";
 import { buildFilterSlug } from "../features/filters/utils/filterSlug.util";
-import { Card, PageHeader, PageShell } from "../shared/ui";
+import { Card, PageShell } from "../shared/ui";
 
 const DASHBOARD_PAGE_SIZE = 2000;
 
@@ -158,26 +158,23 @@ const Dashboard: React.FC = () => {
 
   return (
     <PageShell>
-      <PageHeader
-        title="Dashboard"
-        actions={
-          <JobExportActions
-            jobs={filteredJobs}
-            filterDescriptor={filterSlug}
-            filenamePrefix="dashboard-jobs"
-          />
-        }
-      />
-
-      <FiltersLauncher
-        activeFilters={activeFilters}
-        onFilterChange={onFilterChanged}
-        availableSkills={facets.skills}
-        availableInstruments={availableInstruments}
-        availableStatuses={availableStatuses}
-        availableCollections={collections}
-        collectionNameById={collectionNameById}
-      />
+      <div className="flex min-w-0 items-start justify-between gap-control">
+        <FiltersLauncher
+          activeFilters={activeFilters}
+          onFilterChange={onFilterChanged}
+          availableSkills={facets.skills}
+          availableInstruments={availableInstruments}
+          availableStatuses={availableStatuses}
+          availableCollections={collections}
+          collectionNameById={collectionNameById}
+          className="flex-1"
+        />
+        <JobExportActions
+          jobs={filteredJobs}
+          filterDescriptor={filterSlug}
+          filenamePrefix="dashboard-jobs"
+        />
+      </div>
 
       <JobsSnapshotProgress
         loadedCount={loadedCount}
