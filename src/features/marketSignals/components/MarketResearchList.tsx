@@ -1,6 +1,12 @@
 import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  Clock3,
+  Files,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
 import {
   deleteMarketResearch,
   extractSnapshotSignals,
@@ -26,6 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   EmptyState,
+  IconButton,
   PageShell,
 } from "../../../shared/ui";
 import SnapshotSignalsReview from "./SnapshotSignalsReview";
@@ -41,6 +48,20 @@ const formatDate = (value: string) =>
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+
+const ResearchMetaItem: React.FC<{
+  icon: React.ElementType;
+  children: React.ReactNode;
+}> = ({ icon: Icon, children }) => (
+  <span className="inline-flex min-w-0 items-center gap-micro whitespace-nowrap">
+    <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+    <span className="truncate">{children}</span>
+  </span>
+);
+
+const ResearchMetaSeparator = () => (
+  <span className="h-1 w-1 shrink-0 rounded-full bg-fill-tertiary" aria-hidden="true" />
+);
 
 const MarketResearchList: React.FC<MarketResearchListProps> = ({
   onContinue,
@@ -96,53 +117,62 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
     return (
       <article
         key={record.id}
-        className="flex w-full flex-col gap-item rounded-block bg-block p-component"
+        className="flex w-full flex-col gap-component rounded-block bg-block px-card py-component sm:flex-row sm:items-center sm:justify-between"
       >
-        <span className="flex flex-col gap-control sm:flex-row sm:items-start sm:justify-between">
-          <span className="min-w-0">
-            <span className="block truncate text-ui text-text-primary">
-              {record.title || "Untitled research"}
-            </span>
-            {record.description ? (
-              <span className="mt-micro block text-body text-text-secondary">
-                {record.description}
-              </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-ui font-semibold text-text-primary">
+            {record.title || "Untitled research"}
+          </h3>
+          {record.description ? (
+            <p className="mt-micro truncate text-body text-text-secondary">
+              {record.description}
+            </p>
+          ) : null}
+          <div className="mt-control flex flex-wrap items-center gap-x-control gap-y-micro text-label text-text-muted">
+            <ResearchMetaItem icon={Clock3}>
+              Updated {formatDate(record.updated_at)}
+            </ResearchMetaItem>
+            {snapshots.length ? (
+              <>
+                <ResearchMetaSeparator />
+                <ResearchMetaItem icon={Files}>
+                  {snapshots.length.toLocaleString()} snapshot
+                  {snapshots.length === 1 ? "" : "s"}
+                </ResearchMetaItem>
+              </>
             ) : null}
-          </span>
-          <span className="flex shrink-0 items-center gap-item">
-            <Badge tone={status.isComplete ? "success" : "warning"}>
-              {status.label}
-            </Badge>
-            {!status.isComplete ? (
-              <Button
-                size="sm"
-                variant="soft"
-                onClick={() => onContinue(record)}
-              >
-                Continue setup
-              </Button>
+            {latestSnapshot ? (
+              <>
+                <ResearchMetaSeparator />
+                <ResearchMetaItem icon={BriefcaseBusiness}>
+                  Latest {latestSnapshot.job_ids.length.toLocaleString()} jobs
+                </ResearchMetaItem>
+              </>
             ) : null}
-            {status.isComplete && latestSnapshot ? (
-              <MarketResearchSignalAction
-                record={record}
-                snapshot={latestSnapshot}
-                onReview={() => setReviewResearch(record)}
-              />
-            ) : null}
-            <MarketResearchActionsMenu record={record} />
-          </span>
-        </span>
-        <span className="text-label text-text-muted">
-          Updated {formatDate(record.updated_at)}
-          {snapshots.length
-            ? ` - ${snapshots.length.toLocaleString()} snapshot${
-                snapshots.length === 1 ? "" : "s"
-              }`
-            : ""}
-          {latestSnapshot
-            ? ` - Latest ${latestSnapshot.job_ids.length.toLocaleString()} jobs`
-            : ""}
-        </span>
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-item self-start sm:self-auto sm:justify-end">
+          <Badge tone={status.isComplete ? "success" : "warning"}>
+            {status.label}
+          </Badge>
+          {!status.isComplete ? (
+            <Button
+              size="xs"
+              variant="soft"
+              onClick={() => onContinue(record)}
+            >
+              Continue setup
+            </Button>
+          ) : null}
+          {status.isComplete && latestSnapshot ? (
+            <MarketResearchSignalAction
+              record={record}
+              snapshot={latestSnapshot}
+              onReview={() => setReviewResearch(record)}
+            />
+          ) : null}
+          <MarketResearchActionsMenu record={record} />
+        </div>
       </article>
     );
   };
@@ -229,15 +259,15 @@ const MarketResearchActionsMenu: React.FC<{
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
+          <IconButton
             size="sm"
             variant="ghost"
-            className="h-target w-target rounded-full px-0"
+            className="shrink-0"
             aria-label="Research actions"
             disabled={isDeleting}
           >
-            <MoreHorizontal className="h-icon w-icon" aria-hidden="true" />
-          </Button>
+            <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+          </IconButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-popover">
           <DropdownMenuItem
@@ -248,7 +278,7 @@ const MarketResearchActionsMenu: React.FC<{
               setIsConfirmOpen(true);
             }}
           >
-            <Trash2 className="h-icon-sm w-icon-sm" aria-hidden="true" />
+            <Trash2 className="h-4 w-4" aria-hidden="true" />
             Delete research
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -340,7 +370,7 @@ const MarketResearchSignalAction: React.FC<{
 
   if (snapshotSignalsQuery.isLoading && !snapshotSignalsQuery.data) {
     return (
-      <Button size="sm" variant="soft" disabled>
+      <Button size="xs" variant="soft" disabled>
         Loading signals
       </Button>
     );
@@ -349,12 +379,12 @@ const MarketResearchSignalAction: React.FC<{
   return (
     <span className="flex items-center gap-item">
       {canReview ? (
-        <Button size="sm" variant="soft" onClick={onReview}>
+        <Button size="xs" variant="soft" onClick={onReview}>
           Review signals
         </Button>
       ) : (
         <Button
-          size="sm"
+          size="xs"
           variant="soft"
           disabled={isExtracting}
           onClick={() => {
