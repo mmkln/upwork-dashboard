@@ -1,5 +1,6 @@
 import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import {
   BriefcaseBusiness,
   Clock3,
@@ -35,18 +36,12 @@ import {
   IconButton,
   PageShell,
 } from "../../../shared/ui";
-import SnapshotSignalsReview from "./SnapshotSignalsReview";
+import { formatRelativeTime } from "../../../shared/formatters";
 
 type MarketResearchListProps = {
   records: MarketResearch[];
   onContinue: (record: MarketResearch) => void;
 };
-
-const formatDate = (value: string) =>
-  new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
 
 const ResearchMetaItem: React.FC<{
   icon: React.ElementType;
@@ -66,8 +61,7 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
   onContinue,
   records,
 }) => {
-  const [reviewResearch, setReviewResearch] =
-    React.useState<MarketResearch | null>(null);
+  const navigate = useNavigate();
 
   const { completeRecords, unfinishedRecords } = React.useMemo(
     () =>
@@ -90,23 +84,6 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
   );
   const hasUnfinishedRecords = unfinishedRecords.length > 0;
 
-  if (reviewResearch) {
-    return (
-      <PageShell>
-        <div className="flex justify-start">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setReviewResearch(null)}
-          >
-            Back
-          </Button>
-        </div>
-        <SnapshotSignalsReview research={reviewResearch} />
-      </PageShell>
-    );
-  }
-
   const renderRecord = (record: MarketResearch) => {
     const status = getMarketResearchSetupStatus(record);
     const snapshots = getMarketResearchSnapshots(record);
@@ -128,7 +105,7 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
           ) : null}
           <div className="mt-control flex flex-wrap items-center gap-x-control gap-y-micro text-label text-text-muted">
             <ResearchMetaItem icon={Clock3}>
-              Updated {formatDate(record.updated_at)}
+              {formatRelativeTime(record.updated_at)}
             </ResearchMetaItem>
             {snapshots.length ? (
               <>
@@ -143,7 +120,7 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
               <>
                 <ResearchMetaSeparator />
                 <ResearchMetaItem icon={BriefcaseBusiness}>
-                  Latest {latestSnapshot.job_ids.length.toLocaleString()} jobs
+                  {latestSnapshot.job_ids.length.toLocaleString()} jobs
                 </ResearchMetaItem>
               </>
             ) : null}
@@ -166,7 +143,11 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
             <MarketResearchSignalAction
               record={record}
               snapshot={latestSnapshot}
-              onReview={() => setReviewResearch(record)}
+              onReview={() =>
+                navigate(
+                  `/upwork-dashboard/market-signals/${record.id}/snapshots/${latestSnapshot.id}/review`,
+                )
+              }
             />
           ) : null}
           <MarketResearchActionsMenu record={record} />
