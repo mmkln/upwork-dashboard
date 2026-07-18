@@ -139,6 +139,8 @@ export interface JobQueryParams extends PaginationParams {
   statuses?: string;
   collections?: string;
   experience?: string;
+  created_after?: string;
+  created_before?: string;
   bookmarked?: boolean;
 }
 

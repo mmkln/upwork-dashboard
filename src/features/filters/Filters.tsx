@@ -26,6 +26,8 @@ interface FilterComponentProps {
     selectedCollectionIds: number[],
     selectedExperience: JobExperience[],
     titleFilter: string,
+    createdAfter: string,
+    createdBefore: string,
     bookmarked: boolean,
   ) => void;
   availableSkills: string[];
@@ -106,6 +108,12 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   const [titleFilter, setTitleFilter] = useState<string>(
     initialFilters?.titleFilter ?? "",
   );
+  const [createdAfter, setCreatedAfter] = useState<string>(
+    initialFilters?.createdAfter ?? "",
+  );
+  const [createdBefore, setCreatedBefore] = useState<string>(
+    initialFilters?.createdBefore ?? "",
+  );
   const [bookmarked, setBookmarked] = useState<boolean>(
     initialFilters?.bookmarked ?? false,
   );
@@ -125,6 +133,8 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
     setSelectedCollections(initialFilters.selectedCollectionIds ?? []);
     setSelectedJobExperience(initialFilters.selectedExperience ?? []);
     setTitleFilter(initialFilters.titleFilter ?? "");
+    setCreatedAfter(initialFilters.createdAfter ?? "");
+    setCreatedBefore(initialFilters.createdBefore ?? "");
     setBookmarked(initialFilters.bookmarked ?? false);
   }, [initialFilters]);
 
@@ -164,6 +174,8 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       selectedCollectionIds: selectedCollections,
       selectedExperience: selectedJobExperience,
       titleFilter,
+      createdAfter,
+      createdBefore,
       bookmarked,
       ...nextFilters,
     };
@@ -178,6 +190,8 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
       merged.selectedCollectionIds,
       merged.selectedExperience,
       merged.titleFilter,
+      merged.createdAfter,
+      merged.createdBefore,
       merged.bookmarked,
     );
   };
@@ -199,6 +213,16 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
   const handleTitleFilterChange = (value: string) => {
     setTitleFilter(value);
     emitFilterChange({ titleFilter: value });
+  };
+
+  const handleCreatedAfterChange = (value: string) => {
+    setCreatedAfter(value);
+    emitFilterChange({ createdAfter: value });
+  };
+
+  const handleCreatedBeforeChange = (value: string) => {
+    setCreatedBefore(value);
+    emitFilterChange({ createdBefore: value });
   };
 
   const handleJobTypeChange = (value: JobType) => {
@@ -289,6 +313,22 @@ export const FilterComponent: React.FC<FilterComponentProps> = ({
               </SelectContent>
             </Select>
           </Field>
+
+          <FormField
+            label="Created after"
+            type="date"
+            value={createdAfter}
+            max={createdBefore || undefined}
+            onValueChange={handleCreatedAfterChange}
+          />
+
+          <FormField
+            label="Created before"
+            type="date"
+            value={createdBefore}
+            min={createdAfter || undefined}
+            onValueChange={handleCreatedBeforeChange}
+          />
         </div>
       </FilterSection>
 

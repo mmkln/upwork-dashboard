@@ -246,6 +246,8 @@ const JobList: React.FC = () => {
     selectedCollectionIds: number[],
     selectedExperience: JobExperience[],
     titleFilter: string,
+    createdAfter: string,
+    createdBefore: string,
     bookmarked: boolean,
   ) => {
     const nextFilters: FilterState = {
@@ -258,6 +260,8 @@ const JobList: React.FC = () => {
       selectedCollectionIds,
       selectedExperience,
       titleFilter,
+      createdAfter,
+      createdBefore,
       bookmarked,
     };
     applyFilters(nextFilters);

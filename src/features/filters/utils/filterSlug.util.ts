@@ -21,6 +21,8 @@ export const buildFilterSlug = (
     selectedCollectionIds,
     selectedExperience,
     titleFilter,
+    createdAfter,
+    createdBefore,
     bookmarked,
   } = filters;
 
@@ -67,6 +69,12 @@ export const buildFilterSlug = (
   }
   if (titleFilter.trim()) {
     parts.push(`q-${titleFilter.trim()}`);
+  }
+  if (createdAfter) {
+    parts.push(`from-${createdAfter}`);
+  }
+  if (createdBefore) {
+    parts.push(`to-${createdBefore}`);
   }
   if (bookmarked) {
     parts.push("bookmarked");

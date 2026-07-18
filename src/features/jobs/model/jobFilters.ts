@@ -21,6 +21,8 @@ export const filterJobsByState = (
     filters.selectedCollectionIds,
     filters.selectedExperience,
     filters.titleFilter,
+    filters.createdAfter,
+    filters.createdBefore,
     filters.bookmarked,
   );
 
@@ -35,7 +37,9 @@ export const filterJobs = (
   selectedCollectionIds: number[],
   selectedExperience: JobExperience[],
   titleFilter: string = "",
-  bookmarked: boolean,
+  createdAfter: string = "",
+  createdBefore: string = "",
+  bookmarked: boolean = false,
 ): PreparedUpworkJob[] => {
   const titleQuery = titleFilter.trim();
   const selectedSkillsSet =
@@ -51,6 +55,14 @@ export const filterJobs = (
 
   return jobs.filter((job) => {
     if (titleQuery && !matchesBooleanSearch(job.searchableText, titleQuery)) {
+      return false;
+    }
+
+    const createdDate = job.created_at?.slice(0, 10) ?? "";
+    if (createdAfter && (!createdDate || createdDate < createdAfter)) {
+      return false;
+    }
+    if (createdBefore && (!createdDate || createdDate > createdBefore)) {
       return false;
     }
 

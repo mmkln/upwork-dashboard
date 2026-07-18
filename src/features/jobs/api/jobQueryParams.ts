@@ -47,6 +47,12 @@ export const mapFiltersToJobQuery = (
   if (filters.selectedExperience.length) {
     params.experience = filters.selectedExperience.join(",");
   }
+  if (filters.createdAfter) {
+    params.created_after = filters.createdAfter;
+  }
+  if (filters.createdBefore) {
+    params.created_before = filters.createdBefore;
+  }
   if (filters.bookmarked) {
     params.bookmarked = true;
   }

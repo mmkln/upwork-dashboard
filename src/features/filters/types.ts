@@ -12,6 +12,8 @@ export type FilterState = {
   selectedCollectionIds: number[];
   selectedExperience: JobExperience[];
   titleFilter: string;
+  createdAfter: string;
+  createdBefore: string;
   bookmarked: boolean;
 };
 
@@ -25,5 +27,7 @@ export const DEFAULT_FILTERS: FilterState = {
   selectedCollectionIds: [],
   selectedExperience: [],
   titleFilter: "",
+  createdAfter: "",
+  createdBefore: "",
   bookmarked: false,
 };

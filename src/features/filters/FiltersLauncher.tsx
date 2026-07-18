@@ -27,6 +27,8 @@ type FiltersLauncherProps = {
     selectedCollectionIds: number[],
     selectedExperience: JobExperience[],
     titleFilter: string,
+    createdAfter: string,
+    createdBefore: string,
     bookmarked: boolean,
   ) => void;
   availableSkills: string[];
@@ -91,6 +93,8 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
         nextFilters.selectedCollectionIds,
         nextFilters.selectedExperience,
         nextFilters.titleFilter,
+        nextFilters.createdAfter,
+        nextFilters.createdBefore,
         nextFilters.bookmarked,
       );
     },
@@ -210,6 +214,28 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
           }),
       });
     }
+    if (activeFilters.createdAfter) {
+      list.push({
+        id: "created-after",
+        label: `From: ${activeFilters.createdAfter}`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            createdAfter: DEFAULT_FILTERS.createdAfter,
+          }),
+      });
+    }
+    if (activeFilters.createdBefore) {
+      list.push({
+        id: "created-before",
+        label: `To: ${activeFilters.createdBefore}`,
+        onRemove: () =>
+          applyFilters({
+            ...activeFilters,
+            createdBefore: DEFAULT_FILTERS.createdBefore,
+          }),
+      });
+    }
     if (activeFilters.bookmarked) {
       list.push({
         id: "bookmarked",
@@ -322,6 +348,8 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
                   selectedCollectionIds,
                   selectedExperience,
                   titleFilter,
+                  createdAfter,
+                  createdBefore,
                   bookmarked,
                 ) => {
                   setPendingFilters({
@@ -334,6 +362,8 @@ const FiltersLauncher: React.FC<FiltersLauncherProps> = ({
                     selectedCollectionIds,
                     selectedExperience,
                     titleFilter,
+                    createdAfter,
+                    createdBefore,
                     bookmarked,
                   });
                 }}
