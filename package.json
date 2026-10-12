@@ -11,6 +11,7 @@
     "start:local": "node scripts/start.js local",
     "start:remote": "node scripts/start.js remote",
     "build": "react-scripts build",
+    "postbuild": "node scripts/verify-production-build.js",
     "build:ui-foundation": "npm --workspace @upboard/ui-foundation run build",
     "typecheck:ui-foundation": "npm --workspace @upboard/ui-foundation run typecheck",
     "test": "react-scripts test",
