@@ -49,7 +49,7 @@ const ProfileDetailsSheet: React.FC<ProfileDetailsSheetProps> = ({
         if (!open) onClose();
       }}
     >
-      <SheetContent className="flex flex-col p-0 sm:max-w-[640px]">
+      <SheetContent size="lg" className="flex flex-col p-0">
         {!profile && (
           <SheetHeader className="sr-only">
             <SheetTitle>Freelancer profile</SheetTitle>

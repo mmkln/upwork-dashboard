@@ -221,7 +221,10 @@ const SignalJobDetailPanel: React.FC<SignalJobDetailPanelProps> = ({
         open={isCorrectionOpen}
         onOpenChange={handleCorrectionOpenChange}
       >
-        <SheetContent className="flex w-full max-w-viewport-safe flex-col gap-0 overflow-hidden p-0 sm:max-w-sheet-md">
+        <SheetContent
+          size="md"
+          className="flex w-full max-w-viewport-safe flex-col gap-0 overflow-hidden p-0"
+        >
           <OverlayHeader className="pr-spacious text-left">
             <SheetTitle className="line-clamp-2 text-heading text-text-primary">
               Correct signal

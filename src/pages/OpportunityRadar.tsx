@@ -1110,7 +1110,7 @@ const OpportunityRadar: React.FC = () => {
           if (!open) setInspectorJobId(null);
         }}
       >
-        <SheetContent className="flex w-full max-w-viewport-safe flex-col gap-0 overflow-hidden p-0 sm:max-w-sheet-sm">
+        <SheetContent className="flex w-full max-w-viewport-safe flex-col gap-0 overflow-hidden p-0">
           <OverlayHeader className="pr-spacious text-left">
             <SheetTitle className="line-clamp-3 text-ui text-text-primary">
               {inspectorJob.title}
@@ -1234,7 +1234,10 @@ const OpportunityRadar: React.FC = () => {
           if (!open) closeEditor();
         }}
       >
-        <SheetContent className="flex w-full max-w-viewport-safe flex-col gap-0 overflow-hidden p-0 sm:max-w-sheet-md">
+        <SheetContent
+          size="md"
+          className="flex w-full max-w-viewport-safe flex-col gap-0 overflow-hidden p-0"
+        >
           <OverlayHeader className="pr-spacious text-left">
             <SheetTitle className="text-heading text-text-primary">
               {editorRadar.name || "New Radar"}

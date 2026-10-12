@@ -36,9 +36,9 @@ const sheetVariants = cva(
         top: "inset-x-0 top-0 border-b border-island-border data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
         bottom:
           "inset-x-0 bottom-0 border-t border-island-border data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-        left: "inset-y-0 left-0 h-full w-full max-w-viewport-safe border-r border-island-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sheet-sm",
+        left: "inset-y-0 left-0 h-full w-full max-w-viewport-safe border-r border-island-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
         right:
-          "inset-y-0 right-0 h-full w-full max-w-viewport-safe border-l border-island-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sheet-sm",
+          "inset-y-0 right-0 h-full w-full max-w-viewport-safe border-l border-island-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
       },
     },
     defaultVariants: {
@@ -47,19 +47,33 @@ const sheetVariants = cva(
   },
 )
 
+const sheetSizeClasses = {
+  sm: "sm:max-w-sheet-sm",
+  md: "sm:max-w-sheet-md",
+  lg: "sm:max-w-[640px]",
+} as const
+
+type SheetSize = keyof typeof sheetSizeClasses
+
 interface SheetContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetVariants> {
+  size?: SheetSize
+}
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
+>(({ side = "right", size = "sm", className, children, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
-      className={cn(sheetVariants({ side }), className)}
+      className={cn(
+        sheetVariants({ side }),
+        (side === "left" || side === "right") && sheetSizeClasses[size],
+        className,
+      )}
       {...props}
     >
       {children}
