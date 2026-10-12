@@ -1,5 +1,6 @@
 // Sidebar.tsx
 import React from "react";
+import { Users } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import AccountMenu from "./sidebar/AccountMenu";
 import Logo from "./sidebar/Logo";
@@ -32,6 +33,12 @@ const Sidebar: React.FC = () => {
             icon={<JobsIcon className="w-6 h-6" />}
             label="Jobs"
             link="/upwork-dashboard/jobs"
+            currentPath={location.pathname}
+          />
+          <SidebarItem
+            icon={<Users className="h-6 w-6" />}
+            label="Freelancers"
+            link="/upwork-dashboard/profiles"
             currentPath={location.pathname}
           />
           <SidebarItem

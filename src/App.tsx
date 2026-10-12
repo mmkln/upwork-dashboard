@@ -14,6 +14,7 @@ import {
   Login,
   MarketSignalsBoard,
   OpportunityRadar,
+  ProfilesPage,
 } from "./pages";
 import {
   FiltersProvider,
@@ -89,6 +90,10 @@ function App() {
                   <Route element={<AppShell />}>
                     <Route path="/upwork-dashboard" element={<Dashboard />} />
                     <Route path="/upwork-dashboard/jobs" element={<JobList />} />
+                    <Route
+                      path="/upwork-dashboard/profiles"
+                      element={<ProfilesPage />}
+                    />
                     <Route
                       path="/upwork-dashboard/market-signals"
                       element={<MarketSignalsBoard />}

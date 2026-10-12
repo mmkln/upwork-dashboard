@@ -12,6 +12,10 @@ const PAGE_TITLES: Array<{ path: string; title: string }> = [
     title: "Jobs",
   },
   {
+    path: "/upwork-dashboard/profiles",
+    title: "Freelancers",
+  },
+  {
     path: "/upwork-dashboard/radar",
     title: "Opportunity Radar",
   },
