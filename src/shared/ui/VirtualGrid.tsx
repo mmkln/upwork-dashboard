@@ -35,11 +35,19 @@ const getScrollParent = (element: HTMLElement | null): HTMLElement | Window => {
   return window;
 };
 
-const getColumnCount = (width: number) => {
-  if (width >= 1024) return 4;
-  if (width >= 768) return 3;
-  if (width >= 640) return 2;
-  return 1;
+const MIN_COLUMN_WIDTH = 300;
+const MAX_COLUMN_COUNT = 3;
+
+const getColumnCount = (width: number, gap: number) => {
+  if (width <= 0) return 1;
+
+  return Math.max(
+    1,
+    Math.min(
+      MAX_COLUMN_COUNT,
+      Math.floor((width + gap) / (MIN_COLUMN_WIDTH + gap)),
+    ),
+  );
 };
 
 const getRootRect = (root: HTMLElement | Window) => {
@@ -75,7 +83,7 @@ const VirtualGrid = <T,>({
     endRow: 8,
   });
 
-  const columnCount = getColumnCount(containerWidth);
+  const columnCount = getColumnCount(containerWidth, gap);
   const rowCount = Math.ceil(items.length / columnCount);
   const rowStride = estimateItemHeight + gap;
   const totalHeight =

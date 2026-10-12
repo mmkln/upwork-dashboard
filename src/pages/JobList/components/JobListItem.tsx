@@ -91,9 +91,9 @@ const JobListItem: React.FC<JobListItemProps> = ({
   };
 
   const priceInfo = getPriceInfo(job);
-  const visibleSkills = job.skills.slice(0, 6);
+  const visibleSkills = job.skills.slice(0, 2);
   const hiddenSkillCount = Math.max(0, job.skills.length - visibleSkills.length);
-  const visibleCollections = collectionBadges.slice(0, 2);
+  const visibleCollections = collectionBadges.slice(0, 1);
   const hiddenCollectionCount = Math.max(
     0,
     collectionBadges.length - visibleCollections.length,
@@ -108,72 +108,75 @@ const JobListItem: React.FC<JobListItemProps> = ({
       )}
     >
       <article
-        className="group flex h-full cursor-pointer flex-col gap-card p-card transition-colors duration-motion-fast ease-motion-standard hover:bg-fill-tertiary"
+        className="group flex h-full cursor-pointer flex-col gap-control p-component transition-colors duration-motion-fast ease-motion-standard hover:bg-fill-tertiary"
         onClick={() => onClick(job)}
       >
-        <div className="flex items-start justify-between gap-control">
-          <div className="flex items-center gap-item">
+        <div className="grid min-h-[64px] grid-cols-[minmax(0,1fr)_auto] gap-x-control gap-y-micro">
+          <div className="flex min-w-0 items-center gap-item">
             {onToggleSelect && (
               <Checkbox
                 checked={isSelected}
                 onChange={handleToggleSelect}
                 onClick={(e) => e.stopPropagation()}
                 aria-label={isSelected ? "Deselect job" : "Select job"}
-                className="cursor-pointer transition-transform duration-motion-fast ease-motion-standard hover:scale-110"
+                className="shrink-0 cursor-pointer transition-transform duration-motion-fast ease-motion-standard hover:scale-110"
               />
             )}
-            <div className="flex min-w-0 flex-wrap items-center gap-item text-label text-text-muted">
-              <span className="inline-flex items-center gap-item">
-                <Clock3 className="h-3.5 w-3.5" />
-                {formatRelativeTime(job.created_at)}
+            <span className="inline-flex min-w-0 items-center gap-item whitespace-nowrap text-label text-text-muted">
+              <Clock3 className="h-3.5 w-3.5 shrink-0" />
+              {formatRelativeTime(job.created_at)}
+            </span>
+          </div>
+
+          <div className="inline-flex min-h-control-mini items-center justify-center justify-self-end whitespace-nowrap rounded-full bg-action-muted px-control leading-none">
+            <span className="text-label text-text-primary">
+              {priceInfo.price}
+            </span>
+            {priceInfo.type && (
+              <span className="ml-micro text-label text-text-muted">
+                {priceInfo.type}
               </span>
+            )}
+          </div>
+
+          <div className="flex min-h-control-small items-center">
             {job.connects && (
-              <span className="inline-flex min-h-control-mini items-center justify-center rounded-full bg-surface-muted px-control py-0 leading-none">
+              <span className="inline-flex min-h-control-mini items-center justify-center rounded-full bg-surface-muted px-control leading-none text-label text-text-muted">
                 {parseInt(job.connects)} connects
               </span>
             )}
-            </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-item">
-            <div className="inline-flex min-h-control-mini items-center justify-center rounded-full bg-action-muted px-control py-0 text-right leading-none">
-              <span className="text-label text-text-primary">
-                {priceInfo.price}
-              </span>
-              {priceInfo.type && (
-                <span className="ml-micro text-label text-text-muted">
-                  {priceInfo.type}
-                </span>
-              )}
-            </div>
-            <IconButton
-              type="button"
-              variant="ghost"
-              size="sm"
+          <IconButton
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "justify-self-end transition-colors duration-motion-fast ease-motion-standard",
+              jobData.is_bookmarked ? "text-action" : "text-text-muted",
+            )}
+            title={
+              jobData.is_bookmarked
+                ? "Remove from bookmarks"
+                : "Bookmark job"
+            }
+            aria-label={
+              jobData.is_bookmarked
+                ? "Remove from bookmarks"
+                : "Bookmark job"
+            }
+            onClick={(event) => {
+              event.stopPropagation();
+              handleBookmark();
+            }}
+          >
+            <Bookmark
               className={cn(
-                "transition-opacity duration-motion-fast ease-motion-standard",
-                jobData.is_bookmarked
-                  ? "opacity-100 text-action"
-                  : "opacity-0 group-hover:opacity-100",
+                "h-4 w-4",
+                jobData.is_bookmarked && "fill-current",
               )}
-              title={
-                jobData.is_bookmarked
-                  ? "Remove from bookmarks"
-                  : "Bookmark job"
-              }
-              onClick={(event) => {
-                event.stopPropagation();
-                handleBookmark();
-              }}
-            >
-              <Bookmark
-                className={cn(
-                  "h-4 w-4",
-                  jobData.is_bookmarked && "fill-current",
-                )}
-              />
-            </IconButton>
-          </div>
+            />
+          </IconButton>
         </div>
 
         <div className="flex flex-1 flex-col gap-control">
@@ -181,7 +184,7 @@ const JobListItem: React.FC<JobListItemProps> = ({
             <h3 className="line-clamp-2 min-h-[40px] break-words text-ui text-text-primary">
               {job.title}
             </h3>
-            <p className="line-clamp-3 text-body text-text-secondary">
+            <p className="line-clamp-2 text-body text-text-secondary">
               {job.description || "No description provided."}
             </p>
           </div>
@@ -212,8 +215,8 @@ const JobListItem: React.FC<JobListItemProps> = ({
           </div>
         </div>
 
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-control border-t border-separator pt-component">
-          <div className="flex min-w-0 flex-wrap items-center gap-tag">
+        <div className="mt-auto grid grid-cols-[minmax(0,1fr)_auto] items-center gap-control border-t border-separator pt-control">
+          <div className="flex min-w-0 items-center gap-tag overflow-hidden">
             {visibleCollections.length > 0 ? (
               <>
                 {visibleCollections.map(({ id, name }) => (
@@ -226,7 +229,10 @@ const JobListItem: React.FC<JobListItemProps> = ({
                   </Badge>
                 ))}
                 {hiddenCollectionCount > 0 && (
-                  <Badge tone="neutral" className="text-label text-text-muted">
+                  <Badge
+                    tone="neutral"
+                    className="shrink-0 text-label text-text-muted"
+                  >
                     +{hiddenCollectionCount}
                   </Badge>
                 )}
@@ -236,7 +242,10 @@ const JobListItem: React.FC<JobListItemProps> = ({
             )}
           </div>
 
-          <Badge tone="neutral" className="text-label text-text-secondary">
+          <Badge
+            tone="neutral"
+            className="shrink-0 text-label text-text-secondary"
+          >
             {formatStatus(jobData.status)}
           </Badge>
         </div>

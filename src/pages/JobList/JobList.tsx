@@ -37,7 +37,7 @@ import {
 
 const PAGE_SIZE_OPTIONS = [20, 50, 100, 200, 2000];
 const FACETS_PAGE_SIZE = 2000;
-const JOB_CARD_ESTIMATED_HEIGHT = 320;
+const JOB_CARD_ESTIMATED_HEIGHT = 340;
 
 const sortCollectionsByName = (collections: JobCollection[]) =>
   [...collections].sort((left, right) => left.name.localeCompare(right.name));
@@ -275,7 +275,7 @@ const JobList: React.FC = () => {
   return (
     <PageShell>
       <ContentToolbar className="rounded-none bg-transparent p-0">
-        <div className="flex flex-col gap-component xl:flex-row xl:items-center xl:justify-between">
+        <div className="grid gap-component lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="flex min-w-0 flex-col gap-control lg:flex-row lg:items-center">
             <div className="min-w-0 space-y-micro">
               <p className="text-ui text-text-primary">
@@ -335,7 +335,7 @@ const JobList: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex min-w-0 flex-wrap items-center gap-control xl:justify-end">
+          <div className="flex min-w-0 flex-wrap items-center gap-control lg:justify-self-end">
             <FiltersLauncher
               activeFilters={activeFilters}
               onFilterChange={onFilterChanged}
@@ -350,7 +350,7 @@ const JobList: React.FC = () => {
               emptyLabel={null}
               showButtonIcon
               showCollectionsFilter={false}
-              className="justify-start xl:justify-end"
+              className="justify-start lg:justify-end"
             />
 
             <CollectionsDropdown
