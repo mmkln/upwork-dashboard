@@ -21,7 +21,7 @@ const MarketSignalsBoard = () => {
     null,
   );
 
-  const records = marketResearchQuery.data ?? [];
+  const records: MarketResearch[] = marketResearchQuery.data ?? [];
   const isLoading = marketResearchQuery.isLoading;
   const error = marketResearchQuery.error
     ? (marketResearchQuery.error as Error).message || String(marketResearchQuery.error)
