@@ -113,7 +113,9 @@ function App() {
           </Router>
 
           {/* Devtools — only visible in development */}
-          <ReactQueryDevtools initialIsOpen={false} />
+          {process.env.NODE_ENV === "development" && (
+            <ReactQueryDevtools initialIsOpen={false} />
+          )}
         </ToastProvider>
       </QueryClientProvider>
     </ThemeProvider>
