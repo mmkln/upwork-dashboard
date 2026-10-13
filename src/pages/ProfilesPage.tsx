@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import {
   ProfileCard,
   ProfileDetailsSheet,
+  ProfileExportActions,
   ProfileOrdering,
   useProfiles,
 } from "../features/profiles";
@@ -70,6 +71,13 @@ const ProfilesPage: React.FC = () => {
     [ordering, page, search],
   );
   const profilesQuery = useProfiles(query);
+  const exportQuery = useMemo(
+    () => ({
+      search: search || undefined,
+      ordering,
+    }),
+    [ordering, search],
+  );
   const totalProfiles = profilesQuery.data?.count ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalProfiles / PAGE_SIZE));
   const firstVisible = totalProfiles === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
@@ -118,11 +126,11 @@ const ProfilesPage: React.FC = () => {
                 ? "Loading profiles..."
                 : `${totalProfiles.toLocaleString()} saved profiles`}
             </p>
-            <p className="mt-micro text-label text-text-muted">
-              {profilesQuery.isLoading
-                ? "Preparing your freelancer library"
-                : `Showing ${firstVisible}-${lastVisible} · Page ${page} of ${totalPages}`}
-            </p>
+            {!profilesQuery.isLoading && (
+              <p className="mt-micro text-label text-text-muted">
+                Showing {firstVisible}-{lastVisible} · Page {page} of {totalPages}
+              </p>
+            )}
           </div>
 
           <form className="flex min-w-0 items-center gap-item" onSubmit={submitSearch}>
@@ -151,26 +159,32 @@ const ProfilesPage: React.FC = () => {
             </Button>
           </form>
 
-          <label className="flex items-center gap-item text-ui text-text-secondary xl:justify-self-end">
-            Sort
-            <Select
-              className="w-auto min-w-[168px]"
-              value={ordering}
-              onChange={(event) =>
-                updateParams({
-                  ordering: event.target.value,
-                  page: null,
-                  profile: null,
-                })
-              }
-            >
-              <option value="updated">Recently updated</option>
-              <option value="created">Recently saved</option>
-              <option value="name">Name</option>
-              <option value="rate">Highest rate</option>
-              <option value="success">Highest success</option>
-            </Select>
-          </label>
+          <div className="flex items-center gap-control xl:justify-self-end">
+            <label className="flex items-center gap-item text-ui text-text-secondary">
+              Sort
+              <Select
+                className="w-auto min-w-[168px]"
+                value={ordering}
+                onChange={(event) =>
+                  updateParams({
+                    ordering: event.target.value,
+                    page: null,
+                    profile: null,
+                  })
+                }
+              >
+                <option value="updated">Recently updated</option>
+                <option value="created">Recently saved</option>
+                <option value="name">Name</option>
+                <option value="rate">Highest rate</option>
+                <option value="success">Highest success</option>
+              </Select>
+            </label>
+            <ProfileExportActions
+              query={exportQuery}
+              count={totalProfiles}
+            />
+          </div>
         </div>
       </ContentToolbar>
 

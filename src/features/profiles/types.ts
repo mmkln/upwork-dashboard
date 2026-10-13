@@ -59,3 +59,20 @@ export interface ProfilesQuery {
   country?: string;
   ordering: ProfileOrdering;
 }
+
+export type ProfilesExportQuery = Pick<
+  ProfilesQuery,
+  "search" | "country" | "ordering"
+>;
+
+export interface ProfilesExportPayload {
+  version: number;
+  exported_at: string;
+  count: number;
+  filters: {
+    search: string;
+    country: string;
+    ordering: ProfileOrdering;
+  };
+  profiles: ProfileDetails[];
+}
