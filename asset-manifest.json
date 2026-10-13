@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/upwork-dashboard/static/css/main.e99fe7f7.css",
-    "main.js": "/upwork-dashboard/static/js/main.47695005.js",
+    "main.css": "/upwork-dashboard/static/css/main.7d9531a1.css",
+    "main.js": "/upwork-dashboard/static/js/main.1677ab43.js",
     "static/js/453.6d16c642.chunk.js": "/upwork-dashboard/static/js/453.6d16c642.chunk.js",
     "index.html": "/upwork-dashboard/index.html",
-    "static/media/ub-app-logo.svg": "/upwork-dashboard/static/media/ub-app-logo.956906f56f94778d949a88bb7933b6b7.svg",
-    "main.e99fe7f7.css.map": "/upwork-dashboard/static/css/main.e99fe7f7.css.map",
-    "main.47695005.js.map": "/upwork-dashboard/static/js/main.47695005.js.map",
+    "static/media/ub-app-logo.svg": "/upwork-dashboard/static/media/ub-app-logo.dad52431460e11693ae61df07754f921.svg",
+    "main.7d9531a1.css.map": "/upwork-dashboard/static/css/main.7d9531a1.css.map",
+    "main.1677ab43.js.map": "/upwork-dashboard/static/js/main.1677ab43.js.map",
     "453.6d16c642.chunk.js.map": "/upwork-dashboard/static/js/453.6d16c642.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e99fe7f7.css",
-    "static/js/main.47695005.js"
+    "static/css/main.7d9531a1.css",
+    "static/js/main.1677ab43.js"
   ]
 }
