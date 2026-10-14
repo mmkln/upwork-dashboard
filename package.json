@@ -10,16 +10,18 @@
     "start": "node scripts/start.js",
     "start:local": "node scripts/start.js local",
     "start:remote": "node scripts/start.js remote",
-    "build": "react-scripts build",
+    "build": "node scripts/build.js browser",
+    "build:github-pages": "node scripts/build.js github-pages",
     "postbuild": "node scripts/verify-production-build.js",
+    "postbuild:github-pages": "node scripts/verify-production-build.js",
     "build:ui-foundation": "npm --workspace @upboard/ui-foundation run build",
     "typecheck:ui-foundation": "npm --workspace @upboard/ui-foundation run typecheck",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build:github-pages",
     "deploy": "gh-pages -d build",
-    "deploy:build": "npm run build && gh-pages -d build",
-    "go": "npm run build && gh-pages -d build"
+    "deploy:build": "npm run build:github-pages && gh-pages -d build",
+    "go": "npm run build:github-pages && gh-pages -d build"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

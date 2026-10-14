@@ -1,26 +1,27 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { useHeaderActionsContext } from "./HeaderActionsContext";
+import { ROUTE_PATHS } from "../shared/routing";
 
 const PAGE_TITLES: Array<{ path: string; title: string }> = [
   {
-    path: "/upwork-dashboard/market-signals",
+    path: ROUTE_PATHS.marketSignals,
     title: "Market Signals",
   },
   {
-    path: "/upwork-dashboard/jobs",
+    path: ROUTE_PATHS.jobs,
     title: "Jobs",
   },
   {
-    path: "/upwork-dashboard/profiles",
+    path: ROUTE_PATHS.profiles,
     title: "Freelancers",
   },
   {
-    path: "/upwork-dashboard/radar",
+    path: ROUTE_PATHS.radar,
     title: "Opportunity Radar",
   },
   {
-    path: "/upwork-dashboard",
+    path: ROUTE_PATHS.home,
     title: "Dashboard",
   },
 ];

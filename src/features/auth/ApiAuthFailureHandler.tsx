@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { apiClient, isApiAuthFailureError } from "../../services/apiService";
 import { useAuth } from "./AuthProvider";
+import { ROUTE_PATHS } from "../../shared/routing";
 
-const LOGIN_PATH = "/login";
+const LOGIN_PATH = ROUTE_PATHS.login;
 
 const getRedirectState = (location: ReturnType<typeof useLocation>) => ({
   from: {

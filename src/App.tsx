@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -33,6 +32,7 @@ import {
 } from "./layout";
 import { ThemeProvider } from "./shared/theme";
 import { ToastProvider } from "./shared/toast/ToastProvider";
+import { AppRouter, ROUTE_PATHS } from "./shared/routing";
 
 // TanStack Query (added for clean request management, automatic cancellation, and proper loading states)
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -81,36 +81,36 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
           <GlobalLoadingIndicator />
-          <Router>
+          <AppRouter>
             <AuthProvider>
               <ApiAuthFailureHandler />
               <Routes>
-                <Route path="/login" element={<Login />} />
+                <Route path={ROUTE_PATHS.login} element={<Login />} />
                 <Route element={<RequireAuth />}>
                   <Route element={<AppShell />}>
-                    <Route path="/upwork-dashboard" element={<Dashboard />} />
-                    <Route path="/upwork-dashboard/jobs" element={<JobList />} />
+                    <Route path={ROUTE_PATHS.home} element={<Dashboard />} />
+                    <Route path={ROUTE_PATHS.jobs} element={<JobList />} />
                     <Route
-                      path="/upwork-dashboard/profiles"
+                      path={ROUTE_PATHS.profiles}
                       element={<ProfilesPage />}
                     />
                     <Route
-                      path="/upwork-dashboard/market-signals"
+                      path={ROUTE_PATHS.marketSignals}
                       element={<MarketSignalsBoard />}
                     />
                     <Route
-                      path="/upwork-dashboard/radar"
+                      path={ROUTE_PATHS.radar}
                       element={<OpportunityRadar />}
                     />
                   </Route>
                 </Route>
                 <Route
                   path="*"
-                  element={<Navigate to="/upwork-dashboard" replace />}
+                  element={<Navigate to={ROUTE_PATHS.home} replace />}
                 />
               </Routes>
             </AuthProvider>
-          </Router>
+          </AppRouter>
 
           {/* Devtools — only visible in development */}
           {process.env.NODE_ENV === "development" && (

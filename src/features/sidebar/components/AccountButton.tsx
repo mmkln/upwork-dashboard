@@ -3,6 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../shared/ui";
 import { useAuth } from "../../auth/AuthProvider";
+import { ROUTE_PATHS } from "../../../shared/routing";
 
 const AccountButton: React.FC = () => {
   const navigate = useNavigate();
@@ -14,9 +15,9 @@ const AccountButton: React.FC = () => {
   const handleClick = () => {
     if (user) {
       logout();
-      navigate("/login", { replace: true });
+      navigate(ROUTE_PATHS.login, { replace: true });
     } else {
-      navigate("/login");
+      navigate(ROUTE_PATHS.login);
     }
   };
 

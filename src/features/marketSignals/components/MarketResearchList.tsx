@@ -37,6 +37,7 @@ import {
   PageShell,
 } from "../../../shared/ui";
 import { formatRelativeTime } from "../../../shared/formatters";
+import { getMarketSignalReviewPath } from "../../../shared/routing";
 
 type MarketResearchListProps = {
   records: MarketResearch[];
@@ -145,7 +146,7 @@ const MarketResearchList: React.FC<MarketResearchListProps> = ({
               snapshot={latestSnapshot}
               onReview={() =>
                 navigate(
-                  `/upwork-dashboard/market-signals/${record.id}/snapshots/${latestSnapshot.id}/review`,
+                  getMarketSignalReviewPath(record.id, latestSnapshot.id),
                 )
               }
             />

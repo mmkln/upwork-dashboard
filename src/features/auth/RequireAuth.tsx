@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
+import { ROUTE_PATHS } from "../../shared/routing";
 
 const RequireAuth: React.FC = () => {
   const { token, isLoading } = useAuth();
@@ -15,7 +16,13 @@ const RequireAuth: React.FC = () => {
   }
 
   if (!token) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return (
+      <Navigate
+        to={ROUTE_PATHS.login}
+        state={{ from: location }}
+        replace
+      />
+    );
   }
 
   return <Outlet />;

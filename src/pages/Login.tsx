@@ -2,7 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthProvider";
 import { Button, Card, FormField } from "../shared/ui";
+import { ROUTE_PATHS } from "../shared/routing";
 import ubAppLogo from "../assets/ub-app-logo.svg";
+
+type RedirectLocation = {
+  pathname?: string;
+  search?: string;
+  hash?: string;
+};
 
 const UpboardMark: React.FC = () => (
   <img
@@ -22,9 +29,18 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const from =
-    (location.state as { from?: { pathname?: string } })?.from?.pathname ??
-    "/upwork-dashboard";
+  const redirectLocation = (
+    location.state as { from?: RedirectLocation } | null
+  )?.from;
+  const from = redirectLocation?.pathname
+    ? [
+        redirectLocation.pathname,
+        redirectLocation.search,
+        redirectLocation.hash,
+      ]
+        .filter(Boolean)
+        .join("")
+    : ROUTE_PATHS.home;
 
   useEffect(() => {
     if (token) {

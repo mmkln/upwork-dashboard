@@ -14,6 +14,7 @@ import {
 import { useAuth } from "../../features/auth/AuthProvider";
 import { LogoutIcon } from "../../shared/icons";
 import { useTheme, type ThemeMode } from "../../shared/theme";
+import { ROUTE_PATHS } from "../../shared/routing";
 
 const THEME_OPTIONS: Array<{
   value: ThemeMode;
@@ -37,7 +38,7 @@ const AccountMenu: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login", { replace: true });
+    navigate(ROUTE_PATHS.login, { replace: true });
   };
 
   return (

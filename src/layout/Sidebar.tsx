@@ -12,6 +12,7 @@ import {
   JobsIcon,
   RadarIcon,
 } from "../shared/icons";
+import { ROUTE_PATHS } from "../shared/routing";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -26,31 +27,31 @@ const Sidebar: React.FC = () => {
           <SidebarItem
             icon={<DashboardIcon className="w-6 h-6" />}
             label="Dashboard"
-            link="/upwork-dashboard"
+            link={ROUTE_PATHS.home}
             currentPath={location.pathname}
           />
           <SidebarItem
             icon={<JobsIcon className="w-6 h-6" />}
             label="Jobs"
-            link="/upwork-dashboard/jobs"
+            link={ROUTE_PATHS.jobs}
             currentPath={location.pathname}
           />
           <SidebarItem
             icon={<Users className="h-6 w-6" />}
             label="Freelancers"
-            link="/upwork-dashboard/profiles"
+            link={ROUTE_PATHS.profiles}
             currentPath={location.pathname}
           />
           <SidebarItem
             icon={<ArrowTrendingUpIcon className="w-6 h-6" />}
             label="Signals"
-            link="/upwork-dashboard/market-signals"
+            link={ROUTE_PATHS.marketSignals}
             currentPath={location.pathname}
           />
           <SidebarItem
             icon={<RadarIcon className="w-6 h-6" />}
             label="Radar"
-            link="/upwork-dashboard/radar"
+            link={ROUTE_PATHS.radar}
             currentPath={location.pathname}
           />
           {/*<SidebarItem*/}
@@ -69,7 +70,7 @@ const Sidebar: React.FC = () => {
           {/*    </svg>*/}
           {/*  }*/}
           {/*  label="Collections"*/}
-          {/*  link="/upwork-dashboard"*/}
+          {/*  link={ROUTE_PATHS.home}*/}
           {/*  currentPath={location.pathname}*/}
           {/*/>*/}
         </SidebarSection>
