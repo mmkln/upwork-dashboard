@@ -8,6 +8,7 @@ import {
 import "./App.css";
 
 import {
+  AgenciesPage,
   Dashboard,
   JobList,
   Login,
@@ -93,6 +94,10 @@ function App() {
                     <Route
                       path={ROUTE_PATHS.profiles}
                       element={<ProfilesPage />}
+                    />
+                    <Route
+                      path={ROUTE_PATHS.agencies}
+                      element={<AgenciesPage />}
                     />
                     <Route
                       path={ROUTE_PATHS.marketSignals}

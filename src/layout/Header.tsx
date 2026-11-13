@@ -17,6 +17,10 @@ const PAGE_TITLES: Array<{ path: string; title: string }> = [
     title: "Freelancers",
   },
   {
+    path: ROUTE_PATHS.agencies,
+    title: "Agencies",
+  },
+  {
     path: ROUTE_PATHS.radar,
     title: "Opportunity Radar",
   },

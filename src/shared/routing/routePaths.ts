@@ -3,6 +3,7 @@ export const ROUTE_PATHS = {
   login: "/login",
   jobs: "/jobs",
   profiles: "/profiles",
+  agencies: "/agencies",
   marketSignals: "/market-signals",
   marketSignalReview:
     "/market-signals/:researchId/snapshots/:snapshotId/review",
