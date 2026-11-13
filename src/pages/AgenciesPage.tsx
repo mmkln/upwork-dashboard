@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import {
   AgencyCard,
   AgencyDetailsSheet,
+  AgencyExportActions,
   AgencyOrdering,
   useAgencies,
 } from "../features/agencies";
@@ -68,6 +69,13 @@ const AgenciesPage: React.FC = () => {
     [ordering, page, search],
   );
   const agenciesQuery = useAgencies(query);
+  const exportQuery = useMemo(
+    () => ({
+      search: search || undefined,
+      ordering,
+    }),
+    [ordering, search],
+  );
   const totalAgencies = agenciesQuery.data?.count ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalAgencies / PAGE_SIZE));
   const firstVisible = totalAgencies === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
@@ -152,26 +160,32 @@ const AgenciesPage: React.FC = () => {
             </Button>
           </form>
 
-          <label className="flex items-center gap-item text-ui text-text-secondary xl:justify-self-end">
-            Sort
-            <Select
-              className="w-auto min-w-[168px]"
-              value={ordering}
-              onChange={(event) =>
-                updateParams({
-                  ordering: event.target.value,
-                  page: null,
-                  agency: null,
-                })
-              }
-            >
-              <option value="updated">Recently updated</option>
-              <option value="created">Recently saved</option>
-              <option value="name">Name</option>
-              <option value="success">Highest success</option>
-              <option value="earned">Highest earnings</option>
-            </Select>
-          </label>
+          <div className="flex items-center gap-control xl:justify-self-end">
+            <label className="flex items-center gap-item text-ui text-text-secondary">
+              Sort
+              <Select
+                className="w-auto min-w-[168px]"
+                value={ordering}
+                onChange={(event) =>
+                  updateParams({
+                    ordering: event.target.value,
+                    page: null,
+                    agency: null,
+                  })
+                }
+              >
+                <option value="updated">Recently updated</option>
+                <option value="created">Recently saved</option>
+                <option value="name">Name</option>
+                <option value="success">Highest success</option>
+                <option value="earned">Highest earnings</option>
+              </Select>
+            </label>
+            <AgencyExportActions
+              query={exportQuery}
+              count={totalAgencies}
+            />
+          </div>
         </div>
       </ContentToolbar>
 

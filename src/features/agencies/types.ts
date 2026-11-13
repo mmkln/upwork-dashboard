@@ -65,3 +65,19 @@ export interface AgenciesQuery {
   search?: string;
   ordering: AgencyOrdering;
 }
+
+export type AgenciesExportQuery = Pick<
+  AgenciesQuery,
+  "search" | "ordering"
+>;
+
+export interface AgenciesExportPayload {
+  version: number;
+  exported_at: string;
+  count: number;
+  filters: {
+    search: string;
+    ordering: AgencyOrdering;
+  };
+  agencies: AgencyDetails[];
+}
